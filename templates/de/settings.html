@@ -97,21 +97,28 @@
 										$( "#cam_user_url" ).html($( "#cam_user").val());
 										$( "#cam_pass_url" ).html($( "#cam_pass").val());
 
-										$( "#btntest" ).css('visibility', 'hidden'); $(
-										"#cam_model").change(function()  { 	$( "#cam_path" ).html(
-										$( "#cam_model").val() ); }); $( "#cam_host_or_ip"
-										).keyup(function( event ) { $( "#cam_host_or_ip_url"
-										).html($( "#cam_host_or_ip").val()); $( "#btntest"
-										).css('visibility', 'visible')}); $( "#cam_user"
-										).keyup(function( event ) { $( "#cam_user_url" ).html($(
-										"#cam_user").val()); $( "#btntest" ).css('visibility',
-										'visible')}); $( "#cam_pass" ).keyup(function( event ) { $(
-										"#cam_pass_url" ).html($( "#cam_pass").val()); $( "#btntest"
-										).css('visibility', 'visible')}); $( "#btntest" ).click(
-										function () { url2open = "http://<!--$self_host--><!--
-										$plugin_script-->?kamera=" + $( "#cam_host_or_ip").val() +
-										$( "#cam_model").val()  + "&user=" + 	 $( "#cam_user").val()
-										+ "&pass=" + $( "#cam_pass").val(); window.open(url2open,
-										'Cam-
-										Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,men
-										ubar=no,location=no');}); </script>
+										$( "#btntest" ).css('visibility', 'hidden'); 
+										$("#cam_model").change(function()  
+										{ 	
+											$( "#cam_path" ).html($( "#cam_model").val() ); 
+										}); 
+										$( "#cam_host_or_ip").keyup(function( event ) 
+										{ 
+											$( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val()); 
+											$( "#btntest" ).css('visibility', 'visible')
+										}); 
+										$( "#cam_user" ).keyup(function( event ) 
+										{ 
+											$( "#cam_user_url" ).html($("#cam_user").val()); 
+											$( "#btntest" ).css('visibility','visible')
+										}); 
+										$( "#cam_pass" ).keyup(function( event ) 
+										{ 
+											$("#cam_pass_url" ).html($( "#cam_pass").val()); 
+											$( "#btntest" ).css('visibility', 'visible')
+										}); 
+										$( "#btntest" ).click(function () 
+										{ 
+											url2open = "http://<!--$self_host--><!--$plugin_script-->?kamera=" + $( "#cam_host_or_ip").val() + $( "#cam_model").val()  + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val(); window.open(url2open,'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
+										}); 
+									</script>
