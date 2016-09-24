@@ -1,6 +1,13 @@
 <font size="-1">
-	<p>
-		Dieses Plugin hat nur die Konfigurationseinstellung,
-		ob ein Wasserzeichen in der Ecke gew&uuml;nscht ist.
-	</p>
+	<p><b>Mit LoxBerry Wasserzeichen:</b> Aktiviert ein LoxBerry Wasserzeichen in der unteren linken Ecke.</p>
+	<p><b>eMail mit Kamerabild versenden:</b> Sendet eine eMail mit dem Kamerabild, wenn das Plugin aufgerufen wird.</p>
+	<ul>
+		<li><b>Empf&auml;ngerliste:</b> eMail-Adressen der Empf&auml;nger. Mehrere Empf&auml;nger durch ; trennen.</li>
+		<li><b>Absendername:</b> Name des Absenders. Nicht die eMail-Adresse. Die Einstellungen zum Absender werden im LoxBerry Hauptmen&uuml; unter <a target="_blank" href="/admin/system/mailserver.cgi?do=form">Mailserver</a> vorgenommen.</li>
+		<li><b>Betreff:</b> Die Betreffzeile der eMail. Bestehend aus mehreren Teilen. Das 2. Feld wird als Datum und das 4. Feld als Zeit formatiert. Details siehe <a target="_blank" href="http://php.net/manual/de/function.date.php">PHP-Onlinehilfe</a></li>
+		<li><b>Text:</b> Text der eMail. HTML ist erlaubt. Details siehe <a target="_blank" href="https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML-Onlinehilfe</a>. Zeilenumbr&uuml;che mit <font face="monospace"><big><b>&#x3C;br/&#x3E;</b></big></font></li>
+		<li><b>Kamerabild nicht als Anhang sondern direkt in der eMail:</b> Sendet das Kamerabild nicht als Anhang sondern f&uumlgt es unter dem Text vor der Signatur ein.</li>
+		<li><b>eMail-Empf&auml;nger bei Plugin-Aufruf ermitteln:</b> Beim Aufruf des Plugins aus der Loxone Config wird die Empf&auml;nger-eMailadresse mit <font face="monospace"><big><b>&email_to=ich@email.de</b></big></font> &uuml;bergeben.</li>
+		<li><b>Signatur:</b> Die eMail-Signatur. HTML ist auch hier erlaubt.</li>
+  </ul>
 </font>

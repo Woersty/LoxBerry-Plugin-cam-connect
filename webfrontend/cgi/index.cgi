@@ -23,6 +23,8 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI qw/:standard/;
 use Config::Simple;
 use File::HomeDir;
+use HTML::Entities;
+use Data::Dumper;
 use Cwd 'abs_path';
 use warnings;
 use strict;
@@ -51,12 +53,13 @@ my  $subfolder;
 my  $cgi = new CGI;
 our $languagefileplugin;
 our $phraseplugin;
+our @language_strings;
+our @pluginconfig_strings;
 our $self_host;
 our $plugin_script;
 our $plugin_cfg;
-our $plugin_watermark;
+our $WATERMARK;
 our $saveformdata;
-our $plugin_watermark_label;
 our $plugin_name;
 our $message;
 our $nexturl;
@@ -65,13 +68,26 @@ our $pluginconfigfile;
 our $cam_model_list;
 our @lines;
 our $psubfolder;
-
+our $EMAIL_USED=0;
+our $EMAIL_TO=0;
+our $EMAIL_INLINE=1;
+our $EMAIL_BODY="";
+our $EMAIL_SIGNATURE="";
+our $EMAIL_SUBJECT1="";
+our $EMAIL_SUBJECT2="";
+our $EMAIL_SUBJECT3="";
+our $EMAIL_DATE_FORMAT="";
+our $EMAIL_TIME_FORMAT="";
+our $EMAIL_FROM_NAME="";
+our $EMAIL_RECIPIENTS="";
+our $EMAIL_FILENAME="Snapshot";
+our $error;
 ##########################################################################
 # Read Settings
 ##########################################################################
 
 # Version of this script
-$version = "0.0.3";
+$version = "0.0.4";
 
 # Figure out in which subfolder we are installed
 $psubfolder = abs_path($0);
@@ -87,12 +103,50 @@ $lang             = $cfg->param("BASE.LANG");
 if (!-r $pluginconfigfile) 
 {
 	mkdir $pluginconfigdir unless -d $pluginconfigdir; # Check if dir exists. If not create it.
-	open my $configfileHandle, ">>", "$pluginconfigfile" or die "Can't open '$pluginconfigfile'\n";
-	print $configfileHandle "WATERMARK=1\n";
+	open my $configfileHandle, ">", "$pluginconfigfile" or die "Can't create '$pluginconfigfile'\n";
+	print $configfileHandle 'WATERMARK=1'."\n";
+	print $configfileHandle 'EMAIL_USED=0'."\n";
+	print $configfileHandle 'EMAIL_INLINE=0'."\n";
+	print $configfileHandle 'EMAIL_TO=0'."\n";
+	print $configfileHandle 'EMAIL_BODY=Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.'."\n";
+	print $configfileHandle 'EMAIL_SIGNATURE=--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry'."\n";
+	print $configfileHandle 'EMAIL_SUBJECT1=Es wurde am '."\n";
+	print $configfileHandle 'EMAIL_SUBJECT2= um '."\n";
+	print $configfileHandle 'EMAIL_SUBJECT3= geklingelt!'."\n";
+	print $configfileHandle 'EMAIL_DATE_FORMAT=d.m.Y'."\n";
+	print $configfileHandle 'EMAIL_TIME_FORMAT=H:i:s \U\h\r '."\n";
+	print $configfileHandle 'EMAIL_FROM_NAME=LoxBerry'."\n";
+	print $configfileHandle 'EMAIL_RECIPIENTS=noreply@loxberry.de;invalid@loxberry.de'."\n";
+	print $configfileHandle 'EMAIL_FILENAME=Snapshot'."\n";
 	close $configfileHandle;
 }
-  $plugin_cfg       = new Config::Simple($pluginconfigfile);
-	$plugin_watermark = $plugin_cfg->param("WATERMARK");
+
+# Read configfile
+if (open(my $fh, '<', $pluginconfigfile)) 
+{
+  while (my $row = <$fh>) 
+  {
+    chomp $row;
+		foreach ($row)
+		{
+			if ( substr(($row),0,1) eq ";" )
+			{
+				# Ignore comments
+			}
+			else
+			{
+				my @configs = split /=/, $_,2;
+		  	${@configs[0]} = $configs[1];
+				push @pluginconfig_strings, @configs[0];
+			}
+		}
+  }
+}
+else
+{
+	$error = "Could not open Plugin Configfile";
+	&error; 
+}
 
 # Everything from URL
 foreach (split(/&/,$ENV{'QUERY_STRING'})){
@@ -102,19 +156,6 @@ foreach (split(/&/,$ENV{'QUERY_STRING'})){
   $value =~ tr/+/ /;
   $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
   $query{$namef} = $value;
-}
-
-if ( param('plugin_watermark') )
-{
-	$plugin_watermark = param('plugin_watermark');
-	if ($plugin_watermark eq "on" || $plugin_watermark eq "1" || $plugin_watermark eq "true") 
-	{
-		$plugin_watermark = 1;
-	}
-	else
-	{
-		$plugin_watermark = 0;
-  }
 }
 
 ##########################################################################
@@ -136,12 +177,19 @@ if (!-e "$installfolder/templates/system/$lang/language.dat") {
   $lang = "de";
 }
 
-# Read translations / phrases
+# Read system translations / phrases
 $languagefile = "$installfolder/templates/system/$lang/language.dat";
 $phrase = new Config::Simple($languagefile);
 
+# Read plugin translations / phrases
 $languagefileplugin = "$installfolder/templates/plugins/$psubfolder/$lang/language.dat";
 $phraseplugin = new Config::Simple($languagefileplugin);
+# Create @language_strings array with all known phrase-names
+foreach (keys$phraseplugin->vars())
+{
+	(my $cfg_section,my $cfg_varname) = split(/\./,$_,2);
+	push @language_strings, $cfg_varname;
+}
 
 $template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("TXT0000");
 $self_host =$cgi->server_name();
@@ -151,15 +199,19 @@ $plugin_script = "/plugins/$psubfolder/";
 # Plugin Settings
 ##########################################################################
 
-if ($plugin_watermark eq 1 || $plugin_watermark eq "on" || $plugin_watermark eq "true") 
+# Process checkboxes
+foreach my $parameter_to_process ('WATERMARK','EMAIL_USED','EMAIL_INLINE')
 {
-    $plugin_watermark      	 = '$("#plugin_watermark").prop("checked", 1);';
-    $plugin_watermark_label    = $phraseplugin->param("TXT0003");    
-}
-else
-{
-    $plugin_watermark      	 = '$("#plugin_watermark").prop("checked", 0);';
-    $plugin_watermark_label    = $phraseplugin->param("TXT0003");    
+	if ( int(${$parameter_to_process}) eq 1 ) 
+	{
+	    ${$parameter_to_process."_script"} = '$("#'.$parameter_to_process.'_checkbox").prop("checked", 1);';
+	    ${$parameter_to_process} = 1;
+	}
+	else
+	{
+	    ${$parameter_to_process."_script"} = '$("#'.$parameter_to_process.'_checkbox").prop("checked", 0);';
+	    ${$parameter_to_process} = 0;
+	}
 }
 
 $plugin_name = $phraseplugin->param("TXT0000");
@@ -192,29 +244,20 @@ $plugin_name = $phraseplugin->param("TXT0000");
 		if ($saveformdata == 1)
 		{
 		# Write configuration file
-		if ( param('plugin_watermark') )
+
+		open my $configfileHandle, ">", "$pluginconfigfile" or die "Can't create '$pluginconfigfile'\n";
+		foreach my $parameter_to_write (@pluginconfig_strings)
 		{
-		$plugin_watermark = param('plugin_watermark');
-		if ($plugin_watermark eq "on" || $plugin_watermark eq "1" || $plugin_watermark eq "true") 
-		{
-			$plugin_watermark = 1;
+			print $configfileHandle $parameter_to_write.'='.param($parameter_to_write)."\n";
 		}
-		else
-		{
-			$plugin_watermark = 0;
-		}
-		}
-		else
-		{
-		$plugin_watermark = 0;
-		}
+		close $configfileHandle;
 		
-		$plugin_cfg->param("WATERMARK", "$plugin_watermark");
-		$plugin_cfg->save();
+		
+		
 		
 		print "Content-Type: text/html\n\n";
-		$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("TXT0000");;
-		$message = $phraseplugin->param("TXT0004");
+		$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME");;
+		$message = $phraseplugin->param("CFG_SAVED");
 		$nexturl = "javascript:history.back();";
 		
 		# Print Template
@@ -250,9 +293,7 @@ close(F);
 foreach (@lines){
   s/[\n\r]//g;
   our @cams = split /\|/, $_;
-    $cam_model_list = "$cam_model_list\n<option value=\"$cams[2]\">$cams[0] - $cams[1]</option>\n";
-   # $cam_model_list = "$cam_model_list\n\"$cams[0] - $cams[1]\"\n";
-
+    $cam_model_list = "$cam_model_list\n<option value=\"$cams[0]\">$cams[1] $cams[2]</option>\n";
 }
 
 
@@ -261,6 +302,12 @@ print "Content-Type: text/html\n\n";
 # Print Template
 &lbheader;
 
+# Parse the strings we want
+foreach our $template_string (@language_strings)
+{
+		${$template_string} = $phraseplugin->param($template_string);
+}
+	
 open(F,"$installfolder/templates/plugins/$psubfolder/$lang/settings.html") || die "Missing template plugins/cam-connect/$lang/settings.html";
   while (<F>) {
     $_ =~ s/<!--\$(.*?)-->/${$1}/g;

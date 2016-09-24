@@ -1,6 +1,13 @@
 <font size="-1">
-	<p>
-		This plugin has just the setting, whether
-		a watermark is wanted in the corner.
-	</p>
+	<p><b>With LoxBerry watermark:</b> Prints a LoxBerry watermark in the left lower corner.</p>
+	<p><b>Send eMail with picture:</b> Sends an eMail with the camera picture if the Plugin is called.</p>
+	<ul>
+		<li><b>Recipient list:</b> eMail-Address of the der recipients. Multiple separated by semicolon.</li>
+		<li><b>Sender name:</b> Name but not eMail-Address of the sender. The settings for the sender are made in the LoxBerry Mainmenu under <a target="_blank" href="/admin/system/mailserver.cgi?do=form">Mailserver</a>.</li>
+		<li><b>Subject:</b> The subject line of the eMail. Consists of multiple parts. The 2nd fiels is treated as date and the 4th as time. Details see <a target="_blank" href="http://php.net/manual/en/function.date.php">PHP-Onlinehelp</a></li>
+		<li><b>Text:</b> eMail text. HTML is allowed. Details see <a target="_blank" href="https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML-Onlinehelp</a>. Line breaks with <font face="monospace"><big><b>&#x3C;br/&#x3E;</b></big></font></li>
+		<li><b>Picture not as attachment but inline:</b> Sends the Camera picture not as an attachment but put it under the text before the signature.</li>
+		<li><b>Get eMail recipients from request URL:</b> When calling the plugin from Loxone Config, the recipients-eMailaddress it submitted with <font face="monospace"><big><b>&email_to=me@email.com</b></big></font>.</li>
+		<li><b>Signature:</b> eMail-Signature. HTML is allowed here too.</li>
+  </ul>
 </font>

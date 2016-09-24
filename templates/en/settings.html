@@ -1,38 +1,140 @@
 									<center>
-										<table border=0 cellpadding=10>
-											<tr>
-												<td align="right"><img src="/plugins/cam-connect/cam.png"></td>
-												<td><b>Configuration Settings for the <!--$plugin_name--> Plugin</b></td>
-												<td></td>
-											</tr>
-											<tr>
-												<td colspan="3">
-													<form method="post" data-ajax="false" name="main_form" id="main_form" action="./index.cgi">
-														<label><input type="checkbox" id="plugin_watermark" name="plugin_watermark"><!--$plugin_watermark_label--></label>
-													 	<script><!--$plugin_watermark--></script>
+										<span><img src="/plugins/cam-connect/cam.png"><b><!--$LOGO_TEXT--></b>
+										<form method="post" data-ajax="false" name="main_form" id="main_form" action="./index.cgi">
+											<table border=0 cellpadding=0 width="90%">
+												<tr>
+													<td colspan="3">
+														<input onclick="chk_boxes()" type="checkbox" id="WATERMARK_checkbox" name="WATERMARK_checkbox"><label for="WATERMARK_checkbox"><!--$WATERMARK_TEXT--></label>
+														<script><!--$WATERMARK_script--></script>
+														<input id="WATERMARK" name="WATERMARK" type="hidden" value="<!--$WATERMARK-->">
+													</td>
+												</tr>
+												<tr>
+													<td colspan="3">
+														<input onclick="chk_boxes()" type="checkbox" id="EMAIL_USED_checkbox" name="EMAIL_USED_checkbox"><label title="This button won't do anything" for="EMAIL_USED_checkbox"><!--$EMAIL_USED_TEXT--></label>
+														<script><!--$EMAIL_USED_script--></script>
+														<input id="EMAIL_USED" name="EMAIL_USED" type="hidden" value="<!--$EMAIL_USED-->">
+													</td>
+												</tr>
+											</table>
+											<div id="cam_connect_email_used">
+												<table width="90%" style="padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(255,255,192,.2);">
+													<tr>
+														<td align="right">
+															<nobr><!--$EMAIL_RECIPIENTS_TEXT--></nobr>
+														</td>
+														<td width="100%">
+															<input id="EMAIL_RECIPIENTS" name="EMAIL_RECIPIENTS" type="text" data-validation="length letternumeric" data-validation-length="Min5"
+																data-validation-allowing="-_ </>@.;:." class="textfield" value="<!--$EMAIL_RECIPIENTS-->" data-validation-error-msg="<!--$EMAIL_RECIPIENTS_VALIDATION-->">
+															<input type="hidden" name="EMAIL_FILENAME" value="<!--$EMAIL_FILENAME-->">
+														</td>
+														<td align="right">
+															<nobr><!--$EMAIL_RECIPIENTS_INFO--></nobr>
+														</td>
+													</tr>
+													<tr>
+														<td align="right">
+															<nobr><!--$EMAIL_FROM_NAME_TEXT--></nobr>
+														</td>
+														<td>
+															<input id="EMAIL_FROM_NAME" name="EMAIL_FROM_NAME" type="text" data-validation-optional="false" data-validation="length letternumeric" data-validation-length="Min1"
+																data-validation-allowing="-_ " class="textfield" value="<!--$EMAIL_FROM_NAME-->" data-validation-error-msg="* <!--$EMAIL_FROM_NAME_VALIDATION-->">
+														</td>
+														<td align="right">
+															<nobr><!--$EMAIL_FROM_NAME_INFO--></nobr>
+														</td>
+													</tr>
+													<tr>
+														<td align="right">
+															<nobr><!--$EMAIL_SUBJECT_TEXT--></nobr>
+														</td>
+														<td colspan="2">
+															<table width="100%">
+																<tr>
+																	<td>
+																		<input id="EMAIL_SUBJECT1" name="EMAIL_SUBJECT1" type="text" data-validation="length letternumeric" data-validation-length="Max60" data-validation-optional="true" data-validation-allowing=",!.;:-_/\\ ()" class="textfield" value="<!--$EMAIL_SUBJECT1-->" data-validation-error-msg="<!--$EMAIL_SUBJECT1_VALIDATION-->">
+																	</td>
+																	<td>
+																		<input id="EMAIL_DATE_FORMAT" name="EMAIL_DATE_FORMAT" type="text" data-validation="length alphanumeric" data-validation-length="Max20" data-validation-allowing="-_:.,/\\ " data-validation-optional="true" data-validation-allowing="-_ :\." class="textfield" value="<!--$EMAIL_DATE_FORMAT-->" data-validation-error-msg="<!--$EMAIL_DATE_FORMAT_VALIDATION-->">
+																	</td>
+																	<td>
+																		<input id="EMAIL_SUBJECT2" name="EMAIL_SUBJECT2" type="text" data-validation="length letternumeric" data-validation-length="Max60" data-validation-optional="true" data-validation-allowing=",!.;:-_/\\ ()" class="textfield" value="<!--$EMAIL_SUBJECT2-->" data-validation-error-msg="<!--$EMAIL_SUBJECT2_VALIDATION-->">
+																	</td>
+																	<td>
+																		<input id="EMAIL_TIME_FORMAT" name="EMAIL_TIME_FORMAT" type="text" data-validation="length alphanumeric" data-validation-length="Max20" data-validation-allowing="-_:.,/\\ " data-validation-optional="true" data-validation-allowing="-_ :\." class="textfield" value="<!--$EMAIL_TIME_FORMAT-->" data-validation-error-msg="<!--$EMAIL_TIME_FORMAT_VALIDATION-->">
+																	</td>
+																	<td>
+																		<input id="EMAIL_SUBJECT3" name="EMAIL_SUBJECT3" type="text" data-validation="length letternumeric" data-validation-length="Max60" data-validation-optional="true" data-validation-allowing=",!.;:-_/\\ ()" class="textfield" value="<!--$EMAIL_SUBJECT3-->" data-validation-error-msg="<!--$EMAIL_SUBJECT3_VALIDATION-->">
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+													<tr>
+														<td align="right">
+															<nobr><!--$EMAIL_BODY_TEXT--></nobr>
+														</td>
+														<td colspan="2">
+															<input id="EMAIL_BODY" name="EMAIL_BODY" type="text" data-validation="length letternumeric" data-validation-length="Max1000" data-validation-allowing="-_ </>&;:.,?!" class="textfield" value="<!--$EMAIL_BODY-->" data-validation-error-msg="<!--$EMAIL_BODY_VALIDATION-->">
+														</td>
+													</tr>
+													<tr>
+														<td>
+														</td>
+														<td colspan="2">
+															<table border=0 cellpadding=0 width="100%">
+																<tr>
+																	<td width="50%">
+																		<input onclick="chk_boxes()" type="checkbox" id="EMAIL_INLINE_checkbox" name="EMAIL_INLINE_checkbox"><label for="EMAIL_INLINE_checkbox"><!--$EMAIL_INLINE_TEXT--></label>
+																		<script><!--$EMAIL_INLINE_script--></script>
+																		<input id="EMAIL_INLINE" name="EMAIL_INLINE" type="hidden" value="<!--$EMAIL_INLINE-->">
+																	</td>
+																	<td>
+																		<input onclick="chk_boxes()" type="checkbox" id="EMAIL_TO_checkbox" name="EMAIL_TO_checkbox"><label for="EMAIL_TO_checkbox"><!--$EMAIL_TO_TEXT--> <small><a onclick="display_info('<!--$EMAIL_TO_EXPLAIN_TEXT-->');"><!--$EMAIL_TO_HELP_TEXT--></a></small></label>
+																		<script><!--$EMAIL_TO_script--></script>
+																		<input id="EMAIL_TO" name="EMAIL_TO" type="hidden" value="<!--$EMAIL_TO-->">
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+													<tr>
+														<td align="right">
+															<nobr><!--$EMAIL_SIGNATURE_TEXT--></nobr>
+														</td>
+														<td colspan="2">
+															<input id="EMAIL_SIGNATURE" name="EMAIL_SIGNATURE" type="text" data-validation="length letternumeric" data-validation-length="Max256" data-validation-allowing="-_ </>&;:.,?!+()</>&;:.,#" class="textfield" value="<!--$EMAIL_SIGNATURE-->" data-validation-error-msg="<!--$EMAIL_SIGNATURE_VALIDATION-->">
+														</td>
+													</tr>
+												</table>
+											</div>
+											<div id="form-error-message" class="form-error-message"></div>
+											<table border=0 cellpadding=0 width="90%">
+												<tr>
+													<td colspan="3" width="100%" >
 														<center>
-															<a id="btncancel" data-role="button" data-inline="true" data-mini="true" data-icon="delete" href="/admin/index.cgi">Cancel</a>
+															<a id="btncancel" data-role="button" data-inline="true" data-mini="true" data-icon="delete" href="/admin/index.cgi"><!--$CANCEL_TEXT--></a>
 															<input type="hidden" name="saveformdata" value="1">
 															<input type="hidden" name="lang" value="<!--$lang-->">
-															<button type="submit" form="main_form" id="btnsubmit" data-role="button" data-inline="true" data-mini="true" data-icon="check">Save</button>
+															<button type="submit" form="main_form" id="btnsubmit" data-role="button" data-inline="true" data-mini="true" data-icon="check"><!--$SAVE_TEXT--></button>
 														</center>
-													</form>
-												</td>
-											</tr>
+													</td>
+												</tr>
+											</table>
+										</form>
+										<table width="75%" border=0>
 											<tr>
-												<td colspan="3" width="100%" >
+												<td colspan="3" >
 													<hr>
-													This page can help you to find the correct URL for your Loxone Config Parameter of the Loxone Intercom Object.
+													<!--$URL_HELPER_SECTION_TEXT-->
 												</td>
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_host_or_ip">
-														Cam-IP-Address or Hostname:<br/><small><i>Please enter the port only if different from 80.
-													</label>
+													<label id="label_cam_host_or_ip"><!--$CAM_HOST_TEXT--></label>
 												</td>
 												<td>
-													<input id="cam_host_or_ip" name="cam_host_or_ip" type="text" class="textfield" value="Camera-Hostname:80">
+													<input style="width:500px" id="cam_host_or_ip" name="cam_host_or_ip" type="text" class="textfield" value="<!--$CAM_HOST_SUGGESTION-->">
 												</td>
 												<td>
 													&nbsp;
@@ -40,7 +142,7 @@
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_model">Camera-Model:</label>
+													<label id="label_cam_model"><!--$CAM_MODEL_TEXT--></label>
 												</td>
 												<td>
 													<select style="align:left;" id="cam_model" name="cam_model" data-mini="false">
@@ -51,10 +153,10 @@
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_user">Camera-Username:</label>
+													<label id="label_cam_user"><!--$CAM_USER_TEXT--></label>
 												</td>
 												<td>
-													<input id="cam_user" name="cam_user" type="text" class="textfield" value="Username">
+													<input id="cam_user" name="cam_user" type="text" class="textfield" value="<!--$CAM_USER_SUGGESTION-->">
 												</td>
 												<td>
 													&nbsp;
@@ -62,10 +164,10 @@
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_pass">Camera-Password:</label>
+													<label id="label_cam_pass"><!--$CAM_PASS_TEXT--></label>
 												</td>
 												<td>
-													<input id="cam_pass" type="text" class="textfield" value="Password">
+													<input id="cam_pass" type="text" class="textfield" value="<!--$CAM_PASS_SUGGESTION-->">
 												</td>
 												<td>
 													&nbsp;
@@ -73,36 +175,134 @@
 											</tr>
 											<tr>
 												<td colspan="3" width="100%">
-													<hr>
-													Please paste the following URL in the Loxone Config into the Loxone Intercom-Object in the field "Picture when ringing (internal)":<br/>
-													<br/>
-												 	<font face="courier"><b>http://<!--$self_host--><!--$plugin_script-->?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url">?</span><span id="cam_path">?</span>&user=<span style="color:#FF40C0" id="cam_user_url">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url">?</span></b></font>
-													<br/><center><a id="btntest" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#">Test</a></center>
+													<hr><!--$LOXONE_CONFIG_TEXT--><br/>
 												</td>
 											</tr>
 										</table>
+										<font face="courier"><small><b>http://<!--$self_host--><!--$plugin_script-->?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url">?</span>&user=<span style="color:#FF40C0" id="cam_user_url">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url">?</span>&cam-model=<span style="color:#40c040" id="cam_type">?</span><span url="" id="email_to"></span></b></font></small>
+										<br/><center><a id="btntest" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><!--$TEST_TEXT--></a></center>
 									</center>
-									<p>
-										&nbsp;
-									</p>
 									<script>
+										
 										var $messages = $('#form-error-message');
 										$.validate(
 										{
 											modules : 'security',
-											errorMessagePosition : $messages,
+											errorMessagePosition : $messages
 										});
-			
+										
 										// Init
-										$( "#cam_path" ).html( $( "#cam_model").val() );
+										$( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val());
+										$( "#cam_type" ).html( $( "#cam_model").val() );
 										$( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val());
 										$( "#cam_user_url" ).html($( "#cam_user").val());
 										$( "#cam_pass_url" ).html($( "#cam_pass").val());
-			
-										$( "#btntest" ).css('visibility', 'hidden');
-										$( "#cam_model").change(function()  { 	$( "#cam_path" ).html( $( "#cam_model").val() ); });
-										$( "#cam_host_or_ip" ).keyup(function( event ) { $( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val()); $( "#btntest" ).css('visibility', 'visible')});
-										$( "#cam_user" ).keyup(function( event ) { $( "#cam_user_url" ).html($( "#cam_user").val()); $( "#btntest" ).css('visibility', 'visible')});
-										$( "#cam_pass" ).keyup(function( event ) { $( "#cam_pass_url" ).html($( "#cam_pass").val()); $( "#btntest" ).css('visibility', 'visible')});
-										$( "#btntest" ).click( function () { url2open = "http://<!--$self_host--><!--$plugin_script-->?kamera=" + $( "#cam_host_or_ip").val() + 	 $( "#cam_model").val()  + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val(); window.open(url2open, 'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');});
-										</script>
+
+										$( "#EMAIL_RECIPIENTS" ).keyup(function( event ) 
+										{ 
+											$('#EMAIL_TO_checkbox').trigger('change');
+										}); 
+
+										$("#EMAIL_USED_checkbox").change(function()  
+										{ 
+											$('#EMAIL_TO_checkbox').trigger('change');
+										}); 
+
+										$("#EMAIL_TO_checkbox").change(function()  
+										{ 
+											if ( $('#EMAIL_TO_checkbox').is(':checked') )
+												{
+													if ( $('#EMAIL_USED_checkbox').is(':checked') )
+													{
+	
+														$( "#btntest" ).css('visibility','visible');	
+														$( "#email_to" ).html( "&email_to=<span style='color:#FF8040'>" + encodeURI($('#EMAIL_RECIPIENTS').val()) + "</span>");
+														$( "#email_to" ).attr( 'url', "&email_to=" + encodeURI( $('#EMAIL_RECIPIENTS').val() ) );
+													}
+													else
+													{
+														$( "#email_to" ).html( '');
+														$( "#email_to" ).attr( 'url', '' );
+													}
+												}
+												else
+												{
+													$( "#email_to" ).html( '');
+													$( "#email_to" ).attr( 'url', '' );
+												}
+										}); 
+										$('#EMAIL_TO_checkbox').trigger('change');
+
+										$( "#btntest" ).css('visibility', 'hidden'); 
+										$("#cam_model").change(function()  
+										{ 	
+											$( "#cam_type" ).html($( "#cam_model").val() ); 
+										}); 
+										$( "#cam_host_or_ip").keyup(function( event ) 
+										{ 
+											$( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val()); 
+											$( "#btntest" ).css('visibility', 'visible')
+										}); 
+										$( "#cam_user" ).keyup(function( event ) 
+										{ 
+											$( "#cam_user_url" ).html($("#cam_user").val()); 
+											$( "#btntest" ).css('visibility','visible')
+										}); 
+										$( "#cam_pass" ).keyup(function( event ) 
+										{ 
+											$("#cam_pass_url" ).html($( "#cam_pass").val()); 
+											$( "#btntest" ).css('visibility', 'visible')
+										}); 
+										$( "#btntest" ).click(function () 
+										{ 
+											url2open = "http://<!--$self_host--><!--$plugin_script-->?kamera=" + $( "#cam_host_or_ip").val() + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val() + "&cam-model=" + $( "#cam_model").val() + $( "#email_to").attr('url'); window.open(url2open,'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
+										}); 
+									
+										
+										// Disable some options on click depending on selected value
+										function chk_boxes()
+										{
+											$("#EMAIL_RECIPIENTS").prop("data-validation-optional",true);
+											$("#EMAIL_BODY").prop("data-validation-optional",true);
+											$("#EMAIL_SIGNATURE").prop("data-validation-optional",true);
+											$("#EMAIL_DATE_FORMAT").prop("data-validation-optional",true);
+											$("#EMAIL_TIME_FORMAT").prop("data-validation-optional",true);
+											if ( $('#WATERMARK_checkbox').is(':checked') )
+											{
+												$('#WATERMARK').val(1);
+											}
+											else
+											{
+												$('#WATERMARK').val(0);
+											}
+											if ( $('#EMAIL_USED_checkbox').is(':checked') )
+											{
+												$('#EMAIL_USED').val(1);
+												$('#cam_connect_email_used').css('display','initial')
+												$("#EMAIL_FROM_NAME").prop("data-validation-optional",false);
+												$("#EMAIL_RECIPIENTS").prop("data-validation-optional",false);
+											}
+											else
+											{
+												$('#EMAIL_USED').val(0);
+												$('#cam_connect_email_used').css('display','none')
+												$("#EMAIL_FROM_NAME").prop("data-validation-optional",true);
+												$("#EMAIL_RECIPIENTS").prop("data-validation-optional",true);
+											}
+											if ( $('#EMAIL_INLINE_checkbox').is(':checked') )
+											{
+												$('#EMAIL_INLINE').val(1);
+											}
+											else
+											{
+												$('#EMAIL_INLINE').val(0);
+											}
+											return;
+										}
+										chk_boxes();
+										function display_info (text)
+										{
+															$('#form-error-message').html( text.replace("#RECIPIENTS#", encodeURI($('#EMAIL_RECIPIENTS').val())));
+															setTimeout( function() { $('#form-error-message').html(''); }, 6000);
+										}
+									</script>
