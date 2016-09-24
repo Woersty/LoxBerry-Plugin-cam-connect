@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to Basic to be used in the Loxone Door-Control-Object.          
-# Version: 23.09.2016 23:34:19
+# Version: 24.09.2016 21:13:15
 #####################################################################################################
 
 // Error Reporting off
@@ -247,10 +247,30 @@ function send_mail_pic($picture)
 	}
 	//$mail->SMTPDebug = 2;
 
-  // Read recipients
-	foreach (explode(";",$plugin_cfg['EMAIL_RECIPIENTS']) as $recipients_data) 
+  // Use recipients from URL if valid and configured 
+	$at_least_one_valid_email=0;
+	if ( $plugin_cfg['EMAIL_TO'] == 1 )
 	{
-		$mail->addAddress($recipients_data);  // Add recipient
+		if ( isset($_GET["email_to"]) )
+		{
+			foreach (explode(";",rawurldecode($_GET["email_to"]) ) as $recipients_data) 
+			{
+				if (filter_var($recipients_data, FILTER_VALIDATE_EMAIL)) 
+				{
+					$mail->addAddress($recipients_data);  // Add recipient
+					$at_least_one_valid_email=1;
+				}
+			}
+		}
+	}
+
+  // Read recipients
+	if ( $at_least_one_valid_email == 0 )
+	{	
+		foreach (explode(";",$plugin_cfg['EMAIL_RECIPIENTS']) as $recipients_data) 
+		{
+			$mail->addAddress($recipients_data);  // Add recipient
+		}
 	}
 
 	// Generate date and time
