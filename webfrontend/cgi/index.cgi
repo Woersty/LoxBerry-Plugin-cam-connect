@@ -200,7 +200,7 @@ $plugin_script = "/plugins/$psubfolder/";
 ##########################################################################
 
 # Process checkboxes
-foreach my $parameter_to_process ('WATERMARK','EMAIL_USED','EMAIL_INLINE')
+foreach my $parameter_to_process ('WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO')
 {
 	if ( int(${$parameter_to_process}) eq 1 ) 
 	{

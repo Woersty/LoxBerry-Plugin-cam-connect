@@ -179,7 +179,7 @@
 												</td>
 											</tr>
 										</table>
-										<font face="courier"><small><b>http://<!--$self_host--><!--$plugin_script-->?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url">?</span>&user=<span style="color:#FF40C0" id="cam_user_url">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url">?</span>&cam-model=<span style="color:#40c040" id="cam_type">?</span><span url="" id="email_to"></span></b></font></small>
+										<font face="courier"><small><b>http://<!--$self_host--><!--$plugin_script-->?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url">?</span><span style="color:#000000" id="cam_host_or_ip_port"></span>&user=<span style="color:#FF40C0" id="cam_user_url">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url">?</span>&cam-model=<span style="color:#40c040" id="cam_type">?</span><span url="" id="email_to"></span></b></font></small>
 										<br/><center><a id="btntest" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><!--$TEST_TEXT--></a></center>
 									</center>
 									<script>
@@ -192,9 +192,26 @@
 										});
 										
 										// Init
-										$( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val());
+
+										function cam_url(string2check)
+										{
+											var cam_host_or_ip = string2check.split(":");
+											if ( cam_host_or_ip.length > 1 && ( cam_host_or_ip[1] != "80" & cam_host_or_ip[1] != "") )
+											{
+												$( "#cam_host_or_ip_url" ).html(cam_host_or_ip[0]);
+												$( "#cam_host_or_ip_port" ).html('&port=<span style="color:#00C000">'+cam_host_or_ip[1]+"</SPAN>");
+												var cam_url = cam_host_or_ip[0]+"&port="+cam_host_or_ip[1];
+											}
+											else
+											{
+												$( "#cam_host_or_ip_url" ).html(cam_host_or_ip[0]);
+												$( "#cam_host_or_ip_port" ).html('&port=<span style="color:#00C000">'+80+"</SPAN>");
+												var cam_url = cam_host_or_ip[0]+"&port=80";
+											}
+											return cam_url
+										}
+										cam_url($( "#cam_host_or_ip").val()); 										
 										$( "#cam_type" ).html( $( "#cam_model").val() );
-										$( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val());
 										$( "#cam_user_url" ).html($( "#cam_user").val());
 										$( "#cam_pass_url" ).html($( "#cam_pass").val());
 
@@ -216,8 +233,8 @@
 													{
 	
 														$( "#btntest" ).css('visibility','visible');	
-														$( "#email_to" ).html( "&email_to=<span style='color:#FF8040'>" + encodeURI($('#EMAIL_RECIPIENTS').val()) + "</span>");
-														$( "#email_to" ).attr( 'url', "&email_to=" + encodeURI( $('#EMAIL_RECIPIENTS').val() ) );
+														$( "#email_to" ).html( "&email_to=<span style='color:#FF8040'>" + $('#EMAIL_RECIPIENTS').val().replace("@","(at)") + "</span>");
+														$( "#email_to" ).attr( 'url', "&email_to=" + $('#EMAIL_RECIPIENTS').val().replace("@","(at)") );
 													}
 													else
 													{
@@ -240,7 +257,7 @@
 										}); 
 										$( "#cam_host_or_ip").keyup(function( event ) 
 										{ 
-											$( "#cam_host_or_ip_url" ).html($( "#cam_host_or_ip").val()); 
+											cam_url($( "#cam_host_or_ip").val()); 
 											$( "#btntest" ).css('visibility', 'visible')
 										}); 
 										$( "#cam_user" ).keyup(function( event ) 
@@ -255,7 +272,7 @@
 										}); 
 										$( "#btntest" ).click(function () 
 										{ 
-											url2open = "http://<!--$self_host--><!--$plugin_script-->?kamera=" + $( "#cam_host_or_ip").val() + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val() + "&cam-model=" + $( "#cam_model").val() + $( "#email_to").attr('url'); window.open(url2open,'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
+											url2open = "http://<!--$self_host--><!--$plugin_script-->?kamera=" + cam_url($( "#cam_host_or_ip").val()) + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val() + "&cam-model=" + $( "#cam_model").val() + $( "#email_to").attr('url').replace("@","(at)"); window.open(url2open,'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
 										}); 
 									
 										
@@ -310,7 +327,7 @@
 										chk_boxes();
 										function display_info (text)
 										{
-															$('#form-error-message').html( text.replace("#RECIPIENTS#", encodeURI($('#EMAIL_RECIPIENTS').val())));
+															$('#form-error-message').html( text.replace("#RECIPIENTS#", $('#EMAIL_RECIPIENTS').val().replace("@","(at)")));
 															setTimeout( function() { $('#form-error-message').html(''); }, 6000);
 										}
 									</script>
