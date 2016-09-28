@@ -249,8 +249,8 @@
 													{
 	
 														$( "#btntest" ).css('visibility','visible');	
-														$( "#email_to" ).html( "&email_to=<span style='color:#FF8040'>" + $('#EMAIL_RECIPIENTS').val().replace("@","(at)") + "</span>");
-														$( "#email_to" ).attr( 'url', "&email_to=" + $('#EMAIL_RECIPIENTS').val().replace("@","(at)") );
+														$( "#email_to" ).html( "&email_to=<span style='color:#FF8040'>" + $('#EMAIL_RECIPIENTS').val().replace(new RegExp("@", 'g'), "(at)") + "</span>");
+														$( "#email_to" ).attr( 'url', "&email_to=" + $('#EMAIL_RECIPIENTS').val().replace(new RegExp("@", 'g'), "(at)"));
 													}
 													else
 													{
@@ -288,7 +288,7 @@
 										}); 
 										$( "#btntest" ).click(function () 
 										{ 
-											url2open = "http://<!--$self_host--><!--$plugin_script-->?kamera=" + cam_url($( "#cam_host_or_ip").val()) + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val() + "&cam-model=" + $( "#cam_model").val() + $( "#email_to").attr('url').replace("@","(at)"); window.open(url2open,'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
+											url2open = "http://<!--$self_host--><!--$plugin_script-->?kamera=" + cam_url($( "#cam_host_or_ip").val()) + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val() + "&cam-model=" + $( "#cam_model").val() + $( "#email_to").attr('url').replace(new RegExp("@", 'g'), "(at)"); window.open(url2open,'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
 										}); 
 									
 										

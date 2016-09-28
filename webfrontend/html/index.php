@@ -195,13 +195,9 @@ else
     ImageJPEG($watermarked_picture);
     $picture = ob_get_contents();
     ob_end_clean();
-    echo $picture;
     ImageDestroy($watermarked_picture);
   }
-  else
-  {
-    echo $picture;
-  }
+  echo $picture;
   // If wanted, send eMail
   if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1)) send_mail_pic($picture);
 }
