@@ -73,6 +73,7 @@ our $EMAIL_TO=0;
 our $EMAIL_INLINE=1;
 our $EMAIL_BODY="";
 our $EMAIL_SIGNATURE="";
+our $EMAIL_RESIZE;
 our $EMAIL_SUBJECT1="";
 our $EMAIL_SUBJECT2="";
 our $EMAIL_SUBJECT3="";
@@ -110,6 +111,7 @@ if (!-r $pluginconfigfile)
 	print $configfileHandle 'EMAIL_TO=0'."\n";
 	print $configfileHandle 'EMAIL_BODY=Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.'."\n";
 	print $configfileHandle 'EMAIL_SIGNATURE=--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry'."\n";
+	print $configfileHandle 'EMAIL_RESIZE=720';
 	print $configfileHandle 'EMAIL_SUBJECT1=Es wurde am '."\n";
 	print $configfileHandle 'EMAIL_SUBJECT2= um '."\n";
 	print $configfileHandle 'EMAIL_SUBJECT3= geklingelt!'."\n";
@@ -213,6 +215,9 @@ foreach my $parameter_to_process ('WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL
 	    ${$parameter_to_process} = 0;
 	}
 }
+
+# Process size dropdown
+${"EMAIL_RESIZE_".$EMAIL_RESIZE}=" selected ";
 
 $plugin_name = $phraseplugin->param("TXT0000");
 

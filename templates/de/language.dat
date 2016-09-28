@@ -1,7 +1,7 @@
 ;
 ; Cam-Connect Plugin
 ; Language phrases DE
-; 24.09.2016 14:56:49
+; 28.09.2016 19:44:21
 ;
 MY_NAME=Cam-Connect
 ERROR01=E01: Fehler beim Kamerazugriff
@@ -10,6 +10,7 @@ ERROR03=E03: Konfigurations-Lesefehler
 ERROR04=E04: Kameralisten-Lesefehler
 ERROR05=E05: eMail-Konfiguration Lesefehler
 ERROR06=E06: eMail-Konfigurationsfehler
+ERROR07=E07: Fehler bei Bildanpassung
 CFG_SAVED=Konfiguration gespeichert
 LOGO_TEXT=Konfigurationseinstellungen des Cam-Connect Plugins
 WATERMARK_TEXT=Mit LoxBerry Wasserzeichen
@@ -46,3 +47,5 @@ CAM_USER_SUGGESTION=Benutzername
 CAM_PASS_TEXT=Kamera-Passwort:
 CAM_PASS_SUGGESTION=Passwort
 LOXONE_CONFIG_TEXT=Bitte trage in der Loxone Config im Loxone Intercom-Objekt bei "Bild bei Klingeln (intern)" folgenden String ein:
+EMAIL_RESIZE_ORIGINAL_TEXT=Unver&auml;ndert
+EMAIL_RESIZE_TEXT=Bildbreite in der eMail:

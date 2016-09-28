@@ -1,7 +1,7 @@
 ;
 ; Cam-Connect Plugin
 ; Language phrases EN
-; 24.09.2016 14:56:49
+; 28.09.2016 19:44:38
 ;
 MY_NAME=Cam-Connect
 ERROR01=E01: Camera access error
@@ -10,6 +10,7 @@ ERROR03=E03: Error reading config
 ERROR04=E04: Cam-List: Read error
 ERROR05=E05: eMail-Config: Read error
 ERROR06=E06: eMail-Config invalid
+ERROR07=E07: Error during processing
 CFG_SAVED=Configuration saved
 LOGO_TEXT=Cam-Connect Plugin Settings
 WATERMARK_TEXT=With LoxBerry watermark
@@ -46,3 +47,5 @@ CAM_USER_SUGGESTION=Username
 CAM_PASS_TEXT=Camera-Password:
 CAM_PASS_SUGGESTION=Password
 LOXONE_CONFIG_TEXT=Please enter the following string in the Loxone Config Intercom-Object under "Picture when ringing (intern)":
+EMAIL_RESIZE_ORIGINAL_TEXT=Unchanged
+EMAIL_RESIZE_TEXT=Imagewidth in the eMail:
