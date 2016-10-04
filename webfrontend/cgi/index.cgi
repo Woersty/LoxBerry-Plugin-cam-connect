@@ -26,6 +26,7 @@ use File::HomeDir;
 use HTML::Entities;
 use Data::Dumper;
 use Cwd 'abs_path';
+use Time::Piece;
 use warnings;
 use strict;
 no strict "refs"; # we need it for template system
@@ -74,6 +75,7 @@ our $EMAIL_INLINE=1;
 our $EMAIL_BODY="";
 our $EMAIL_SIGNATURE="";
 our $EMAIL_RESIZE;
+our $IMAGE_RESIZE;
 our $EMAIL_SUBJECT1="";
 our $EMAIL_SUBJECT2="";
 our $EMAIL_SUBJECT3="";
@@ -83,6 +85,7 @@ our $EMAIL_FROM_NAME="";
 our $EMAIL_RECIPIENTS="";
 our $EMAIL_FILENAME="Snapshot";
 our $error;
+our $SAVE_DATE=localtime->strftime('%Y_%m_%d_%H-%M-%S');
 ##########################################################################
 # Read Settings
 ##########################################################################
@@ -111,7 +114,8 @@ if (!-r $pluginconfigfile)
 	print $configfileHandle 'EMAIL_TO=0'."\n";
 	print $configfileHandle 'EMAIL_BODY=Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.'."\n";
 	print $configfileHandle 'EMAIL_SIGNATURE=--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry'."\n";
-	print $configfileHandle 'EMAIL_RESIZE=720';
+	print $configfileHandle 'EMAIL_RESIZE=0'."\n";
+	print $configfileHandle 'IMAGE_RESIZE=0'."\n";
 	print $configfileHandle 'EMAIL_SUBJECT1=Es wurde am '."\n";
 	print $configfileHandle 'EMAIL_SUBJECT2= um '."\n";
 	print $configfileHandle 'EMAIL_SUBJECT3= geklingelt!'."\n";
@@ -120,6 +124,7 @@ if (!-r $pluginconfigfile)
 	print $configfileHandle 'EMAIL_FROM_NAME=LoxBerry'."\n";
 	print $configfileHandle 'EMAIL_RECIPIENTS=noreply@loxberry.de;invalid@loxberry.de'."\n";
 	print $configfileHandle 'EMAIL_FILENAME=Snapshot'."\n";
+	print $configfileHandle 'SAVE_DATE='.$SAVE_DATE."\n";
 	close $configfileHandle;
 }
 
@@ -139,7 +144,6 @@ if (open(my $fh, '<', $pluginconfigfile))
 			{
 				my @configs = split /=/, $_,2;
 		  	${@configs[0]} = $configs[1];
-				push @pluginconfig_strings, @configs[0];
 			}
 		}
   }
@@ -149,6 +153,9 @@ else
 	$error = "Could not open Plugin Configfile";
 	&error; 
 }
+
+# Definition of valid config vars
+@pluginconfig_strings = ('SAVE_DATE','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
 
 # Everything from URL
 foreach (split(/&/,$ENV{'QUERY_STRING'})){
@@ -193,7 +200,7 @@ foreach (keys$phraseplugin->vars())
 	push @language_strings, $cfg_varname;
 }
 
-$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("TXT0000");
+$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME");
 $self_host =$cgi->server_name();
 $plugin_script = "/plugins/$psubfolder/";
 
@@ -202,7 +209,7 @@ $plugin_script = "/plugins/$psubfolder/";
 ##########################################################################
 
 # Process checkboxes
-foreach my $parameter_to_process ('WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO')
+foreach my $parameter_to_process ('WATERMARK','EMAIL_INLINE','EMAIL_TO')
 {
 	if ( int(${$parameter_to_process}) eq 1 ) 
 	{
@@ -216,10 +223,6 @@ foreach my $parameter_to_process ('WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL
 	}
 }
 
-# Process size dropdown
-${"EMAIL_RESIZE_".$EMAIL_RESIZE}=" selected ";
-
-$plugin_name = $phraseplugin->param("TXT0000");
 
 ###############################
 ###########################################
@@ -253,7 +256,7 @@ $plugin_name = $phraseplugin->param("TXT0000");
 		open my $configfileHandle, ">", "$pluginconfigfile" or die "Can't create '$pluginconfigfile'\n";
 		foreach my $parameter_to_write (@pluginconfig_strings)
 		{
-			print $configfileHandle $parameter_to_write.'='.param($parameter_to_write)."\n";
+				print $configfileHandle $parameter_to_write.'='.param($parameter_to_write)."\n";
 		}
 		close $configfileHandle;
 		
@@ -261,7 +264,7 @@ $plugin_name = $phraseplugin->param("TXT0000");
 		
 		
 		print "Content-Type: text/html\n\n";
-		$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME");;
+		$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME"); 
 		$message = $phraseplugin->param("CFG_SAVED");
 		$nexturl = "javascript:history.back();";
 		
@@ -306,6 +309,7 @@ print "Content-Type: text/html\n\n";
 
 # Print Template
 &lbheader;
+ 
 
 # Parse the strings we want
 foreach our $template_string (@language_strings)
@@ -342,7 +346,7 @@ exit;
 
 sub error {
 
-$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("TXT0000") . " - " . $phrase->param("TXT0028");
+$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME") . " - " . $phrase->param("TXT0028");
 
 print "Content-Type: text/html\n\n";
 

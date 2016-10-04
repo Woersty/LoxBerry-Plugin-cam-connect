@@ -1,8 +1,8 @@
 <?php
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
-# from Digest to Basic to be used in the Loxone Door-Control-Object.
-# Version: 28.09.2016 21:20:18
+# from Digest to none to be used in the Loxone Door-Control-Object.
+# Version: 04.10.2016 19:47:45
 #####################################################################################################
 
 // Error Reporting off
@@ -10,7 +10,7 @@ error_reporting(E_ALL & ~E_STRICT);     // Alle Fehler reporten (Außer E_STRICT)
 ini_set("display_errors", false);       // Fehler nicht direkt via PHP ausgeben
 
 // Read LoxBerry Basic configuration file to get the used language
-$config_file        = dirname(__FILE__)."/../../../../config/system/general.cfg";
+$config_file          = dirname(__FILE__)."/../../../../config/system/general.cfg";
 $config_file_handle   = fopen($config_file, "r");
 if ($config_file_handle)
 {
@@ -197,9 +197,83 @@ else
     ob_end_clean();
     ImageDestroy($watermarked_picture);
   }
-  echo $picture;
+
+  // Resize image to parameter &image_resize=xxx from URL if provided - must be >= 240 or <= 1920
+  if ( isset($_GET["image_resize"]) )
+	{
+		// Resize
+		if ( (intval($_GET["image_resize"]) >= 200) &&  ( intval($_GET["image_resize"]) <= 1920 ) )
+		{
+			$newwidth = intval($_GET["image_resize"]);
+			$resized_picture = resize_cam_image($picture,$newwidth);
+		}
+		else
+		{
+			// Invalid, no resize
+			$resized_picture = $picture;
+		}
+	}
+	// Resize image to parameter IMAGE_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
+	elseif ( isset( $plugin_cfg['IMAGE_RESIZE'] ) )
+	{
+		// Resize as configured in cam-connect.cfg
+		if ( (intval($plugin_cfg['IMAGE_RESIZE']) >= 200) &&  ( intval($plugin_cfg['IMAGE_RESIZE']) <= 1920 ) )
+		{
+			$newwidth = intval($plugin_cfg['IMAGE_RESIZE']);
+			$resized_picture = resize_cam_image($picture,$newwidth);
+		}
+		else
+		{
+			// Invalid, no resize
+			$resized_picture = $picture;
+		}
+	}
+	else
+	{
+		// No resize
+		$resized_picture = $picture;
+	}
+  echo $resized_picture;
+
+  // eMail Part
+  // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
+  if ( isset($_GET["email_resize"]) )
+	{
+		// Resize
+		if ( (intval($_GET["email_resize"]) >= 200) &&  ( intval($_GET["email_resize"]) <= 1920 ) )
+		{
+			$newwidth = intval($_GET["email_resize"]);
+			$resized_picture = resize_cam_image($picture,$newwidth);
+		}
+		else
+		{
+			// Invalid, no resize
+			$resized_picture = $picture;
+		}
+	}
+	// Resize image to parameter EMAIL_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
+	elseif ( isset( $plugin_cfg['EMAIL_RESIZE'] ) )
+	{
+		// Resize as configured in cam-connect.cfg
+		if ( (intval($plugin_cfg['EMAIL_RESIZE']) >= 200) &&  ( intval($plugin_cfg['EMAIL_RESIZE']) <= 1920 ) )
+		{
+			$newwidth = intval($plugin_cfg['EMAIL_RESIZE']);
+			$resized_picture = resize_cam_image($picture,$newwidth);
+		}
+		else
+		{
+			// Invalid, no resize
+			$resized_picture = $picture;
+		}
+	}
+	else
+	{
+		// No resize
+		$resized_picture = $picture;
+	}
+	
   // If wanted, send eMail
-  if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1)) send_mail_pic($picture);
+  if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"])) send_mail_pic($resized_picture );
 }
 exit;
 
@@ -297,22 +371,21 @@ function send_mail_pic($picture)
     $inline  =  'attachment';
   }
 
-  // Resize image if EMAIL_RESIZE is >= 240
+  // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
+  if ( isset($_GET["email_resize"]) )
+	{
+		if ( (intval($_GET["email_resize"]) >= 200) && (intval($_GET["email_resize"]) <= 1920) )
+		{
+			$plugin_cfg['EMAIL_RESIZE'] = intval($_GET["email_resize"]);
+		}
+	}
+
+  // Resize image if EMAIL_RESIZE is >= 240 - max is 1920
   $newwidth = $plugin_cfg['EMAIL_RESIZE'];
   if ($newwidth >= 240)
   {
     if ($newwidth > 1920) $newwidth=1920;
-    list($width, $height) = getimagesizefromstring($picture);
-    $newheight = $height / ($width/$newwidth);
-    $thumb = imagecreatetruecolor($newwidth, $newheight);
-    $source = imagecreatefromstring($picture);
-    imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
-    ob_start();
-    ImageJPEG($thumb);
-    $picture = ob_get_contents();
-    ob_end_clean();
-    ImageDestroy($thumb);
-    ImageDestroy($source);
+		$picture = resize_cam_image($picture,$newwidth);
   }
 
   // Insert image
@@ -324,4 +397,20 @@ function send_mail_pic($picture)
   {
      return 'Mailer Error: ' . $mail->ErrorInfo;
   }
+}
+
+function resize_cam_image ($picture,$newwidth=720)
+{
+    list($width, $height) = getimagesizefromstring($picture);
+    $newheight = $height / ($width/$newwidth);
+    $thumb = imagecreatetruecolor($newwidth, $newheight);
+    $source = imagecreatefromstring($picture);
+    imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+    ob_start();
+    ImageJPEG($thumb);
+    $picture = ob_get_contents();
+    ob_end_clean();
+    ImageDestroy($thumb);
+   	ImageDestroy($source);
+		return $picture;
 }
