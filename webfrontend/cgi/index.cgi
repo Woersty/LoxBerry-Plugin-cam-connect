@@ -91,7 +91,7 @@ our $SAVE_DATE=localtime->strftime('%Y_%m_%d_%H-%M-%S');
 ##########################################################################
 
 # Version of this script
-$version = "0.0.4";
+$version = "1.6";
 
 # Figure out in which subfolder we are installed
 $psubfolder = abs_path($0);
@@ -143,7 +143,7 @@ if (open(my $fh, '<', $pluginconfigfile))
 			else
 			{
 				my @configs = split /=/, $_,2;
-		  	${@configs[0]} = $configs[1];
+		  	${$configs[0]} = $configs[1];
 			}
 		}
   }
@@ -194,9 +194,10 @@ $phrase = new Config::Simple($languagefile);
 $languagefileplugin = "$installfolder/templates/plugins/$psubfolder/$lang/language.dat";
 $phraseplugin = new Config::Simple($languagefileplugin);
 # Create @language_strings array with all known phrase-names
-foreach (keys$phraseplugin->vars())
+
+foreach my $key (keys %{ $phraseplugin->vars() } ) 
 {
-	(my $cfg_section,my $cfg_varname) = split(/\./,$_,2);
+	(my $cfg_section,my $cfg_varname) = split(/\./,$key,2);
 	push @language_strings, $cfg_varname;
 }
 
