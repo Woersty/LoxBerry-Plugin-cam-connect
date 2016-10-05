@@ -152,16 +152,55 @@ curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
 curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
 curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
 
-// Read picture from IP-Cam and close connection to Cam
 $picture = curl_exec($curl);
-curl_close($curl);
 
+// Read picture from IP-Cam and close connection to Cam
+if($picture === false)
+{
+	// Display an Error-Picture
+  header ("Content-type: image/jpeg");
+  $error_msg = $phrases["ERROR01"];
+  $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
+  $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
+  $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
+  ImageString ($error_image, 20, 10, 90, $error_msg, $text_color);
+  $text_color       = ImageColorAllocate ($error_image, 128,128,128);
+  $error_msg = "cURL error: ".curl_error($curl);
+  ImageString ($error_image, 20, 10, 110, $error_msg, $text_color);
+  ImageJPEG ($error_image);
+  ImageDestroy($error_image);
+  exit;
+}
+else
+{
+	$picture = curl_exec($curl);
+}
+curl_close($curl);
 
 // If the result has less than 500 byte, it's no picture.
 if(mb_strlen($picture) < 500)
 {
   // Image too small, raise error 01
-  error_image($phrases,"ERROR01");
+	header ("Content-type: image/jpeg");
+  $error_msg = $phrases["ERROR01"];
+  $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
+  $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
+  $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
+  ImageString ($error_image,20, 10, 10, $error_msg, $text_color);
+  $text_color       = ImageColorAllocate ($error_image, 0, 0, 255);
+  $error_msg = "URL: ".$plugin_cfg['url'];
+  ImageString ($error_image, 20, 10, 50, $error_msg, $text_color);
+  $text_color       = ImageColorAllocate ($error_image, 128,128,128);
+  $line = 70;
+  $picture= preg_replace("/\r|/",'',$picture);
+  foreach (explode("\n",$picture ) as $pic_line)
+	{
+		$line = $line + 20;
+	  ImageString ($error_image, 20, 10, $line, $pic_line, $text_color);
+	}
+  ImageJPEG ($error_image);
+  ImageDestroy($error_image);
+	exit;
 }
 else
 {
