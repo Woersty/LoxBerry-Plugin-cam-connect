@@ -1,57 +1,58 @@
 ;
 ; Cam-Connect Plugin
 ; Language phrases DE
-; 28.09.2016 19:44:21
+; 11.11.2016 01:42:39
 ;
-MY_NAME=Cam-Connect
-ERROR01=E01: Fehler beim Kamerazugriff
-ERROR02=E02: Nur JPG Dateien erlaubt
-ERROR03=E03: Konfigurations-Lesefehler 
-ERROR04=E04: Kameralisten-Lesefehler
-ERROR05=E05: eMail-Konfiguration Lesefehler
-ERROR06=E06: eMail-Konfigurationsfehler
-ERROR07=E07: Fehler bei Bildanpassung
-CFG_SAVED=Konfiguration gespeichert
-LOGO_TEXT=Konfigurationseinstellungen des Cam-Connect Plugins
-WATERMARK_TEXT=Mit LoxBerry Wasserzeichen
-EMAIL_USED_TEXT=eMail mit Kamerabild versenden
-EMAIL_INLINE_TEXT=Kamerabild nicht als Anhang sondern im eMail-Text versenden
-EMAIL_TO_TEXT=eMail-Empf&auml;nger bei Plugin-Aufruf ermitteln
-EMAIL_TO_HELP_TEXT=(Was bedeutet das?)
-EMAIL_TO_EXPLAIN_TEXT=Beim Aufruf des Plugins aus der Loxone Config wird die Empf&auml;nger-eMailadresse mit <font color="black">&email_to=</font><font color="blue">#RECIPIENTS#</font> &uuml;bergeben.
-EMAIL_BODY_TEXT=Text:
-EMAIL_SIGNATURE_TEXT=Signatur:
-EMAIL_SIGNATURE_VALIDATION=Bitte gib den Text der eMail Signatur ein.  <a target="_blank" href="https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> ist erlaubt.
-EMAIL_SUBJECT_TEXT=Betreff:
-EMAIL_SUBJECT1_VALIDATION=Bitte gib den ersten Teil des eMail-Betreffs ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ []()
-EMAIL_SUBJECT2_VALIDATION=Bitte gib den mittleren Teil des eMail-Betreffs ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ []()
-EMAIL_SUBJECT3_VALIDATION=Bitte gib den letzten Teil des eMail-Betreffs ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ []()
-EMAIL_DATE_FORMAT_VALIDATION=Bitte gib das Datumsformat f&uuml;r den eMail-Betreff ein. Siehe <a href="http://php.net/manual/de/function.date.php" target="_blank">PHP-Manual</a>. Beispiel: <font color="#000000">d.m.Y</font> 
-EMAIL_TIME_FORMAT_VALIDATION=Bitte gib das Uhrzeitformat f&uuml;r den eMail-Betreff ein. Siehe <a href="http://php.net/manual/de/function.date.php" target="_blank">PHP-Manual</a>. Beispiel: <font color="#000000">H:i:s \\U\\h\\r</font> 
-EMAIL_BODY_VALIDATION=Bitte gib den Text der eMail ein. <a target="_blank" href="https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> ist erlaubt.
-EMAIL_FROM_NAME_TEXT=Absendername:
-EMAIL_FROM_NAME_VALIDATION=Bitte gib den Namen des Absenders der eMail ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ 
-EMAIL_FROM_NAME_INFO=<small><i>Hier bitte nur den Namen eingeben.<br/>Der Rest wird bei <a target="_blank" href="/admin/system/mailserver.cgi?do=form">Mailserver</a> konfiguriert.</i></small>
-EMAIL_RECIPIENTS_TEXT=Empf&auml;ngerliste:
-EMAIL_RECIPIENTS_INFO=<small><i>Mehrere Empf&auml;ngeradressen bitte <br/>durch ein Semikolon trennen.</i></small>
-EMAIL_RECIPIENTS_VALIDATION=Bitte gib die Empf&auml;nger-eMailadressen ein. Mehrere Empf&auml;nger werden durch ein Semikolon getrennt eingegeben. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ </>@.;:. 
-CANCEL_TEXT=Abbrechen
-SAVE_TEXT=Speichern
-TEST_TEXT=Testen
-URL_HELPER_SECTION_TEXT=Dieser Abschnitt kann dir helfen\, den richtigen URL f&uuml;r die Loxone Config Parameter der Loxone Intercom zu finden.
-CAM_HOST_TEXT=Kamera-IP-Adresse oder Hostname\:<br/><small><i>Der Port ist nur anzugeben\, wenn nicht 80.</i></small>
-CAM_HOST_SUGGESTION=Kamera-Hostname:80
-CAM_MODEL_TEXT=Kamera-Modell:
-CAM_USER_TEXT=Kamera-Benutzername:
-CAM_USER_SUGGESTION=Benutzername
-CAM_PASS_TEXT=Kamera-Passwort:
-CAM_PASS_SUGGESTION=Passwort
-LOXONE_CONFIG_TEXT=Bitte trage in der Loxone Config im Loxone Intercom-Objekt bei "Bild bei Klingeln (intern)" folgenden String ein:
-EMAIL_RESIZE_ORIGINAL_TEXT=Unver&auml;ndert
-EMAIL_RESIZE_TEXT=Bildbreite in der eMail:
-IMAGE_RESIZE_ORIGINAL_TEXT=Unver&auml;ndert
-IMAGE_RESIZE_TEXT=Bildbreite:
-URL_HELP_CUSTOMIZE_TEXT=Experten-Einstellungen um das Plugin vom Standard abweichend zu nutzen:
-URL_HELP_NO_MAIL_TEXT=Keine eMail beim Aufruf versenden
-URL_HELP_IMAGE_RESIZE_TEXT=Bildgr&ouml;&szlig;e beim Aufruf &uuml;bergeben
-URL_HELP_EMAIL_RESIZE_TEXT=Bildgr&ouml;&szlig;e f&uuml;r eMail beim Aufruf &uuml;bergeben
+MY_NAME="Cam-Connect"
+ERROR01="E01: Fehler beim Kamerazugriff"
+ERROR02="E02: Nur JPG Dateien erlaubt"
+ERROR03="E03: Konfigurations-Lesefehler "
+ERROR04="E04: Kameralisten-Lesefehler"
+ERROR05="E05: eMail-Konfiguration Lesefehler"
+ERROR06="E06: eMail-Konfigurationsfehler"
+ERROR07="E07: Fehler bei Bildanpassung"
+CFG_SAVED="Konfiguration gespeichert"
+LOGO_TEXT="Konfigurationseinstellungen des Cam-Connect Plugins"
+WATERMARK_TEXT="Mit LoxBerry Wasserzeichen"
+EMAIL_USED_TEXT="eMail mit Kamerabild versenden"
+EMAIL_INLINE_TEXT="Kamerabild nicht als Anhang sondern im eMail-Text versenden"
+EMAIL_TO_TEXT="eMail-Empf&auml;nger bei Plugin-Aufruf ermitteln"
+EMAIL_TO_HELP_TEXT="(Was bedeutet das?)"
+EMAIL_TO_EXPLAIN_TEXT="Beim Aufruf des Plugins aus der Loxone Config wird die Empf&auml;nger-eMailadresse mit <font color=""black">&email_to="</font><font color=""blue">#RECIPIENTS#</font> &uuml;bergeben."
+EMAIL_BODY_TEXT="Text:"
+EMAIL_SIGNATURE_TEXT="Signatur:"
+EMAIL_SIGNATURE_VALIDATION="Bitte gib den Text der eMail Signatur ein.  <a target=""_blank" href=""https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> ist erlaubt."
+EMAIL_SUBJECT_TEXT="Betreff:"
+EMAIL_SUBJECT1_VALIDATION="Bitte gib den ersten Teil des eMail-Betreffs ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ []()"
+EMAIL_SUBJECT2_VALIDATION="Bitte gib den mittleren Teil des eMail-Betreffs ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ []()"
+EMAIL_SUBJECT3_VALIDATION="Bitte gib den letzten Teil des eMail-Betreffs ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ []()"
+EMAIL_DATE_FORMAT_VALIDATION="Bitte gib das Datumsformat f&uuml;r den eMail-Betreff ein. Siehe <a href=""http://php.net/manual/de/function.date.php" target=""_blank">PHP-Manual</a>. Beispiel: <font color=""#000000">d.m.Y</font> "
+EMAIL_TIME_FORMAT_VALIDATION="Bitte gib das Uhrzeitformat f&uuml;r den eMail-Betreff ein. Siehe <a href=""http://php.net/manual/de/function.date.php" target=""_blank">PHP-Manual</a>. Beispiel: <font color=""#000000">H:i:s \\U\\h\\r</font> "
+EMAIL_BODY_VALIDATION="Bitte gib den Text der eMail ein. <a target=""_blank" href=""https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> ist erlaubt."
+EMAIL_FROM_NAME_TEXT="Absendername:"
+EMAIL_FROM_NAME_VALIDATION="Bitte gib den Namen des Absenders der eMail ein. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ "
+EMAIL_FROM_NAME_INFO="<small><i>Hier bitte nur den Namen eingeben.<br/>Der Rest wird bei <a target=""_blank" href=""/admin/system/mailserver.cgi?do="form">Mailserver</a> konfiguriert.</i></small>"
+EMAIL_RECIPIENTS_TEXT="Empf&auml;ngerliste:"
+EMAIL_RECIPIENTS_INFO="<small><i>Mehrere Empf&auml;ngeradressen bitte <br/>durch ein Semikolon trennen.</i></small>"
+EMAIL_RECIPIENTS_VALIDATION="Bitte gib die Empf&auml;nger-eMailadressen ein. Mehrere Empf&auml;nger werden durch ein Semikolon getrennt eingegeben. Folgende Zeichen sind erlaubt: Buchstaben\, Zahlen und -_ </>@.;:. "
+CANCEL_TEXT="Abbrechen"
+SAVE_TEXT="Speichern"
+TEST_TEXT="Testen"
+URL_HELPER_SECTION_TEXT="Dieser Abschnitt kann dir helfen\, den richtigen URL f&uuml;r die Loxone Config Parameter der Loxone Intercom zu finden."
+CAM_HOST_TEXT="Kamera-IP-Adresse oder Hostname\:<br/><small><i>Der Port ist nur anzugeben\, wenn nicht 80.</i></small>"
+CAM_HOST_SUGGESTION="Kamera-Hostname:80"
+CAM_MODEL_TEXT="Kamera-Modell:"
+CAM_USER_TEXT="Kamera-Benutzername:"
+CAM_USER_SUGGESTION="Benutzername"
+CAM_PASS_TEXT="Kamera-Passwort:"
+CAM_PASS_SUGGESTION="Passwort"
+LOXONE_CONFIG_TEXT="Bitte trage in der Loxone Config im Loxone Intercom-Objekt bei "Bild bei Klingeln (intern)" folgenden String ein:"
+EMAIL_RESIZE_ORIGINAL_TEXT="Unverändert"
+EMAIL_RESIZE_TEXT="Bildbreite in der eMail:"
+IMAGE_RESIZE_ORIGINAL_TEXT="Unver&auml;ndert"
+IMAGE_RESIZE_JUST_TEXT="Bei Aufruf kein Bild anzeigen"
+IMAGE_RESIZE_TEXT="Bildbreite:"
+URL_HELP_CUSTOMIZE_TEXT="Experten-Einstellungen um das Plugin vom Standard abweichend zu nutzen:"
+URL_HELP_NO_MAIL_TEXT="Keine eMail beim Aufruf versenden"
+URL_HELP_IMAGE_RESIZE_TEXT="Bildgr&ouml;&szlig;e beim Aufruf &uuml;bergeben"
+URL_HELP_EMAIL_RESIZE_TEXT="Bildgr&ouml;&szlig;e f&uuml;r eMail beim Aufruf &uuml;bergeben"

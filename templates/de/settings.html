@@ -5,7 +5,7 @@
 												<tr>
 													<td colspan="3">
 														<select id="IMAGE_RESIZE" name="IMAGE_RESIZE" data-mini="false">
-															<option value="0"   ><!--$IMAGE_RESIZE_TEXT--> <!--$IMAGE_RESIZE_ORIGINAL_TEXT--></option>
+															<option value="9999"><!--$IMAGE_RESIZE_TEXT--> <!--$IMAGE_RESIZE_ORIGINAL_TEXT--></option>
 															<option value="240" ><!--$IMAGE_RESIZE_TEXT--> 240px</option>
 															<option value="320" ><!--$IMAGE_RESIZE_TEXT--> 320px</option>
 															<option value="640" ><!--$IMAGE_RESIZE_TEXT--> 640px</option>
@@ -14,6 +14,7 @@
 															<option value="1280"><!--$IMAGE_RESIZE_TEXT--> 1280px</option>
 															<option value="1600"><!--$IMAGE_RESIZE_TEXT--> 1600px</option>
 															<option value="1920"><!--$IMAGE_RESIZE_TEXT--> 1920px</option>
+															<option value="0"   ><!--$IMAGE_RESIZE_JUST_TEXT--></option>
 														</select>
 														<SCRIPT> $("#IMAGE_RESIZE").val('<!--$IMAGE_RESIZE-->'); </SCRIPT>
 													</td>
@@ -254,7 +255,18 @@
 											modules : 'security',
 											errorMessagePosition : $messages
 										});
+
+										$('#IMAGE_RESIZE').on('click change', function(event) 
+										{ 
+											if ( $('#URL_HELP_IMAGE_RESIZE').is(':checked') ) { $( '#image_resize' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#IMAGE_RESIZE').val()+'</SPAN>'); $( '#image_resize' ).prop('url','&image_resize=' + $('#IMAGE_RESIZE').val()) } else { $( '#image_resize' ).html(''); $( '#image_resize' ).prop('url','') };
+										});
+										$('#EMAIL_RESIZE').on('click change', function(event) 
+										{ 
+													if ( $('#URL_HELP_EMAIL_RESIZE').is(':checked') ) { $( '#email_resize' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#EMAIL_RESIZE').val()+'</SPAN>'); $( '#email_resize' ).prop('url','&email_resize=' + $('#EMAIL_RESIZE').val()) } else { $( '#email_resize' ).html(''); $( '#email_resize' ).prop('url','') };
+										});
+
 										
+											
 										// Init
 
 										function cam_url(string2check)
@@ -341,6 +353,7 @@
 											{
 												last_part = last_part + $( "#image_resize").prop('url');
 											}
+
 											if ( $( "#no_email").css('display') == 'none' )
 											{
 												// Ignore in URL if not visible 

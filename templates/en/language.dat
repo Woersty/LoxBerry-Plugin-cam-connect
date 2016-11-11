@@ -1,57 +1,58 @@
 ;
 ; Cam-Connect Plugin
 ; Language phrases EN
-; 28.09.2016 19:44:38
+; 11.11.2016 01:42:45
 ;
-MY_NAME=Cam-Connect
-ERROR01=E01: Camera access error
-ERROR02=E02: JPEG files only
-ERROR03=E03: Error reading config
-ERROR04=E04: Cam-List: Read error
-ERROR05=E05: eMail-Config: Read error
-ERROR06=E06: eMail-Config invalid
-ERROR07=E07: Error during processing
-CFG_SAVED=Configuration saved
-LOGO_TEXT=Cam-Connect Plugin Settings
-WATERMARK_TEXT=With LoxBerry watermark
-EMAIL_USED_TEXT=Send eMail with picture
-EMAIL_INLINE_TEXT=Send picture not as an attachment but in the eMail body
-EMAIL_TO_TEXT=Get eMail recipients from request URL
-EMAIL_TO_HELP_TEXT=(What does it mean?)
-EMAIL_TO_EXPLAIN_TEXT=When calling the plugin from Loxone Config\, the recipients-eMailaddress it submitted with <font color="black">&email_to=</font><font color="blue">#RECIPIENTS#</font>.
-EMAIL_BODY_TEXT=Text:
-EMAIL_SIGNATURE_TEXT=Signature:
-EMAIL_SIGNATURE_VALIDATION=Please enter the eMail signature text.  <a target="_blank" href="https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> is allowed.
-EMAIL_SUBJECT_TEXT=Subject:
-EMAIL_SUBJECT1_VALIDATION=Please enter the first part of the eMail subject. Characters\, digigs and -_ []() are allowed.
-EMAIL_SUBJECT2_VALIDATION=Please enter the middle part of the eMail subject. Characters\, digigs and -_ []() are allowed.
-EMAIL_SUBJECT3_VALIDATION=Please enter the last part of the eMail subject. Characters\, digigs and -_ []() are allowed.
-EMAIL_DATE_FORMAT_VALIDATION=Please enter the date format for the eMail-subject. See <a href="http://php.net/manual/de/function.date.php" target="_blank">PHP-Manual</a>. Example: <font color="#000000">Y/m/d</font> 
-EMAIL_TIME_FORMAT_VALIDATION=Please enter the time format for the eMail-subject. See <a href="http://php.net/manual/de/function.date.php" target="_blank">PHP-Manual</a>. Example: <font color="#000000">H:i:s \\h</font> 
-EMAIL_BODY_VALIDATION=Please enter the eMail Text. <a target="_blank" href="https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> is allowed.
-EMAIL_FROM_NAME_TEXT=Sender name:
-EMAIL_FROM_NAME_VALIDATION=Please enter the eMail sender name. Characters\, digigs and -_ []() are allowed.
-EMAIL_FROM_NAME_INFO=<small><i>Please enter just the name.<br/>For other settings see <a target="_blank" href="/admin/system/mailserver.cgi?do=form">Mailserver</a>.</i></small>
-EMAIL_RECIPIENTS_TEXT=Recipient list:
-EMAIL_RECIPIENTS_INFO=<small><i>Separate multiple recipients <br/>by using a semicolon.</i></small>
-EMAIL_RECIPIENTS_VALIDATION=Please enter the recipient eMailaddresses. Multiple recipients are separated by using a semicolon. Characters\, digigs and -_ </>@.;:. are allowed
-CANCEL_TEXT=Cancel
-SAVE_TEXT=Save
-TEST_TEXT=Test
-URL_HELPER_SECTION_TEXT=This section can help you\, to figure out the right URL for the Loxone Config parameter of the Loxone Intercom object.
-CAM_HOST_TEXT=Camera-IP-Address or Hostname\:<br/><small><i>The port must be entered only\, if different from 80.</i></small>
-CAM_HOST_SUGGESTION=Camera-Hostname:80
-CAM_MODEL_TEXT=Camera-Model:
-CAM_USER_TEXT=Camera-Username:
-CAM_USER_SUGGESTION=Username
-CAM_PASS_TEXT=Camera-Password:
-CAM_PASS_SUGGESTION=Password
-LOXONE_CONFIG_TEXT=Please enter the following string in the Loxone Config Intercom-Object under "Picture when ringing (intern)":
-EMAIL_RESIZE_ORIGINAL_TEXT=Unchanged
-EMAIL_RESIZE_TEXT=Imagewidth in the eMail:
-IMAGE_RESIZE_ORIGINAL_TEXT=Unchanged
-IMAGE_RESIZE_TEXT=Imagewidth:
-URL_HELP_CUSTOMIZE_TEXT=Expert settings to use the plugin different from standard config:
-URL_HELP_NO_MAIL_TEXT=Send no eMail when called
-URL_HELP_IMAGE_RESIZE_TEXT=Use image resize info from URL
-URL_HELP_EMAIL_RESIZE_TEXT=Use image resize info from URL for eMail 
+MY_NAME="Cam-Connect"
+ERROR01="E01: Camera access error"
+ERROR02="E02: JPEG files only"
+ERROR03="E03: Error reading config"
+ERROR04="E04: Cam-List: Read error"
+ERROR05="E05: eMail-Config: Read error"
+ERROR06="E06: eMail-Config invalid"
+ERROR07="E07: Error during processing"
+CFG_SAVED="Configuration saved"
+LOGO_TEXT="Cam-Connect Plugin Settings"
+WATERMARK_TEXT="With LoxBerry watermark"
+EMAIL_USED_TEXT="Send eMail with picture"
+EMAIL_INLINE_TEXT="Send picture not as an attachment but in the eMail body"
+EMAIL_TO_TEXT="Get eMail recipients from request URL"
+EMAIL_TO_HELP_TEXT="(What does it mean?)"
+EMAIL_TO_EXPLAIN_TEXT="When calling the plugin from Loxone Config\, the recipients-eMailaddress it submitted with <font color=""black">&email_to="</font><font color=""blue">#RECIPIENTS#</font>."
+EMAIL_BODY_TEXT="Text:"
+EMAIL_SIGNATURE_TEXT="Signature:"
+EMAIL_SIGNATURE_VALIDATION="Please enter the eMail signature text.  <a target=""_blank" href=""https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> is allowed."
+EMAIL_SUBJECT_TEXT="Subject:"
+EMAIL_SUBJECT1_VALIDATION="Please enter the first part of the eMail subject. Characters\, digigs and -_ []() are allowed."
+EMAIL_SUBJECT2_VALIDATION="Please enter the middle part of the eMail subject. Characters\, digigs and -_ []() are allowed."
+EMAIL_SUBJECT3_VALIDATION="Please enter the last part of the eMail subject. Characters\, digigs and -_ []() are allowed."
+EMAIL_DATE_FORMAT_VALIDATION="Please enter the date format for the eMail-subject. See <a href=""http://php.net/manual/de/function.date.php" target=""_blank">PHP-Manual</a>. Example: <font color=""#000000">Y/m/d</font> "
+EMAIL_TIME_FORMAT_VALIDATION="Please enter the time format for the eMail-subject. See <a href=""http://php.net/manual/de/function.date.php" target=""_blank">PHP-Manual</a>. Example: <font color=""#000000">H:i:s \\h</font> "
+EMAIL_BODY_VALIDATION="Please enter the eMail Text. <a target=""_blank" href=""https://wiki.selfhtml.org/wiki/HTML#Elemente">HTML</a> is allowed."
+EMAIL_FROM_NAME_TEXT="Sender name:"
+EMAIL_FROM_NAME_VALIDATION="Please enter the eMail sender name. Characters\, digigs and -_ []() are allowed."
+EMAIL_FROM_NAME_INFO="<small><i>Please enter just the name.<br/>For other settings see <a target=""_blank" href=""/admin/system/mailserver.cgi?do="form">Mailserver</a>.</i></small>"
+EMAIL_RECIPIENTS_TEXT="Recipient list:"
+EMAIL_RECIPIENTS_INFO="<small><i>Separate multiple recipients <br/>by using a semicolon.</i></small>"
+EMAIL_RECIPIENTS_VALIDATION="Please enter the recipient eMailaddresses. Multiple recipients are separated by using a semicolon. Characters\, digigs and -_ </>@.;:. are allowed"
+CANCEL_TEXT="Cancel"
+SAVE_TEXT="Save"
+TEST_TEXT="Test"
+URL_HELPER_SECTION_TEXT="This section can help you\, to figure out the right URL for the Loxone Config parameter of the Loxone Intercom object."
+CAM_HOST_TEXT="Camera-IP-Address or Hostname\:<br/><small><i>The port must be entered only\, if different from 80.</i></small>"
+CAM_HOST_SUGGESTION="Camera-Hostname:80"
+CAM_MODEL_TEXT="Camera-Model:"
+CAM_USER_TEXT="Camera-Username:"
+CAM_USER_SUGGESTION="Username"
+CAM_PASS_TEXT="Camera-Password:"
+CAM_PASS_SUGGESTION="Password"
+LOXONE_CONFIG_TEXT="Please enter the following string in the Loxone Config Intercom-Object under "Picture when ringing (intern)":"
+EMAIL_RESIZE_ORIGINAL_TEXT="Unchanged"
+EMAIL_RESIZE_TEXT="Imagewidth in the eMail:"
+IMAGE_RESIZE_ORIGINAL_TEXT="Unchanged"
+IMAGE_RESIZE_JUST_TEXT="Do not display a picture"
+IMAGE_RESIZE_TEXT="Imagewidth:"
+URL_HELP_CUSTOMIZE_TEXT="Expert settings to use the plugin different from standard config:"
+URL_HELP_NO_MAIL_TEXT="Send no eMail when called"
+URL_HELP_IMAGE_RESIZE_TEXT="Use image resize info from URL"
+URL_HELP_EMAIL_RESIZE_TEXT="Use image resize info from URL for eMail "

@@ -2,11 +2,11 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 04.10.2016 19:47:45
+# Version: 11.11.2016 01:10:37
 #####################################################################################################
 
 // Error Reporting off
-error_reporting(E_ALL & ~E_STRICT);     // Alle Fehler reporten (Auﬂer E_STRICT)
+error_reporting(~E_ALL & ~E_STRICT);     // Alle Fehler reporten (Auﬂer E_STRICT)
 ini_set("display_errors", false);       // Fehler nicht direkt via PHP ausgeben
 
 // Read LoxBerry Basic configuration file to get the used language
@@ -205,8 +205,6 @@ if(mb_strlen($picture) < 500)
 else
 {
   // Seems to be ok - Display the picture
-  header('Content-type: image/jpeg');
-  header('Content-Disposition: inline; filename="snapshot.jpeg"');
   if ($plugin_cfg["WATERMARK"] == 1)
   {
     // Create Cam Image Object
@@ -238,7 +236,7 @@ else
   }
 
   // Resize image to parameter &image_resize=xxx from URL if provided - must be >= 240 or <= 1920
-  if ( isset($_GET["image_resize"]) )
+  if ( isset($_GET["image_resize"]) && $_GET["image_resize"] <> 0 )
 	{
 		// Resize
 		if ( (intval($_GET["image_resize"]) >= 200) &&  ( intval($_GET["image_resize"]) <= 1920 ) )
@@ -253,7 +251,7 @@ else
 		}
 	}
 	// Resize image to parameter IMAGE_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
-	elseif ( isset( $plugin_cfg['IMAGE_RESIZE'] ) )
+	elseif ( ( isset( $plugin_cfg['IMAGE_RESIZE'] ) && $plugin_cfg['IMAGE_RESIZE'] <> 0 ) && !isset($_GET["image_resize"]) )
 	{
 		// Resize as configured in cam-connect.cfg
 		if ( (intval($plugin_cfg['IMAGE_RESIZE']) >= 200) &&  ( intval($plugin_cfg['IMAGE_RESIZE']) <= 1920 ) )
@@ -272,8 +270,19 @@ else
 		// No resize
 		$resized_picture = $picture;
 	}
-  echo $resized_picture;
-
+	
+	// No picture to display?
+	if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ) )
+	{
+		// No picture 
+	}
+	else
+	{
+	  header('Content-type: image/jpeg');
+  	header('Content-Disposition: inline; filename="snapshot.jpeg"');
+  	echo $resized_picture;
+	}
+	
   // eMail Part
   // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
   if ( isset($_GET["email_resize"]) )
@@ -312,7 +321,13 @@ else
 	}
 	
   // If wanted, send eMail
-  if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"])) send_mail_pic($resized_picture );
+  if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"])) $sent = send_mail_pic($resized_picture );
+
+  // If just text mode
+	if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ))
+	{
+		echo $sent;
+	}
 }
 exit;
 
@@ -358,7 +373,6 @@ function send_mail_pic($picture)
   {
       $mail->FromName   = "LoxBerry";
   }
-  //$mail->SMTPDebug = 2;
 
   // Use recipients from URL if valid and configured
   $at_least_one_valid_email=0;
@@ -432,9 +446,19 @@ function send_mail_pic($picture)
   $html .= "<br/>".utf8_decode($plugin_cfg["EMAIL_SIGNATURE"]);
   $html .= '</body></html>';                                            // End of eMail
   $mail->Body    = $html;
+
+
+  
+	ob_start();
   if(!$mail->send())
   {
-     return 'Mailer Error: ' . $mail->ErrorInfo;
+	ob_end_clean();
+  return "Plugin-Error: [".$mail->ErrorInfo."]";
+  }
+  else
+  {
+	ob_end_clean();
+  return "Mail ok.";
   }
 }
 
