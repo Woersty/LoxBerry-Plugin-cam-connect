@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 11.11.2016 01:10:37
+# Version: 22.11.2016 19:21:09
 #####################################################################################################
 
 // Error Reporting off
@@ -99,6 +99,7 @@ if ($cam_models_handle)
       if (intval($config_line[0]) == $cam_model)
       {
         $plugin_cfg['imagepath'] = $config_line[3];
+        $plugin_cfg['model']     = $config_line[2];
         break;
       }
     }
@@ -144,6 +145,27 @@ $plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'
 $plugin_cfg['user'] = addslashes($_GET['user']);
 $plugin_cfg['pass'] = addslashes($_GET['pass']);
 
+// Exception for Digitus DN-16049
+if ( $plugin_cfg['model'] == "DN-16049" )
+{
+  $curl = curl_init();
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+  curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
+  curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
+  foreach(split("\n",curl_exec($curl)) as $k=>$html_zeile)
+  {
+    if(preg_match("/\b.jpg\b/i", $html_zeile))
+    {
+      $anfang             = stripos($html_zeile, '"../../..')  +9;
+      $ende               = strrpos($html_zeile, '.jpg"')       -5 -9;
+      $plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].substr($html_zeile,$anfang,$ende)));
+      break;
+    }
+  }
+}
+
 // Init and config cURL
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -157,7 +179,7 @@ $picture = curl_exec($curl);
 // Read picture from IP-Cam and close connection to Cam
 if($picture === false)
 {
-	// Display an Error-Picture
+  // Display an Error-Picture
   header ("Content-type: image/jpeg");
   $error_msg = $phrases["ERROR01"];
   $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
@@ -173,7 +195,7 @@ if($picture === false)
 }
 else
 {
-	$picture = curl_exec($curl);
+  $picture = curl_exec($curl);
 }
 curl_close($curl);
 
@@ -181,7 +203,7 @@ curl_close($curl);
 if(mb_strlen($picture) < 500)
 {
   // Image too small, raise error 01
-	header ("Content-type: image/jpeg");
+  header ("Content-type: image/jpeg");
   $error_msg = $phrases["ERROR01"];
   $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
   $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
@@ -194,13 +216,13 @@ if(mb_strlen($picture) < 500)
   $line = 70;
   $picture= preg_replace("/\r|/",'',$picture);
   foreach (explode("\n",$picture ) as $pic_line)
-	{
-		$line = $line + 20;
-	  ImageString ($error_image, 20, 10, $line, $pic_line, $text_color);
-	}
+  {
+    $line = $line + 20;
+    ImageString ($error_image, 20, 10, $line, $pic_line, $text_color);
+  }
   ImageJPEG ($error_image);
   ImageDestroy($error_image);
-	exit;
+  exit;
 }
 else
 {
@@ -237,97 +259,97 @@ else
 
   // Resize image to parameter &image_resize=xxx from URL if provided - must be >= 240 or <= 1920
   if ( isset($_GET["image_resize"]) && $_GET["image_resize"] <> 0 )
-	{
-		// Resize
-		if ( (intval($_GET["image_resize"]) >= 200) &&  ( intval($_GET["image_resize"]) <= 1920 ) )
-		{
-			$newwidth = intval($_GET["image_resize"]);
-			$resized_picture = resize_cam_image($picture,$newwidth);
-		}
-		else
-		{
-			// Invalid, no resize
-			$resized_picture = $picture;
-		}
-	}
-	// Resize image to parameter IMAGE_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
-	elseif ( ( isset( $plugin_cfg['IMAGE_RESIZE'] ) && $plugin_cfg['IMAGE_RESIZE'] <> 0 ) && !isset($_GET["image_resize"]) )
-	{
-		// Resize as configured in cam-connect.cfg
-		if ( (intval($plugin_cfg['IMAGE_RESIZE']) >= 200) &&  ( intval($plugin_cfg['IMAGE_RESIZE']) <= 1920 ) )
-		{
-			$newwidth = intval($plugin_cfg['IMAGE_RESIZE']);
-			$resized_picture = resize_cam_image($picture,$newwidth);
-		}
-		else
-		{
-			// Invalid, no resize
-			$resized_picture = $picture;
-		}
-	}
-	else
-	{
-		// No resize
-		$resized_picture = $picture;
-	}
-	
-	// No picture to display?
-	if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ) )
-	{
-		// No picture 
-	}
-	else
-	{
-	  header('Content-type: image/jpeg');
-  	header('Content-Disposition: inline; filename="snapshot.jpeg"');
-  	echo $resized_picture;
-	}
-	
+  {
+    // Resize
+    if ( (intval($_GET["image_resize"]) >= 200) &&  ( intval($_GET["image_resize"]) <= 1920 ) )
+    {
+      $newwidth = intval($_GET["image_resize"]);
+      $resized_picture = resize_cam_image($picture,$newwidth);
+    }
+    else
+    {
+      // Invalid, no resize
+      $resized_picture = $picture;
+    }
+  }
+  // Resize image to parameter IMAGE_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
+  elseif ( ( isset( $plugin_cfg['IMAGE_RESIZE'] ) && $plugin_cfg['IMAGE_RESIZE'] <> 0 ) && !isset($_GET["image_resize"]) )
+  {
+    // Resize as configured in cam-connect.cfg
+    if ( (intval($plugin_cfg['IMAGE_RESIZE']) >= 200) &&  ( intval($plugin_cfg['IMAGE_RESIZE']) <= 1920 ) )
+    {
+      $newwidth = intval($plugin_cfg['IMAGE_RESIZE']);
+      $resized_picture = resize_cam_image($picture,$newwidth);
+    }
+    else
+    {
+      // Invalid, no resize
+      $resized_picture = $picture;
+    }
+  }
+  else
+  {
+    // No resize
+    $resized_picture = $picture;
+  }
+
+  // No picture to display?
+  if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ) )
+  {
+    // No picture
+  }
+  else
+  {
+    header('Content-type: image/jpeg');
+    header('Content-Disposition: inline; filename="snapshot.jpeg"');
+    echo $resized_picture;
+  }
+
   // eMail Part
   // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
   if ( isset($_GET["email_resize"]) )
-	{
-		// Resize
-		if ( (intval($_GET["email_resize"]) >= 200) &&  ( intval($_GET["email_resize"]) <= 1920 ) )
-		{
-			$newwidth = intval($_GET["email_resize"]);
-			$resized_picture = resize_cam_image($picture,$newwidth);
-		}
-		else
-		{
-			// Invalid, no resize
-			$resized_picture = $picture;
-		}
-	}
-	// Resize image to parameter EMAIL_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
-	elseif ( isset( $plugin_cfg['EMAIL_RESIZE'] ) )
-	{
-		// Resize as configured in cam-connect.cfg
-		if ( (intval($plugin_cfg['EMAIL_RESIZE']) >= 200) &&  ( intval($plugin_cfg['EMAIL_RESIZE']) <= 1920 ) )
-		{
-			$newwidth = intval($plugin_cfg['EMAIL_RESIZE']);
-			$resized_picture = resize_cam_image($picture,$newwidth);
-		}
-		else
-		{
-			// Invalid, no resize
-			$resized_picture = $picture;
-		}
-	}
-	else
-	{
-		// No resize
-		$resized_picture = $picture;
-	}
-	
+  {
+    // Resize
+    if ( (intval($_GET["email_resize"]) >= 200) &&  ( intval($_GET["email_resize"]) <= 1920 ) )
+    {
+      $newwidth = intval($_GET["email_resize"]);
+      $resized_picture = resize_cam_image($picture,$newwidth);
+    }
+    else
+    {
+      // Invalid, no resize
+      $resized_picture = $picture;
+    }
+  }
+  // Resize image to parameter EMAIL_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
+  elseif ( isset( $plugin_cfg['EMAIL_RESIZE'] ) )
+  {
+    // Resize as configured in cam-connect.cfg
+    if ( (intval($plugin_cfg['EMAIL_RESIZE']) >= 200) &&  ( intval($plugin_cfg['EMAIL_RESIZE']) <= 1920 ) )
+    {
+      $newwidth = intval($plugin_cfg['EMAIL_RESIZE']);
+      $resized_picture = resize_cam_image($picture,$newwidth);
+    }
+    else
+    {
+      // Invalid, no resize
+      $resized_picture = $picture;
+    }
+  }
+  else
+  {
+    // No resize
+    $resized_picture = $picture;
+  }
+
   // If wanted, send eMail
   if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"])) $sent = send_mail_pic($resized_picture );
 
   // If just text mode
-	if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ))
-	{
-		echo $sent;
-	}
+  if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ))
+  {
+    echo $sent;
+  }
 }
 exit;
 
@@ -426,19 +448,19 @@ function send_mail_pic($picture)
 
   // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
   if ( isset($_GET["email_resize"]) )
-	{
-		if ( (intval($_GET["email_resize"]) >= 200) && (intval($_GET["email_resize"]) <= 1920) )
-		{
-			$plugin_cfg['EMAIL_RESIZE'] = intval($_GET["email_resize"]);
-		}
-	}
+  {
+    if ( (intval($_GET["email_resize"]) >= 200) && (intval($_GET["email_resize"]) <= 1920) )
+    {
+      $plugin_cfg['EMAIL_RESIZE'] = intval($_GET["email_resize"]);
+    }
+  }
 
   // Resize image if EMAIL_RESIZE is >= 240 - max is 1920
   $newwidth = $plugin_cfg['EMAIL_RESIZE'];
   if ($newwidth >= 240)
   {
     if ($newwidth > 1920) $newwidth=1920;
-		$picture = resize_cam_image($picture,$newwidth);
+    $picture = resize_cam_image($picture,$newwidth);
   }
 
   // Insert image
@@ -448,16 +470,16 @@ function send_mail_pic($picture)
   $mail->Body    = $html;
 
 
-  
-	ob_start();
+
+  ob_start();
   if(!$mail->send())
   {
-	ob_end_clean();
+  ob_end_clean();
   return "Plugin-Error: [".$mail->ErrorInfo."]";
   }
   else
   {
-	ob_end_clean();
+  ob_end_clean();
   return "Mail ok.";
   }
 }
@@ -474,6 +496,6 @@ function resize_cam_image ($picture,$newwidth=720)
     $picture = ob_get_contents();
     ob_end_clean();
     ImageDestroy($thumb);
-   	ImageDestroy($source);
-		return $picture;
+    ImageDestroy($source);
+    return $picture;
 }
