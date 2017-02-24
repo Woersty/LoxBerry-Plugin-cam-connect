@@ -1,7 +1,7 @@
 ;
 ; Cam-Connect Plugin
 ; Language phrases EN
-; 11.11.2016 01:42:45
+; 24.02.2017 20:15:02
 ;
 MY_NAME="Cam-Connect"
 ERROR01="E01: Camera access error"
@@ -56,3 +56,13 @@ URL_HELP_CUSTOMIZE_TEXT="Expert settings to use the plugin different from standa
 URL_HELP_NO_MAIL_TEXT="Send no eMail when called"
 URL_HELP_IMAGE_RESIZE_TEXT="Use image resize info from URL"
 URL_HELP_EMAIL_RESIZE_TEXT="Use image resize info from URL for eMail "
+HLP_WATERMARK_TEXT="Prints a LoxBerry watermark in the left lower corner."
+HLP_EMAIL_USED_TEXT="Sends an eMail with the camera picture if the Plugin is called."
+HLP_EMAIL_RECIPIENTS_TEXT="eMail-Address of the der recipients. Multiple separated by semicolon."
+HLP_EMAIL_FROM_NAME_TEXT="Name but not eMail-Address of the sender. The settings for the sender are made in the LoxBerry Mainmenu under <a target='_blank' href='/admin/system/mailserver.cgi?do=form'>Mailserver</a>."
+HLP_EMAIL_SUBJECT_TEXT="The subject line of the eMail. Consists of multiple parts. The 2nd fiels is treated as date and the 4th as time. Details see <a target='_blank' href='http://php.net/manual/en/function.date.php'>PHP-Onlinehelp</a>"
+HLP_EMAIL_BODY_TEXT="eMail text. HTML is allowed. Details see <a target='_blank' href='https://wiki.selfhtml.org/wiki/HTML#Elemente'>HTML-Onlinehelp</a>. Line breaks with <font face='monospace'><big><b>&#x3C;br/&#x3E;</b></big></font>"
+HLP_EMAIL_INLINE_TEXT="Sends the Camera picture not as an attachment but put it under the text before the signature."
+HLP_EMAIL_TO_TEXT="When calling the plugin from Loxone Config, the recipients-eMailaddress it submitted with <font face='monospace'><big><b>&email_to=me@email.com</b></big></font>."
+HLP_EMAIL_RESIZE_TEXT="Size of the picture in the eMail. Height is automatically calculated to keep aspect ratio."
+HLP_EMAIL_SIGNATURE_TEXT="eMail-Signature. HTML is allowed here too."

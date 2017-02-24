@@ -1,7 +1,7 @@
 ;
 ; Cam-Connect Plugin
 ; Language phrases DE
-; 11.11.2016 01:42:39
+; 24.02.2017 20:14:55
 ;
 MY_NAME="Cam-Connect"
 ERROR01="E01: Fehler beim Kamerazugriff"
@@ -56,3 +56,14 @@ URL_HELP_CUSTOMIZE_TEXT="Experten-Einstellungen um das Plugin vom Standard abwei
 URL_HELP_NO_MAIL_TEXT="Keine eMail beim Aufruf versenden"
 URL_HELP_IMAGE_RESIZE_TEXT="Bildgr&ouml;&szlig;e beim Aufruf &uuml;bergeben"
 URL_HELP_EMAIL_RESIZE_TEXT="Bildgr&ouml;&szlig;e f&uuml;r eMail beim Aufruf &uuml;bergeben"
+HLP_WATERMARK_TEXT="Aktiviert ein LoxBerry Wasserzeichen in der unteren linken Ecke."
+HLP_EMAIL_USED_TEXT="Sendet eine eMail mit dem Kamerabild, wenn das Plugin aufgerufen wird."
+HLP_EMAIL_RECIPIENTS_TEXT="eMail-Adressen der Empf&auml;nger. Mehrere Empf&auml;nger durch ; trennen."
+HLP_EMAIL_FROM_NAME_TEXT="Name des Absenders. Nicht die eMail-Adresse. Die Einstellungen zum Absender werden im LoxBerry Hauptmen&uuml; unter <a target='_blank' href='/admin/system/mailserver.cgi?do=form'>Mailserver</a> vorgenommen."
+HLP_EMAIL_SUBJECT_TEXT="Die Betreffzeile der eMail. Bestehend aus mehreren Teilen. Das 2. Feld wird als Datum und das 4. Feld als Zeit formatiert. Details siehe <a target='_blank' href='http://php.net/manual/de/function.date.php'>PHP-Onlinehilfe</a>"
+HLP_EMAIL_BODY_TEXT="Text der eMail. HTML ist erlaubt. Details siehe <a target='_blank' href='https://wiki.selfhtml.org/wiki/HTML#Elemente'>HTML-Onlinehilfe</a>. Zeilenumbr&uuml;che mit <font face='monospace'><big><b>&#x3C;br/&#x3E;</b></big></font>"
+HLP_EMAIL_INLINE_TEXT="Sendet das Kamerabild nicht als Anhang sondern f&uumlgt es unter dem Text vor der Signatur ein."
+HLP_EMAIL_RESIZE_TEXT="Breite des Bildes in der eMail. Die H&ouml;he wird automatisch berechnet um die Seitenverh&auml;ltnisse beizubehalten."
+HLP_EMAIL_TO_TEXT="Beim Aufruf des Plugins aus der Loxone Config wird die Empf&auml;nger-eMailadresse mit <font face='monospace'><big><b>&email_to=ich@email.de</b></big></font> &uuml;bergeben."
+HLP_EMAIL_SIGNATURE_TEXT="Die eMail-Signatur. HTML ist auch hier erlaubt."
+ 

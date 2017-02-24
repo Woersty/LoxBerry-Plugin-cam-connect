@@ -91,7 +91,7 @@ our $SAVE_DATE=localtime->strftime('%Y_%m_%d_%H-%M-%S');
 ##########################################################################
 
 # Version of this script
-$version = "1.6";
+$version = "1.9.3";
 
 # Figure out in which subfolder we are installed
 $psubfolder = abs_path($0);
@@ -199,6 +199,11 @@ foreach my $key (keys %{ $phraseplugin->vars() } )
 {
 	(my $cfg_section,my $cfg_varname) = split(/\./,$key,2);
 	push @language_strings, $cfg_varname;
+}
+
+foreach our $template_string (@language_strings)
+{
+  ${$template_string} = $phraseplugin->param($template_string);
 }
 
 $template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME");
@@ -374,11 +379,14 @@ sub lbheader {
   $helplink = "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
   $helptext = "";
    open(F,"$installfolder/templates/plugins/$psubfolder/$lang/help.html") || die "Missing template plugins/miniserverbackup/$lang/help.html";
-    @help = <F>;
-    foreach (@help){
-      s/[\n\r]/ /g;
-      $helptext = $helptext . $_;
-    }
+	    @help = <F>;
+	    foreach (@help)
+	    {
+	      $_ =~ s/<!--\$psubfolder-->/$psubfolder/g;
+	      s/[\n\r]/ /g;
+	      $_ =~ s/<!--\$(.*?)-->/${$1}/g;
+	      $helptext = $helptext . $_;
+	    }
   close(F);
 
   open(F,"$installfolder/templates/system/$lang/header.html") || die "Missing template system/$lang/header.html";
