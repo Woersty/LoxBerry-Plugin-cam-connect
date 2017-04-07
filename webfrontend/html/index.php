@@ -2,15 +2,15 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 19.03.2017 18:50:00
+# Version: 07.04.2017 14:36:04
 #####################################################################################################
 
 // Error Reporting off
 error_reporting(~E_ALL & ~E_STRICT);     // Alle Fehler reporten (Außer E_STRICT)
-ini_set("display_errors", false);       // Fehler nicht direkt via PHP ausgeben
+ini_set("display_errors", false);        // Fehler nicht direkt via PHP ausgeben
 
 // Generate date and time
-$dt    = new DateTime;
+$datetime    = new DateTime;
 
 // Read LoxBerry Basic configuration file to get the used language
 $config_file          = dirname(__FILE__)."/../../../../config/system/general.cfg";
@@ -304,7 +304,7 @@ else
   else
   {
     header('Content-type: image/jpeg');
-    header('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$dt->format("Y-m-d_i\hh\mH\s").'.jpg');
+    header('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg');
     echo $resized_picture;
   }
 
@@ -346,7 +346,7 @@ else
   }
 
   // If wanted, send eMail
-  if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"])) $sent = send_mail_pic($resized_picture );
+  if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"])) $sent = send_mail_pic($resized_picture);
 
   // If just text mode
   if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ))
@@ -375,7 +375,7 @@ function error_image ($phrases,$error_code)
 
 function send_mail_pic($picture)
 {
-  global $plugin_cfg, $cam_name, $mail_cfg, $phrases;
+  global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $phrases;
   require dirname($_SERVER["SCRIPT_FILENAME"]).'/PHPMailerAutoload.php';
   $mail = new PHPMailer;
   $mail->isSMTP();                                       // Set mailer to use SMTP
@@ -401,6 +401,7 @@ function send_mail_pic($picture)
 
   // Use recipients from URL if valid and configured
   $at_least_one_valid_email=0;
+
   if ( $plugin_cfg['EMAIL_TO'] == 1 )
   {
     if ( isset($_GET["email_to"]) )
@@ -427,10 +428,10 @@ function send_mail_pic($picture)
   }
 
 	// Date for eMail
-  $datum = $dt->format($plugin_cfg['EMAIL_DATE_FORMAT']." ".$plugin_cfg['EMAIL_TIME_FORMAT']);
-
+  $datum = $datetime->format($plugin_cfg['EMAIL_DATE_FORMAT']." ".$plugin_cfg['EMAIL_TIME_FORMAT']);
+	
   // Generate subject
-  $mail->Subject = utf8_decode($cam_name.$plugin_cfg["EMAIL_SUBJECT1"].$dt->format($plugin_cfg["EMAIL_DATE_FORMAT"]).$plugin_cfg["EMAIL_SUBJECT2"].$dt->format($plugin_cfg["EMAIL_TIME_FORMAT"]).$plugin_cfg["EMAIL_SUBJECT3"]);
+  $mail->Subject = utf8_decode($cam_name.$plugin_cfg["EMAIL_SUBJECT1"].$datetime->format($plugin_cfg["EMAIL_DATE_FORMAT"]).$plugin_cfg["EMAIL_SUBJECT2"].$datetime->format($plugin_cfg["EMAIL_TIME_FORMAT"]).$plugin_cfg["EMAIL_SUBJECT3"]);
 
   // Create Body
   $mail->AltBody = $plugin_cfg["EMAIL_BODY"];
@@ -466,7 +467,7 @@ function send_mail_pic($picture)
   }
 
   // Insert image
-  $mail->AddStringEmbeddedImage($picture, $plugin_cfg['EMAIL_FILENAME'], $plugin_cfg['EMAIL_FILENAME']."_".$dt->format("Y-m-d_i\hh\mH\s").'.jpg', 'base64', "image/jpeg", "$inline");
+  $mail->AddStringEmbeddedImage($picture, $plugin_cfg['EMAIL_FILENAME'], $plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg', 'base64', "image/jpeg", "$inline");
   $html .= "<br/>".utf8_decode($plugin_cfg["EMAIL_SIGNATURE"]);
   $html .= '</body></html>';                                            // End of eMail
   $mail->Body    = $html;
