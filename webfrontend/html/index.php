@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 07.04.2017 14:36:04
+# Version: 12.04.2017 07:42:17
 #####################################################################################################
 
 // Error Reporting off
@@ -184,6 +184,9 @@ if($picture === false)
 {
   // Display an Error-Picture
   header ("Content-type: image/jpeg");
+  header ("Cache-Control: no-cache, no-store, must-revalidate"); 
+  header ("Pragma: no-cache"); 
+  header ("Expires: 0"); 
   $error_msg = $phrases["ERROR01"];
   $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
   $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
@@ -207,6 +210,9 @@ if(mb_strlen($picture) < 500)
 {
   // Image too small, raise error 01
   header ("Content-type: image/jpeg");
+  header ("Cache-Control: no-cache, no-store, must-revalidate"); 
+  header ("Pragma: no-cache"); 
+  header ("Expires: 0"); 
   $error_msg = $phrases["ERROR01"];
   $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
   $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
@@ -303,8 +309,11 @@ else
   }
   else
   {
-    header('Content-type: image/jpeg');
-    header('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg');
+    header ('Content-type: image/jpeg');
+    header ("Cache-Control: no-cache, no-store, must-revalidate"); 
+    header ("Pragma: no-cache"); 
+    header ("Expires: 0"); 
+    header ('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg');
     echo $resized_picture;
   }
 
@@ -364,6 +373,9 @@ function error_image ($phrases,$error_code)
 
   // Display an Error-Picture
   header ("Content-type: image/jpeg");
+  header ("Cache-Control: no-cache, no-store, must-revalidate"); 
+  header ("Pragma: no-cache"); 
+  header ("Expires: 0"); 
   $error_image      = @ImageCreate (320, 240) or die ($error_msg);
   $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
   $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
