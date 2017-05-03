@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 12.04.2017 07:42:17
+# Version: 03.05.2017 22:14:23
 #####################################################################################################
 
 // Error Reporting off
@@ -454,7 +454,7 @@ function send_mail_pic($picture)
   if ($plugin_cfg["EMAIL_INLINE"] == 1)
   {
     $inline  =  'inline';
-    $html   .=  '<img src="cid:'.$plugin_cfg['EMAIL_FILENAME'].'" alt="'.$plugin_cfg['EMAIL_FILENAME'].'" />';
+    $html   .=  '<img src="cid:'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'" alt="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg'.'" />';
   }
   else
   {
@@ -479,7 +479,7 @@ function send_mail_pic($picture)
   }
 
   // Insert image
-  $mail->AddStringEmbeddedImage($picture, $plugin_cfg['EMAIL_FILENAME'], $plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg', 'base64', "image/jpeg", "$inline");
+  $mail->AddStringEmbeddedImage($picture, $plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s"), $plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg', 'base64', "image/jpeg", "$inline");
   $html .= "<br/>".utf8_decode($plugin_cfg["EMAIL_SIGNATURE"]);
   $html .= '</body></html>';                                            // End of eMail
   $mail->Body    = $html;
