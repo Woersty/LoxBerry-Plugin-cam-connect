@@ -96,6 +96,7 @@ if ($cam_models_handle)
   while (!feof($cam_models_handle))
   {
     $line_of_text = fgets($cam_models_handle);
+    $line_of_text = preg_replace('/\r?\n|\r/','', $line_of_text);
     $config_line = explode('|', $line_of_text);
     if (count($config_line) == 5)
     {
@@ -154,7 +155,7 @@ if ( $plugin_cfg['model'] == "DN-16049" )
 {
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($curl, CURLOPT_HTTPAUTH, $plugin_cfg['httpauth']);
+  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
   curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
   curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
   curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
@@ -174,6 +175,7 @@ if ( $plugin_cfg['model'] == "DN-16049" )
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($curl, CURLOPT_HTTPAUTH, $plugin_cfg['httpauth']);
+#curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
 curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
 curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
@@ -220,7 +222,7 @@ if(mb_strlen($picture) < 500)
   $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
   ImageString ($error_image,20, 10, 10, $error_msg, $text_color);
   $text_color       = ImageColorAllocate ($error_image, 0, 0, 255);
-  $error_msg = "URL: ".$plugin_cfg['url'];
+  $error_msg = "URL: ".$plugin_cfg['url']."  HTTPAUTH: ".$plugin_cfg['httpauth'];
   ImageString ($error_image, 20, 10, 50, $error_msg, $text_color);
   $text_color       = ImageColorAllocate ($error_image, 128,128,128);
   $line = 70;
