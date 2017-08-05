@@ -97,10 +97,11 @@ if ($cam_models_handle)
   {
     $line_of_text = fgets($cam_models_handle);
     $config_line = explode('|', $line_of_text);
-    if (count($config_line) == 4)
+    if (count($config_line) == 5)
     {
       if (intval($config_line[0]) == $cam_model)
       {
+        $plugin_cfg['httpauth'] = $config_line[4];
         $plugin_cfg['imagepath'] = $config_line[3];
         $plugin_cfg['model']     = $config_line[2];
         break;
@@ -153,7 +154,7 @@ if ( $plugin_cfg['model'] == "DN-16049" )
 {
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+  curl_setopt($curl, CURLOPT_HTTPAUTH, $plugin_cfg['httpauth']);
   curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
   curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
   curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
@@ -172,7 +173,7 @@ if ( $plugin_cfg['model'] == "DN-16049" )
 // Init and config cURL
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+curl_setopt($curl, CURLOPT_HTTPAUTH, $plugin_cfg['httpauth']);
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
 curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
 curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);

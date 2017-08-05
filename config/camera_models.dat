@@ -1,4 +1,7 @@
-1|Trendnet|TV-IP310PI|/Streaming/channels/1/picture
-2|Trendnet|TV-IP302PI|/GetImage.cgi
-3|Digitus|DN-16049|/web/cgi-bin/hi3510/snap.cgi?&-getpic
-4|Axis|M3024-L|/jpg/image.jpg
+1|Trendnet|TV-IP310PI|/Streaming/channels/1/picture|CURLAUTH_DIGEST
+2|Trendnet|TV-IP302PI|/GetImage.cgi|CURLAUTH_DIGEST
+3|Digitus|DN-16049|/web/cgi-bin/hi3510/snap.cgi?&-getpic|CURLAUTH_DIGEST
+4|Axis|M3024-L|/jpg/image.jpg|CURLAUTH_DIGEST
+5|Hikvision|DS-2CD2132|/Streaming/channels/1/picture|CURLAUTH_ANY
+6|Hikvision|DS-2CD2532|/Streaming/channels/1/picture|CURLAUTH_ANY
+7|Hikvision|Generic|/Streaming/channels/1/picture|CURLAUTH_ANY
