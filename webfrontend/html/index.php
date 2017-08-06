@@ -155,7 +155,7 @@ if ( $plugin_cfg['model'] == "DN-16049" )
 {
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+  curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
   curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
   curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
   curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
@@ -174,8 +174,7 @@ if ( $plugin_cfg['model'] == "DN-16049" )
 // Init and config cURL
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPAUTH, $plugin_cfg['httpauth']);
-#curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
 curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
 curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
