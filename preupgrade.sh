@@ -47,7 +47,8 @@ mkdir -p /tmp/uploads/$ARGV1\_upgrade/config
 mkdir -p /tmp/uploads/$ARGV1\_upgrade/log
 
 echo "<INFO> Backing up existing config files"
-cp -v -r $ARGV5/config/plugins/$ARGV3/ /tmp/uploads/$ARGV1\_upgrade/config
+# Avoid backing up camera_models.dat here
+cp -v -r $ARGV5/config/plugins/$ARGV3/cam-connect.cfg /tmp/uploads/$ARGV1\_upgrade/config
 
 echo "<INFO> Backing up existing log files"
 cp -v -r $ARGV5/log/plugins/$ARGV3/ /tmp/uploads/$ARGV1\_upgrade/log
