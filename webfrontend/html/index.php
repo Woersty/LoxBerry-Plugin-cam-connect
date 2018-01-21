@@ -89,6 +89,9 @@ else
   error_image($phrases,"ERROR03");
 }
 
+// Read channel Parameter - if none, default to 1
+(isset($_GET['channel']))?$channel_part='?&channel='.intval($_GET['channel']):$channel_part='';
+
 // Read camera-config
 if ($cam_models_handle)
 {
@@ -96,11 +99,13 @@ if ($cam_models_handle)
   while (!feof($cam_models_handle))
   {
     $line_of_text = fgets($cam_models_handle);
+    $line_of_text = preg_replace('/\r?\n|\r/','', $line_of_text);
     $config_line = explode('|', $line_of_text);
-    if (count($config_line) == 4)
+    if (count($config_line) == 5)
     {
       if (intval($config_line[0]) == $cam_model)
       {
+        $plugin_cfg['httpauth'] = $config_line[4];
         $plugin_cfg['imagepath'] = $config_line[3];
         $plugin_cfg['model']     = $config_line[2];
         break;
@@ -119,6 +124,9 @@ if (isset($_GET['email']))
 {
   $plugin_cfg['EMAIL_USED'] = intval($_GET['email']);
 }
+
+// Override $plugin_cfg['EMAIL_USED'] in config or URL if stream mode is used
+(isset($_GET['stream']))?$plugin_cfg['EMAIL_USED']=0:$plugin_cfg['EMAIL_USED']=$plugin_cfg['EMAIL_USED'];
 
 // Read LoxBerry Mail config
 $mail_config_file   = dirname(__FILE__)."/../../../../config/system/mail.cfg";
@@ -140,70 +148,58 @@ if (($plugin_cfg['EMAIL_USED'] == 1))
 // Set camera name if provided in URL via &cam-name=xxxx
 (isset($_GET['cam-name']))?$cam_name="[".addslashes($_GET['cam-name'])."] ":$cam_name="";
 
-// Wait a half second to be sure the image is available.
-sleep(.5);
-
 // Read IP-CAM connection details from URL
-$plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].$plugin_cfg['imagepath']));
+$plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].$plugin_cfg['imagepath'].$channel_part));
 $plugin_cfg['user'] = addslashes($_GET['user']);
 $plugin_cfg['pass'] = addslashes($_GET['pass']);
 
-// Exception for Digitus DN-16049
-if ( $plugin_cfg['model'] == "DN-16049" )
+function get_image()
 {
-  $curl = curl_init();
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-  curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
-  curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
-  foreach(split("\n",curl_exec($curl)) as $k=>$html_zeile)
-  {
-    if(preg_match("/\b.jpg\b/i", $html_zeile))
-    {
-      $anfang             = stripos($html_zeile, '"../../..')  +9;
-      $ende               = strrpos($html_zeile, '.jpg"')       -5 -9;
-      $plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].substr($html_zeile,$anfang,$ende)));
-      break;
-    }
-  }
+	global $plugin_cfg, $curl;
+	// Wait a half second to be sure the image is available.
+	sleep(.5);
+	// Exception for Digitus DN-16049
+	if ( $plugin_cfg['model'] == "DN-16049" )
+	{
+	  $curl = curl_init();
+	  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	  curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
+	  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+	  curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
+	  curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
+	  foreach(split("\n",curl_exec($curl)) as $k=>$html_zeile)
+	  {
+	    if(preg_match("/\b.jpg\b/i", $html_zeile))
+	    {
+	      $anfang             = stripos($html_zeile, '"../../..')  +9;
+	      $ende               = strrpos($html_zeile, '.jpg"')       -5 -9;
+	      $plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].substr($html_zeile,$anfang,$ende)));
+	      break;
+	    }
+	  }
+	}
+	
+	// Init and config cURL
+	$curl = curl_init();
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
+	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+	curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
+	curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
+	$picture = curl_exec($curl);
+	curl_close($curl);
+	// Read picture from IP-Cam and close connection to Cam
+	if($picture === false)
+	{
+	  $picture = get_image(); //error_image ($phrases,$error_msg);
+	}	
+	return $picture;
 }
 
-// Init and config cURL
-$curl = curl_init();
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
-curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
+$picture = get_image();
 
-$picture = curl_exec($curl);
 
-// Read picture from IP-Cam and close connection to Cam
-if($picture === false)
-{
-  // Display an Error-Picture
-  header ("Content-type: image/jpeg");
-  header ("Cache-Control: no-cache, no-store, must-revalidate"); 
-  header ("Pragma: no-cache"); 
-  header ("Expires: 0"); 
-  $error_msg = $phrases["ERROR01"];
-  $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
-  $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
-  $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
-  ImageString ($error_image, 20, 10, 90, $error_msg, $text_color);
-  $text_color       = ImageColorAllocate ($error_image, 128,128,128);
-  $error_msg = "cURL error: ".curl_error($curl);
-  ImageString ($error_image, 20, 10, 110, $error_msg, $text_color);
-  ImageJPEG ($error_image);
-  ImageDestroy($error_image);
-  exit;
-}
-else
-{
-  $picture = curl_exec($curl);
-}
-curl_close($curl);
+
 
 // If the result has less than 500 byte, it's no picture.
 if(mb_strlen($picture) < 500)
@@ -219,7 +215,7 @@ if(mb_strlen($picture) < 500)
   $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
   ImageString ($error_image,20, 10, 10, $error_msg, $text_color);
   $text_color       = ImageColorAllocate ($error_image, 0, 0, 255);
-  $error_msg = "URL: ".$plugin_cfg['url'];
+  $error_msg = "URL: ".$plugin_cfg['url']."  HTTPAUTH: ".$plugin_cfg['httpauth'];
   ImageString ($error_image, 20, 10, 50, $error_msg, $text_color);
   $text_color       = ImageColorAllocate ($error_image, 128,128,128);
   $line = 70;
@@ -302,20 +298,62 @@ else
     $resized_picture = $picture;
   }
 
-  // No picture to display?
-  if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ) )
-  {
-    // No picture
-  }
-  else
-  {
-    header ('Content-type: image/jpeg');
-    header ("Cache-Control: no-cache, no-store, must-revalidate"); 
-    header ("Pragma: no-cache"); 
-    header ("Expires: 0"); 
-    header ('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg');
-    echo $resized_picture;
-  }
+	if (isset($_GET['stream'])) 
+	{
+		$boundary = "mjpeg_stream";
+		header("Cache-Control: no-cache");
+		header("Cache-Control: private");
+		header("Pragma: no-cache");
+		header("Content-type: multipart/x-mixed-replace; boundary=$boundary");
+		print "--$boundary\n";
+		# Set this so PHP doesn't timeout during a long stream
+		set_time_limit(0);
+		# Disable Apache and PHP's compression of output to the client
+		@apache_setenv('no-gzip', 1);
+		@ini_set('zlib.output_compression', 0);
+		# Set implicit flush, and flush all current buffers
+		@ini_set('implicit_flush', 1);
+		for ($i = 0; $i < ob_get_level(); $i++)
+    	ob_end_flush();
+		ob_implicit_flush(1);
+		# The loop, producing one jpeg frame per iteration
+		while (true) 
+		{
+	    # Per-image header, note the two new-lines
+	    print "Content-type: image/jpeg\n\n";
+			$picture = get_image();
+			// Try again if last call failed e.g. device busy
+			if(mb_strlen($picture) < 2000)
+			{
+				$picture = get_image();
+			}
+			// Try again if last call failed - but last time we try it...
+			if(mb_strlen($picture) < 2000)
+			{
+				$picture = get_image();
+			}
+			echo $picture;
+			print "--$boundary\n";
+		}
+		exit;
+	}
+	else
+	{
+		// No picture to display?
+	  if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ) )
+	  {
+	    // No picture
+	  }
+	  else
+	  {
+	    header ('Content-type: image/jpeg');
+	    header ("Cache-Control: no-cache, no-store, must-revalidate"); 
+	    header ("Pragma: no-cache"); 
+	    header ("Expires: ".gmdate('D, d M Y H:i:s', time()-3600) . " GMT"); 
+	    header ('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg');
+	    echo $resized_picture;
+	  }
+	}
 
   // eMail Part
   // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
@@ -362,6 +400,7 @@ else
   {
     echo $sent;
   }
+	
 }
 exit;
 
