@@ -91,7 +91,7 @@ our $SAVE_DATE=localtime->strftime('%Y_%m_%d_%H-%M-%S');
 ##########################################################################
 
 # Version of this script
-$version = "1.9.3";
+$version = "2.0.1";
 
 # Figure out in which subfolder we are installed
 $psubfolder = abs_path($0);

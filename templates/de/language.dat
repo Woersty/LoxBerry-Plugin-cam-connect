@@ -66,4 +66,4 @@ HLP_EMAIL_INLINE_TEXT="Sendet das Kamerabild nicht als Anhang sondern f&uumlgt e
 HLP_EMAIL_RESIZE_TEXT="Breite des Bildes in der eMail. Die H&ouml;he wird automatisch berechnet um die Seitenverh&auml;ltnisse beizubehalten."
 HLP_EMAIL_TO_TEXT="Beim Aufruf des Plugins aus der Loxone Config wird die Empf&auml;nger-eMailadresse mit <font face='monospace'><big><b>&email_to=ich@email.de</b></big></font> &uuml;bergeben."
 HLP_EMAIL_SIGNATURE_TEXT="Die eMail-Signatur. HTML ist auch hier erlaubt."
- 
+CAM_CHANNEL="Kanal"
