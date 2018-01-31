@@ -9,39 +9,53 @@
 error_reporting(~E_ALL & ~E_STRICT);     // Alle Fehler reporten (Außer E_STRICT)
 ini_set("display_errors", false);        // Fehler nicht direkt via PHP ausgeben
 require_once "loxberry_system.php";
+require_once "loxberry_log.php";
 $L = LBSystem::readlanguage("language.ini");
 ini_set("log_errors", 1);
 ini_set("error_log", LBPLOGDIR."/cam_connect.log");
-use PHPMailer\PHPMailer\PHPMailer;
 
-function debug($message = "", $loglevel = 3)
+function debug($message = "", $loglevel)
 {
 	global $plugin_cfg;
-	if ( $plugin_cfg["LOGLEVEL"] >= $loglevel || $plugin_cfg["LOGLEVEL"] == "" )
+	if ( intval($plugin_cfg["LOGLEVEL"]) >= intval($loglevel) )
 	{
 		switch ($loglevel)
 		{
 		    case 2:
-		        $prefix = "<CRITICAL>";
+		        Error_Log( "<CRITICAL> PHP: ".$message );
 		        break;
 		    case 3:
-		        $prefix = "<ERROR>";
+		        Error_Log( "<ERROR> PHP: ".$message );
 		        break;
 		    case 4:
-		        $prefix = "<WARNING>";
+		        Error_Log( "<WARNING> PHP: ".$message );
 		        break;
 		    case 7:
 		    default:
-		        $prefix = "";
+		        Error_Log( " PHP: ".$message );
 		        break;
 		}
-		Error_Log( $prefix." PHP: ".$message );
 	}
 	return;
 }
 
 $datetime    = new DateTime;
 debug("Entering plugin for ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
+
+debug("Check Logfile size: ".LBPLOGDIR."/cam_connect.log",7);
+$logsize = filesize(LBPLOGDIR."/cam_connect.log");
+if ( $logsize > 5242880 )
+{
+	debug("Logfile size is above 5 MB threshold: ".$logsize." Bytes",4);
+    debug("Set Logfile notification: ".LBPPLUGINDIR." ".$L['CC.MY_NAME']." => ".$L['ERRORS.ERROR_LOGFILE_TOO_BIG'],4);
+    notify ( LBPPLUGINDIR, $L['CC.MY_NAME'], $L['ERRORS.ERROR_LOGFILE_TOO_BIG']);
+    system("echo '' > ".LBPLOGDIR."/cam_connect.log");
+    debug($L["ERROR_LOGFILE_TOO_BIG"],4);
+}
+else
+{
+	debug("Logfile size is ok: ".$logsize,7);
+}
 
 $plugin_config_file = LBPCONFIGDIR."/cam-connect.cfg";
 debug("Read plugin config from ".$plugin_config_file,7);

@@ -1,5 +1,8 @@
 									<center>
 										<span><img src="<TMPL_VAR CC.LOGO_ICON>"><hr><b><TMPL_VAR CC.LOGO_TEXT></b><hr>
+										<!-- NOTIFICATIONS //-->
+										<TMPL_VAR NOTIFICATIONS>
+										<!-- NOTIFICATIONS //-->
 										<form method="post" data-ajax="false" name="main_form" id="main_form" action="<TMPL_VAR SELFURL>">
 											<table border=0 cellpadding=0 width="90%">
 												<tr>
@@ -148,11 +151,10 @@
 														<table>
 															<tr>
 																<td>
-																	<button onclick="$.ajax({url: '', type: 'POST', data: { action: 'delete_log'}}); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="delete"><TMPL_VAR CC.LOG_BUTTON_DELETE></button>
+																	<button onclick="$.ajax({url: '', type: 'GET', data: { 'delete_log':1}}); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="delete"><TMPL_VAR CC.LOG_BUTTON_DELETE></button>
 																</td>
 																<td>
-																	<button onclick="window.open('/admin/system/tools/logfile.cgi?logfile=<TMPL_VAR LOGFILE>&amp;header=html&amp;format=template', 'log')" id="logview" data-role="button" data-inline="true" data-mini="true" data-icon="bars"><TMPL_VAR CC.LOG_BUTTON_VIEW></button>
-																	<SCRIPT> $("#LOGLEVEL").val('<TMPL_VAR LOGLEVEL>'); </SCRIPT>
+																	<button onclick="window.open('/admin/system/tools/logfile.cgi?logfile=<TMPL_VAR LOGFILE>&amp;header=html&amp;format=template', 'log'); return false;" id="logview" data-role="button" data-inline="true" data-mini="true" data-icon="bars"><TMPL_VAR CC.LOG_BUTTON_VIEW></button>
 																</td>
 																<td>
 																	<select id="LOGLEVEL" name="LOGLEVEL" data-mini="true">
@@ -161,6 +163,7 @@
 																		<option value="3"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL3></option>
 																		<option value="2"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL2></option>
 																	</select>
+																	<SCRIPT> $("#LOGLEVEL").val('<TMPL_VAR LOGLEVEL>'); </SCRIPT>
 																</td>
 															</tr>
 														</table>

@@ -62,23 +62,20 @@ LOGDEB "Init CGI and import names in namespace R::";
 my $cgi 	= CGI->new;
 $cgi->import_names('R');
 
-if ( $R::action ) 
+if ( $R::delete_log )
 {
-    LOGDEB "Is it a log delete call: ".$R::action;
-	if ($R::action eq "delete_log" )
-	{
-		LOGDEB "Oh, it's a log delete call";
-		my $logfile = $log->close;
-		LOGWARN "Delete Logfile: ".$logfile;
-		system("/usr/bin/date > $logfile");
-		$log->open;
-		LOGSTART "Logfile restarted.";
-		exit;
-	}
-	else
-	{
-		LOGDEB "No log delete call. Go ahead";
-	}
+	LOGDEB "Oh, it's a log delete call. ".$R::delete_log;
+	LOGWARN "Delete Logfile: ".$logfile;
+	print "Content-Type: text/plain\n\n";
+	my $logfile = $log->close;
+	system("/usr/bin/date > $logfile") or print "Failed";
+	$log->open;
+	LOGSTART "Logfile restarted.";
+	exit;
+}
+else
+{
+	LOGDEB "No log delete call. Go ahead";
 }
 
 LOGDEB "Get language";
@@ -283,7 +280,11 @@ sub defaultpage
 	$maintemplate->param( "cam_model_list"	, $cam_model_list);
 	$lbplogdir =~ s/$lbhomedir\/log\///; # Workaround due to missing variable for Logview
 	$maintemplate->param( "LOGFILE" , $lbplogdir . "/" . $logfile );
-	print $maintemplate->output();
+	my $notifications = LoxBerry::Log::get_notifications_html($lbpplugindir, $lbpplugindir);
+	LOGDEB "Check for pending notifications for: " . $lbpplugindir . " " . ${'CC.MY_NAME'};
+	LOGDEB "Notifications are: ".$notifications;
+    $maintemplate->param( "NOTIFICATIONS" , $notifications);
+    print $maintemplate->output();
 	LoxBerry::Web::lbfooter();
 	LOGDEB "Leaving Cam-Connect Plugin normally";
 	exit;
