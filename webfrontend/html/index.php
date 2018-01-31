@@ -564,8 +564,7 @@ function send_mail_pic($picture)
         debug("Recipient(s): ".$recipients_data,7);
         if (filter_var($recipients_data, FILTER_VALIDATE_EMAIL))
         {
-          $mailTo .= '"'.$recipients_data.'"'." <".$recipients_data.">";  // Add recipient
-          $mailTo .= ";";
+          $mailTo .= '"'.$recipients_data.'"'." <".$recipients_data.">;";  // Add recipient
           $at_least_one_valid_email=1;
           debug("Validated recipient(s): ".$recipients_data,7);
         }
@@ -596,8 +595,7 @@ else
         $recipients_data = str_ireplace("\"","",$recipients_data);
         if (filter_var($recipients_data, FILTER_VALIDATE_EMAIL))
         {
-          $mailTo .= '"'.$recipients_data.'"'." <$recipients_data>";  // Add recipient
-          if ( $at_least_one_valid_email == 1 ) $mailTo .= ";";
+          $mailTo .= '"'.$recipients_data.'"'." <$recipients_data>;";  // Add recipient
           $at_least_one_valid_email=1;
           debug("Validated recipient(s): ".$recipients_data,7);
         }
