@@ -679,7 +679,7 @@ Content-Transfer-Encoding: 8bit
 --b1_7eb9272345eb191ab133eafc6fca47e1
 Content-Type: text/plain; charset=us-ascii
 
-Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.
+".utf8_decode($plugin_cfg["EMAIL_BODY"])."
 
 
 --b1_7eb9272345eb191ab133eafc6fca47e1
@@ -690,8 +690,8 @@ Content-Type: multipart/related;
 Content-Type: text/html; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
 
-<html><body>Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.<br/>".$email_image_part."
-".utf8_decode($plugin_cfg["EMAIL_SIGNATURE"])." 
+<html><body>".utf8_decode($plugin_cfg["EMAIL_BODY"])."<br/>".$email_image_part."
+<br>".utf8_decode($plugin_cfg["EMAIL_SIGNATURE"])." 
 </body></html>
 
 
