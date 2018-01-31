@@ -561,10 +561,11 @@ function send_mail_pic($picture)
       foreach (explode(";",rawurldecode($_GET["email_to"]) ) as $recipients_data)
       {
         $recipients_data = str_ireplace("(at)","@",$recipients_data);
+        $recipients_data = trim(str_ireplace("\"","",$recipients_data));
         debug("Recipient(s): ".$recipients_data,7);
         if (filter_var($recipients_data, FILTER_VALIDATE_EMAIL))
         {
-          $mailTo .= '"'.$recipients_data.'"'." <".$recipients_data.">;";  // Add recipient
+          $mailTo .= $recipients_data.",";  // Add recipient
           $at_least_one_valid_email=1;
           debug("Validated recipient(s): ".$recipients_data,7);
         }
@@ -592,10 +593,10 @@ else
       foreach (explode(";",$plugin_cfg['EMAIL_RECIPIENTS']) as $recipients_data)
       {
         debug("Recipient(s): ".$recipients_data,7);
-        $recipients_data = str_ireplace("\"","",$recipients_data);
+        $recipients_data = trim(str_ireplace("\"","",$recipients_data));
         if (filter_var($recipients_data, FILTER_VALIDATE_EMAIL))
         {
-          $mailTo .= '"'.$recipients_data.'"'." <$recipients_data>;";  // Add recipient
+          $mailTo .= $recipients_data.",";  // Add recipient
           $at_least_one_valid_email=1;
           debug("Validated recipient(s): ".$recipients_data,7);
         }
@@ -666,8 +667,9 @@ else
        debug("Mimimum width < 240, but ok, keep it: ".$newwidth,4);
   }
 
-$html = "To: ".$mailTo."
-From: ".$mailFromName."
+$mailTo = substr($mailTo,0,-1);
+$html = "From: ".$mailFromName."
+To: ".$mailTo."
 Subject: ".$emailSubject." 
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
