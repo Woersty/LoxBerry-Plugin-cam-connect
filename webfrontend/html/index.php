@@ -696,10 +696,10 @@ Content-Transfer-Encoding: 8bit
 
 
 --b2_7eb9272345eb191ab133eafc6fca47e1
-Content-Type: image/jpeg; name=\"".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."\"
+Content-Type: image/jpeg; name=\"".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").".jpg\"
 Content-Transfer-Encoding: base64
 Content-ID: <".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").">
-Content-Disposition: ".$inline."; filename=".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."
+Content-Disposition: ".$inline."; filename=".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").".jpg
 
 ".base64_encode($picture)."
 
