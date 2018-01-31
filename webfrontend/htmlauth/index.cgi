@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2016 Michael Schlenstedt, michael@loxberry.de
-# + Wörsty (git@loxberry.woerstenfeld.de)
+# Copyright 2018 Wörsty (git@loxberry.woerstenfeld.de)
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,402 +13,295 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-##########################################################################
-# Modules
-##########################################################################
-
+use LoxBerry::System;
+use LoxBerry::Web;
+use LoxBerry::Log;
+use MIME::Base64;
 use CGI::Carp qw(fatalsToBrowser);
 use CGI qw/:standard/;
-use Config::Simple;
-use File::HomeDir;
-use HTML::Entities;
-use Data::Dumper;
-use Cwd 'abs_path';
-use Time::Piece;
+use Config::Simple '-strict';
 use warnings;
 use strict;
-no strict "refs"; # we need it for template system
+no  strict "refs"; 
 
-##########################################################################
 # Variables
-##########################################################################
+my $maintemplatefilename 		= "cam_connect.html";
+my $errortemplatefilename 		= "error.html";
+my $successtemplatefilename 	= "success.html";
+my $helptemplatefilename		= "help.html";
+my $pluginconfigfile 			= "cam-connect.cfg";
+my $languagefile 				= "language.ini";
+my $logfile 					= "cam_connect.log";
+my $template_title;
+my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not readable. We must abort here. Please try to reinstall the plugin.";
+my $version 					= "2.0.1";
+my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
+my @pluginconfig_strings 		= ('LOGLEVEL','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
+my $cam_model_list				= "";
+my @lines						= [];	
+my $log 						= LoxBerry::Log->new ( name => 'CamConnect', filename => $lbplogdir ."/". $logfile, append => 1 );
+my $plugin_cfg 					= new Config::Simple($lbpconfigdir . "/" . $pluginconfigfile);
+my %Config 						= $plugin_cfg->vars() if ( $plugin_cfg );
+our $error_message				= "";
 
-our $cfg;
-our $phrase;
-our $namef;
-our $value;
-our %query;
-our $lang;
-our $template_title;
-our $help;
-our @help;
-our $helptext;
-our $helplink;
-our $installfolder;
-our $languagefile;
-our $version;
-my  $home = File::HomeDir->my_home;
-my  $subfolder;
-my  $cgi = new CGI;
-our $languagefileplugin;
-our $phraseplugin;
-our @language_strings;
-our @pluginconfig_strings;
-our $self_host;
-our $plugin_script;
-our $plugin_cfg;
-our $WATERMARK;
-our $saveformdata;
-our $plugin_name;
-our $message;
-our $nexturl;
-our $pluginconfigdir;
-our $pluginconfigfile;
-our $cam_model_list;
-our @lines;
-our $psubfolder;
-our $EMAIL_USED=0;
-our $EMAIL_TO=0;
-our $EMAIL_INLINE=1;
-our $EMAIL_BODY="";
-our $EMAIL_SIGNATURE="";
-our $EMAIL_RESIZE;
-our $IMAGE_RESIZE;
-our $EMAIL_SUBJECT1="";
-our $EMAIL_SUBJECT2="";
-our $EMAIL_SUBJECT3="";
-our $EMAIL_DATE_FORMAT="";
-our $EMAIL_TIME_FORMAT="";
-our $EMAIL_FROM_NAME="";
-our $EMAIL_RECIPIENTS="";
-our $EMAIL_FILENAME="Snapshot";
-our $error;
-our $SAVE_DATE=localtime->strftime('%Y_%m_%d_%H-%M-%S');
-##########################################################################
-# Read Settings
-##########################################################################
-
-# Version of this script
-$version = "2.0.1";
-
-# Figure out in which subfolder we are installed
-$psubfolder = abs_path($0);
-$psubfolder =~ s/(.*)\/(.*)\/(.*)$/$2/g;
-$pluginconfigdir  = "$home/config/plugins/$psubfolder";
-$pluginconfigfile = "$pluginconfigdir/cam-connect.cfg";
-
-$cfg              = new Config::Simple("$home/config/system/general.cfg");
-$installfolder    = $cfg->param("BASE.INSTALLFOLDER");
-$lang             = $cfg->param("BASE.LANG");
-
-# If there's no plugin config file create default
-if (!-r $pluginconfigfile) 
+# Logging
+if ( $plugin_cfg )
 {
-	mkdir $pluginconfigdir unless -d $pluginconfigdir; # Check if dir exists. If not create it.
-	open my $configfileHandle, ">", "$pluginconfigfile" or die "Can't create '$pluginconfigfile'\n";
-	print $configfileHandle 'WATERMARK=1'."\n";
-	print $configfileHandle 'EMAIL_USED=0'."\n";
-	print $configfileHandle 'EMAIL_INLINE=0'."\n";
-	print $configfileHandle 'EMAIL_TO=0'."\n";
-	print $configfileHandle 'EMAIL_BODY=Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.'."\n";
-	print $configfileHandle 'EMAIL_SIGNATURE=--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry'."\n";
-	print $configfileHandle 'EMAIL_RESIZE=0'."\n";
-	print $configfileHandle 'IMAGE_RESIZE=0'."\n";
-	print $configfileHandle 'EMAIL_SUBJECT1=Es wurde am '."\n";
-	print $configfileHandle 'EMAIL_SUBJECT2= um '."\n";
-	print $configfileHandle 'EMAIL_SUBJECT3= geklingelt!'."\n";
-	print $configfileHandle 'EMAIL_DATE_FORMAT=d.m.Y'."\n";
-	print $configfileHandle 'EMAIL_TIME_FORMAT=H:i:s \U\h\r '."\n";
-	print $configfileHandle 'EMAIL_FROM_NAME=LoxBerry'."\n";
-	print $configfileHandle 'EMAIL_RECIPIENTS=noreply@loxberry.de;invalid@loxberry.de'."\n";
-	print $configfileHandle 'EMAIL_FILENAME=Snapshot'."\n";
-	print $configfileHandle 'SAVE_DATE='.$SAVE_DATE."\n";
-	close $configfileHandle;
-}
-
-# Read configfile
-if (open(my $fh, '<', $pluginconfigfile)) 
-{
-  while (my $row = <$fh>) 
-  {
-    chomp $row;
-		foreach ($row)
-		{
-			if ( substr(($row),0,1) eq ";" )
-			{
-				# Ignore comments
-			}
-			else
-			{
-				my @configs = split /=/, $_,2;
-		  	${$configs[0]} = $configs[1];
-			}
-		}
-  }
+	$log->loglevel(int($Config{'default.LOGLEVEL'}));
+	$LoxBerry::System::DEBUG 	= 1 if int($Config{'default.LOGLEVEL'}) eq 7;
+	$LoxBerry::Web::DEBUG 		= 1 if int($Config{'default.LOGLEVEL'}) eq 7;
 }
 else
 {
-	$error = "Could not open Plugin Configfile";
+	$log->loglevel(7);
+	$LoxBerry::System::DEBUG 	= 1;
+	$LoxBerry::Web::DEBUG 		= 1;
+}
+
+LOGDEB "Init CGI and import names in namespace R::";
+my $cgi 	= CGI->new;
+$cgi->import_names('R');
+
+if ( $R::action ) 
+{
+    LOGDEB "Is it a log delete call: ".$R::action;
+	if ($R::action eq "delete_log" )
+	{
+		LOGDEB "Oh, it's a log delete call";
+		my $logfile = $log->close;
+		LOGWARN "Delete Logfile: ".$logfile;
+		system("/usr/bin/date > $logfile");
+		$log->open;
+		LOGSTART "Logfile restarted.";
+		exit;
+	}
+	else
+	{
+		LOGDEB "No log delete call. Go ahead";
+	}
+}
+
+LOGDEB "Get language";
+my $lang	= lblanguage();
+LOGDEB "Resulting language is: " . $lang;
+
+LOGDEB "Check, if filename for the errortemplate is readable";
+stat($lbptemplatedir . "/" . $errortemplatefilename);
+if ( !-r _ )
+{
+	LOGDEB "Filename for the errortemplate is not readable, that's bad";
+	$error_message = $no_error_template_message;
+	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
+	print $error_message;
+	LOGCRIT $error_message;
+	LoxBerry::Web::lbfooter();
+	LOGCRIT "Leaving Cam-Connect Plugin due to an unrecoverable error";
+	exit;
+}
+
+LOGDEB "Filename for the errortemplate is ok, preparing template";
+my $errortemplate = HTML::Template->new(
+		filename => $lbptemplatedir . "/" . $errortemplatefilename,
+		global_vars => 1,
+		loop_context_vars => 1,
+		die_on_bad_params=> 0,
+		associate => $cgi,
+		%htmltemplate_options,
+		debug => 1,
+		);
+LOGDEB "Read error strings from " . $languagefile . " for language " . $lang;
+my %ERR = LoxBerry::System::readlanguage($errortemplate, $languagefile);
+
+LOGDEB "Check, if filename for the successtemplate is readable";
+stat($lbptemplatedir . "/" . $successtemplatefilename);
+if ( !-r _ )
+{
+	LOGDEB "Filename for the successtemplate is not readable, that's bad";
+	$error_message = $ERR{'ERRORS.ERR_SUCCESS_TEMPLATE_NOT_READABLE'};
+	&error;
+}
+LOGDEB "Filename for the successtemplate is ok, preparing template";
+my $successtemplate = HTML::Template->new(
+		filename => $lbptemplatedir . "/" . $successtemplatefilename,
+		global_vars => 1,
+		loop_context_vars => 1,
+		die_on_bad_params=> 0,
+		associate => $cgi,
+		%htmltemplate_options,
+		debug => 1,
+		);
+LOGDEB "Read success strings from " . $languagefile . " for language " . $lang;
+my %SUC = LoxBerry::System::readlanguage($successtemplate, $languagefile);
+
+LOGDEB "Check, if filename for the maintemplate is readable, if not raise an error";
+$error_message = $ERR{'ERRORS.ERR_MAIN_TEMPLATE_NOT_READABLE'};
+stat($lbptemplatedir . "/" . $maintemplatefilename);
+&error if !-r _;
+LOGDEB "Filename for the maintemplate is ok, preparing template";
+my $maintemplate = HTML::Template->new(
+		filename => $lbptemplatedir . "/" . $maintemplatefilename,
+		global_vars => 1,
+		loop_context_vars => 1,
+		die_on_bad_params=> 0,
+		%htmltemplate_options,
+		debug => 1
+		);
+LOGDEB "Read main strings from " . $languagefile . " for language " . $lang;
+my %L = LoxBerry::System::readlanguage($maintemplate, $languagefile);
+
+LOGDEB "Check if plugin config file is readable";
+if (!-r $lbpconfigdir . "/" . $pluginconfigfile) 
+{
+	LOGWARN "Plugin config file not readable.";
+	LOGDEB "Check if config directory exists. If not, try to create it. In case of problems raise an error";
+	$error_message = $ERR{'ERRORS.ERR_CREATE_CONFIG_DIRECTORY'};
+	mkdir $lbpconfigdir unless -d $lbpconfigdir or &error; 
+	LOGDEB "Try to create a default config";
+	$error_message = $ERR{'ERRORS.ERR_CREATE CONFIG_FILE'};
+	open my $configfileHandle, ">", $lbpconfigdir . "/" . $pluginconfigfile or &error;
+ 		print $configfileHandle 'WATERMARK="1"'."\n";
+		print $configfileHandle 'EMAIL_USED="0"'."\n";
+		print $configfileHandle 'EMAIL_INLINE="0"'."\n";
+		print $configfileHandle 'EMAIL_TO="0"'."\n";
+		print $configfileHandle 'EMAIL_BODY="Hallo,<br/>es wurde eben geklingelt. Anbei das Bild."'."\n";
+		print $configfileHandle 'EMAIL_SIGNATURE="--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry"'."\n";
+		print $configfileHandle 'EMAIL_RESIZE="0"'."\n";
+		print $configfileHandle 'IMAGE_RESIZE="0"'."\n";
+		print $configfileHandle 'EMAIL_SUBJECT1="Es wurde am"'."\n";
+		print $configfileHandle 'EMAIL_SUBJECT2="um"'."\n";
+		print $configfileHandle 'EMAIL_SUBJECT3="Uhr geklingelt!"'."\n";
+		print $configfileHandle 'EMAIL_DATE_FORMAT="d.m.Y"'."\n";
+		print $configfileHandle 'EMAIL_TIME_FORMAT="H:i:s"'."\n";
+		print $configfileHandle 'EMAIL_FROM_NAME="LoxBerry"'."\n";
+		print $configfileHandle 'EMAIL_RECIPIENTS="noreply@loxberry.de;invalid@loxberry.de"'."\n";
+		print $configfileHandle 'EMAIL_FILENAME="Snapshot"'."\n";
+		print $configfileHandle 'LOGLEVEL="2"'."\n";
+	close $configfileHandle;
+	LOGWARN "Default config created. Display error anyway to force a page reload";
+	$error_message = $ERR{'ERRORS.ERR_NO_CONFIG_FILE'};
 	&error; 
 }
 
-# Definition of valid config vars
-@pluginconfig_strings = ('SAVE_DATE','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
-
-# Everything from URL
-foreach (split(/&/,$ENV{'QUERY_STRING'})){
-  ($namef,$value) = split(/=/,$_,2);
-  $namef =~ tr/+/ /;
-  $namef =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-  $value =~ tr/+/ /;
-  $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-  $query{$namef} = $value;
-}
-
-##########################################################################
-# Language Settings
-##########################################################################
-
-# Override settings with URL param
-if ($query{'lang'}) {
-  $lang = $query{'lang'};
-}
-
-# Standard is german
-if ($lang eq "") {
-  $lang = "de";
-}
-
-# If there's no language phrases file for choosed language, use german as default
-if (!-e "$installfolder/templates/system/$lang/language.dat") {
-  $lang = "de";
-}
-
-# Read system translations / phrases
-$languagefile = "$installfolder/templates/system/$lang/language.dat";
-$phrase = new Config::Simple($languagefile);
-
-# Read plugin translations / phrases
-$languagefileplugin = "$installfolder/templates/plugins/$psubfolder/$lang/language.dat";
-$phraseplugin = new Config::Simple($languagefileplugin);
-# Create @language_strings array with all known phrase-names
-
-foreach my $key (keys %{ $phraseplugin->vars() } ) 
+LOGDEB "Parsing valid config variables into the maintemplate";
+foreach my $config_value (@pluginconfig_strings)
 {
-	(my $cfg_section,my $cfg_varname) = split(/\./,$key,2);
-	push @language_strings, $cfg_varname;
-}
+	${$config_value} = $Config{'default.' . $config_value};
+	if (defined ${$config_value} && ${$config_value} ne '') 
+	{
+		LOGDEB "Set config variable: " . $config_value . " to " . ${$config_value};
+  		$maintemplate->param($config_value	, ${$config_value} );
+	}                                  	                             
+	else
+	{
+		LOGWARN "Config variable: " . $config_value . " missing or empty.";     
+  		$maintemplate->param($config_value	, "");
+	}	                                                                
+}    
 
-foreach our $template_string (@language_strings)
-{
-  ${$template_string} = $phraseplugin->param($template_string);
-}
-
-$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME");
-$self_host =$cgi->server_name();
-$plugin_script = "/plugins/$psubfolder/";
-
-##########################################################################
-# Plugin Settings
-##########################################################################
-
-# Process checkboxes
+LOGDEB "Parsing special parameters into the maintemplate";
 foreach my $parameter_to_process ('WATERMARK','EMAIL_INLINE','EMAIL_TO')
 {
 	if ( int(${$parameter_to_process}) eq 1 ) 
 	{
-	    ${$parameter_to_process."_script"} = '$("#'.$parameter_to_process.'_checkbox").prop("checked", 1);';
+	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 1);');
 	    ${$parameter_to_process} = 1;
 	}
 	else
 	{
-	    ${$parameter_to_process."_script"} = '$("#'.$parameter_to_process.'_checkbox").prop("checked", 0);';
+	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 0);');
 	    ${$parameter_to_process} = 0;
 	}
+	LOGDEB "Set special parameter " . $parameter_to_process . " to " . ${$parameter_to_process};
 }
 
+$R::saveformdata if 0; # Prevent errors
+LOGDEB "Is it a save call?";
+if ( $R::saveformdata ) 
+{
+	LOGDEB "Yes, is it a save call";
+	foreach my $parameter_to_write (@pluginconfig_strings)
+	{
+	    while (my ($config_variable, $value) = each %R::) 
+	    {
+			if ( $config_variable eq $parameter_to_write )
+			{
+				$plugin_cfg->param($config_variable, ${$value});		
+				LOGDEB "Setting configuration variable [$config_variable] to value (${$value}) ";
+			}
+		}
+	}
+	LOGDEB "Write config to file";
+	$error_message = $ERR{'ERRORS.ERR_SAVE_CONFIG_FILE'};
+	$plugin_cfg->save() or &error; 
 
-###############################
-###########################################
-# Main program
-##########################################################################
-
-
-		# Form Save?
-		
-		if ( param('saveformdata') )
-		{
-		$saveformdata = param('saveformdata');
-		if ($saveformdata eq "") 
-		{
-			$saveformdata = 0;
-		}
-		else
-		{
-		 $saveformdata      = 1;
-		}
-		}
-		else
-		{
-		$saveformdata = 0;
-		}
-		
-		if ($saveformdata == 1)
-		{
-		# Write configuration file
-
-		open my $configfileHandle, ">", "$pluginconfigfile" or die "Can't create '$pluginconfigfile'\n";
-		foreach my $parameter_to_write (@pluginconfig_strings)
-		{
-				print $configfileHandle $parameter_to_write.'='.param($parameter_to_write)."\n";
-		}
-		close $configfileHandle;
-		
-		
-		
-		
-		print "Content-Type: text/html\n\n";
-		$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME"); 
-		$message = $phraseplugin->param("CFG_SAVED");
-		$nexturl = "javascript:history.back();";
-		
-		# Print Template
-		&lbheader;
-		open(F,"$installfolder/templates/system/$lang/success.html") || die "Missing template system/$lang/succses.html";
-		while (<F>) {
-		  $_ =~ s/<!--\$(.*?)-->/${$1}/g;
-		  print $_;
-		}
-		close(F);
-		&footer;
-		exit;
-		}
-
+	LOGDEB "Set page title, load header, parse variables, set footer, end";
+	$template_title = " : " . $SUC{'SAVE.MY_NAME'};
+	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
+	$successtemplate->param('SAVE_ALL_OK'		, $SUC{'SAVE.SAVE_ALL_OK'});
+	$successtemplate->param('SAVE_MESSAGE'		, $SUC{'SAVE.SAVE_MESSAGE'});
+	$successtemplate->param('SAVE_BUTTON_OK' 	, $SUC{'SAVE.SAVE_BUTTON_OK'});
+	$successtemplate->param('SAVE_NEXTURL'		, $ENV{REQUEST_URI});
+	print $successtemplate->output();
+	LoxBerry::Web::lbfooter();
+	LOGDEB "Leaving Cam-Connect Plugin after saving the configuration.";
+	exit;
+}
+else
+{
+	LOGDEB "No, not a save call";
+}
+LOGDEB "Call default page";
 &defaultpage;
 
-exit;
-
 #####################################################
-# Form
+# Subs
 #####################################################
 
-sub defaultpage {
-
-
-# Prepare Cams
-$cam_model_list="";
-open(F,"$installfolder/config/plugins/$psubfolder/camera_models.dat") || die "Missing camera list.";
- flock(F,2);
- @lines = <F>;
- flock(F,8);
-close(F);
-foreach (@lines){
-  s/[\n\r]//g;
-  our @cams = split /\|/, $_;
-    $cam_model_list = "$cam_model_list\n<option value=\"$cams[0]\">$cams[1] $cams[2]</option>\n";
-}
-
-
-print "Content-Type: text/html\n\n";
-
-# Print Template
-&lbheader;
- 
-
-# Parse the strings we want
-foreach our $template_string (@language_strings)
+sub defaultpage 
 {
-		${$template_string} = $phraseplugin->param($template_string);
-}
-	
-open(F,"$installfolder/templates/plugins/$psubfolder/$lang/settings.html") || die "Missing template plugins/cam-connect/$lang/settings.html";
-  while (<F>) {
-    $_ =~ s/<!--\$(.*?)-->/${$1}/g;
-    print $_;
-  }
-
-  
-close(F);
-&footer;
-
-exit;
-
-}
-
-exit;
-
-
-#####################################################
-# 
-# Subroutines
-#
-#####################################################
-
-#####################################################
-# Error
-#####################################################
-
-sub error {
-
-$template_title = $phrase->param("TXT0000") . ": " . $phraseplugin->param("MY_NAME") . " - " . $phrase->param("TXT0028");
-
-print "Content-Type: text/html\n\n";
-
-&lbheader;
-open(F,"$installfolder/templates/system/$lang/error.html") || die "Missing template system/$lang/error.html";
-    while (<F>) {
-      $_ =~ s/<!--\$(.*?)-->/${$1}/g;
-      print $_;
-    }
-close(F);
-&footer;
-
-exit;
-
+	LOGDEB "Sub defaultpage";
+	LOGDEB "Prepare Cam list";
+	$cam_model_list="";
+	open(F,"$lbpconfigdir/camera_models.dat") || die "Missing camera list.";
+	 flock(F,2);
+	 @lines = <F>;
+	 flock(F,8);
+	close(F);
+	foreach (@lines)
+	{
+	  s/[\n\r]//g;
+	  our @cams = split /\|/, $_;
+	    $cam_model_list = "$cam_model_list\n<option value=\"$cams[0]\">$cams[1] $cams[2]</option>\n";
+		LOGDEB "Adding cam model: #" . $cams[0] . " " . $cams[1] . " (" . $cams[2] . ")";
+	}
+	LOGDEB "Set page title, load header, parse variables, set footer, end";
+	$template_title = " : " . $L{'CC.MY_NAME'};
+	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
+	$maintemplate->param( "CC.LOGO_ICON", get_plugin_icon(64) );
+	$maintemplate->param( "HTTP_HOST"		, $ENV{HTTP_HOST});
+	$maintemplate->param( "HTTP_PATH"		, "/plugins/" . $lbpplugindir);
+	$maintemplate->param( "cam_model_list"	, $cam_model_list);
+	$lbplogdir =~ s/$lbhomedir\/log\///; # Workaround due to missing variable for Logview
+	$maintemplate->param( "LOGFILE" , $lbplogdir . "/" . $logfile );
+	print $maintemplate->output();
+	LoxBerry::Web::lbfooter();
+	LOGDEB "Leaving Cam-Connect Plugin normally";
+	exit;
 }
 
-#####################################################
-# Header
-#####################################################
-
-sub lbheader {
-
-  # create help page
-  $helplink = "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
-  $helptext = "";
-   open(F,"$installfolder/templates/plugins/$psubfolder/$lang/help.html") || die "Missing template plugins/miniserverbackup/$lang/help.html";
-	    @help = <F>;
-	    foreach (@help)
-	    {
-	      $_ =~ s/<!--\$psubfolder-->/$psubfolder/g;
-	      s/[\n\r]/ /g;
-	      $_ =~ s/<!--\$(.*?)-->/${$1}/g;
-	      $helptext = $helptext . $_;
-	    }
-  close(F);
-
-  open(F,"$installfolder/templates/system/$lang/header.html") || die "Missing template system/$lang/header.html";
-    while (<F>) {
-      $_ =~ s/<!--\$(.*?)-->/${$1}/g;
-      print $_;
-    }
-  close(F);
-
+sub error 
+{
+	LOGDEB "Sub error";
+	LOGERR $error_message;
+	LOGDEB "Set page title, load header, parse variables, set footer, end with error";
+	$template_title = " : " . $ERR{'ERRORS.MY_NAME'} . " - " . $ERR{'ERRORS.ERR_TITLE'};
+	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
+	$errortemplate->param('ERR_MESSAGE'		, $error_message);
+	$errortemplate->param('ERR_TITLE'		, $ERR{'ERRORS.ERR_TITLE'});
+	$errortemplate->param('ERR_BUTTON_BACK' , $ERR{'ERRORS.ERR_BUTTON_BACK'});
+	$successtemplate->param('ERR_NEXTURL'	, $ENV{REQUEST_URI});
+	print $errortemplate->output();
+	LoxBerry::Web::lbfooter();
+	LOGDEB "Leaving Cam-Connect Plugin with an error";
+	exit;
 }
-
-#####################################################
-# Footer
-#####################################################
-
-sub footer {
-
-  open(F,"$installfolder/templates/system/$lang/footer.html") || die "Missing template system/$lang/footer.html";
-    while (<F>) {
-      $_ =~ s/<!--\$(.*?)-->/${$1}/g;
-      print $_;
-    }
-  close(F);
-
-}
-

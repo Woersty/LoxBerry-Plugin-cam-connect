@@ -8,77 +8,56 @@
 // Error Reporting off
 error_reporting(~E_ALL & ~E_STRICT);     // Alle Fehler reporten (Außer E_STRICT)
 ini_set("display_errors", false);        // Fehler nicht direkt via PHP ausgeben
+require_once "loxberry_system.php";
+$L = LBSystem::readlanguage("language.ini");
+ini_set("log_errors", 1);
+ini_set("error_log", LBPLOGDIR."/cam_connect.log");
+use PHPMailer\PHPMailer\PHPMailer;
 
-// Generate date and time
+function debug($message = "", $loglevel = 3)
+{
+	global $plugin_cfg;
+	if ( $plugin_cfg["LOGLEVEL"] >= $loglevel || $plugin_cfg["LOGLEVEL"] == "" )
+	{
+		switch ($loglevel)
+		{
+		    case 2:
+		        $prefix = "<CRITICAL>";
+		        break;
+		    case 3:
+		        $prefix = "<ERROR>";
+		        break;
+		    case 4:
+		        $prefix = "<WARNING>";
+		        break;
+		    case 7:
+		    default:
+		        $prefix = "";
+		        break;
+		}
+		Error_Log( $prefix." PHP: ".$message );
+	}
+	return;
+}
+
 $datetime    = new DateTime;
+debug("Entering plugin for ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
 
-// Read LoxBerry Basic configuration file to get the used language
-$config_file          = dirname(__FILE__)."/../../../../config/system/general.cfg";
-$config_file_handle   = fopen($config_file, "r");
-if ($config_file_handle)
-{
-  while (!feof($config_file_handle))
-  {
-    $line_of_text = fgets($config_file_handle);
-    if (strlen($line_of_text) > 3)
-    {
-      $config_line = explode('=', $line_of_text);
-      if ($config_line[0] == "LANG")
-      {
-        $cfg[$config_line[0]]=preg_replace('/\r?\n|\r/','', $config_line[1]);
-        $lang = $cfg["LANG"];
-        break;
-      }
-    }
-  }
-  fclose($config_file_handle);
-}
-else
-{
-  error_image(array('FATAL1: Error reading general.cfg'),0);
-}
-
-$plugin_config_file = dirname(__FILE__)."/../../../../config/plugins/".basename(dirname(__FILE__))."/cam-connect.cfg";
-$camera_models_file = dirname(__FILE__)."/../../../../config/plugins/".basename(dirname(__FILE__))."/camera_models.dat";
-$plugin_phrase_file = dirname(__FILE__)."/../../../../templates/plugins/".basename(dirname(__FILE__))."/$lang/language.dat";
+$plugin_config_file = LBPCONFIGDIR."/cam-connect.cfg";
+debug("Read plugin config from ".$plugin_config_file,7);
 $plugin_cfg_handle    = fopen($plugin_config_file, "r");
-$cam_models_handle    = fopen($camera_models_file, "r");
-$plugin_phrase_handle = fopen($plugin_phrase_file, "r");
-
-// Read language file to get the strings for the right language
-if ($plugin_phrase_handle)
-{
-  while (!feof($plugin_phrase_handle))
-  {
-    $line_of_text = fgets($plugin_phrase_handle);
-    if (strlen($line_of_text) > 3)
-    {
-      $config_line = explode('=', $line_of_text);
-      if ( isset($config_line[1]))
-      {
-        $phrases[$config_line[0]]=preg_replace('/\r?\n|\r/','', $config_line[1]);
-      }
-    }
-  }
-  fclose($plugin_phrase_handle);
-}
-else
-{
-  error_image(array('FATAL2: Error reading language.dat'),0);
-}
-
-// Read config into $plugin_cfg array
 if ($plugin_cfg_handle)
 {
   while (!feof($plugin_cfg_handle))
   {
     $line_of_text = fgets($plugin_cfg_handle);
+    debug("Read plugin config line: ".$line_of_text,7);
     if (strlen($line_of_text) > 3)
     {
       $config_line = explode('=', $line_of_text);
       if ($config_line[0])
       {
-        $plugin_cfg[$config_line[0]]=preg_replace('/\r?\n|\r/','', $config_line[1]);
+        $plugin_cfg[$config_line[0]]=preg_replace('/\r?\n|\r/','', str_ireplace('"','',$config_line[1]));
       }
     }
   }
@@ -86,19 +65,20 @@ if ($plugin_cfg_handle)
 }
 else
 {
-  error_image($phrases,"ERROR03");
+  debug("No plugin config file handle found.",7);
+  error_image($L["ERRORS.ERROR_READING_CFG"]);
 }
 
-// Read channel Parameter - if none, default to 1
-(isset($_GET['channel']))?$channel_part='?&channel='.intval($_GET['channel']):$channel_part='';
-
-// Read camera-config
+$camera_models_file = LBPCONFIGDIR."/camera_models.dat";
+debug("Read cameras from ".$camera_models_file,7);
+$cam_models_handle    = fopen($camera_models_file, "r");
 if ($cam_models_handle)
 {
   (isset($_GET['cam-model']))?$cam_model=intval($_GET['cam-model']):$cam_model=1;
   while (!feof($cam_models_handle))
   {
     $line_of_text = fgets($cam_models_handle);
+	debug("Read cameras line: ".$line_of_text,7);
     $line_of_text = preg_replace('/\r?\n|\r/','', $line_of_text);
     $config_line = explode('|', $line_of_text);
     if (count($config_line) == 5)
@@ -116,57 +96,93 @@ if ($cam_models_handle)
 }
 else
 {
-  // cannot read cam models
-  error_image($phrases,"ERROR04");
+  debug("No camera file handle found.",7);
+  error_image($L["ERRORS.ERROR_READING_CAMS"]);
 }
-// Override $plugin_cfg['EMAIL_USED'] in config with URL if exists
+
+debug("Check for GET parameter 'email' (can override EMAIL_USED in config)",7);
 if (isset($_GET['email']))
 {
+  debug("Found. Override EMAIL_USED in config (".$plugin_cfg['EMAIL_USED'].") with integer of ".$_GET['email']." => ".intval($_GET['email']),7);
   $plugin_cfg['EMAIL_USED'] = intval($_GET['email']);
 }
+else
+{
+  debug("Not found. Use EMAIL_USED from config: ".$plugin_cfg['EMAIL_USED'],7);
+}
 
-// Override $plugin_cfg['EMAIL_USED'] in config or URL if stream mode is used
-(isset($_GET['stream']))?$plugin_cfg['EMAIL_USED']=0:$plugin_cfg['EMAIL_USED']=$plugin_cfg['EMAIL_USED'];
+debug("Check for GET parameter 'stream' (must override EMAIL_USED in config in this case)",7);
+if (isset($_GET['stream']))
+{
+	$plugin_cfg['EMAIL_USED']=0;
+	debug("Found. Override EMAIL_USED with: ".$plugin_cfg['EMAIL_USED'],7);
+}
+else
+{
+	debug("Not found. Keep EMAIL_USED: ".$plugin_cfg['EMAIL_USED'],7);
+}
 
-// Read LoxBerry Mail config
-$mail_config_file   = dirname(__FILE__)."/../../../../config/system/mail.cfg";
+debug("Read LoxBerry global eMail config",7);
 if (($plugin_cfg['EMAIL_USED'] == 1))
 {
+  $mail_config_file   = LBSCONFIGDIR."/mail.cfg";
+  debug("Parameter EMAIL_USED is set, read eMail config from ".$mail_config_file,7);
   $mail_cfg    = parse_ini_file($mail_config_file,true);
   if ( !isset($mail_cfg) )
   {
-     error_image($phrases,"ERROR05");
+     debug("Can't read eMail config",7);
+     error_image($L["ERRORS.ERROR_READING_EMAIL_CFG"]);
   }
   else
   {
+    debug("eMail config found, assuming it's okay. Using Server: ".$mail_cfg['SMTP']['SMTPSERVER']." on port: ".$mail_cfg['SMTP']['PORT'],7);
     if ( $mail_cfg['SMTP']['ISCONFIGURED'] == "0" )
     {
-     error_image($phrases,"ERROR06");
+     debug("eMail ist not configured: SMTP.ISCONFIGURED is 0",7);
+     error_image($L["ERRORS.ERROR_INVALID_EMAIL_CFG"]);
     }
   }
 }
-// Set camera name if provided in URL via &cam-name=xxxx
-(isset($_GET['cam-name']))?$cam_name="[".addslashes($_GET['cam-name'])."] ":$cam_name="";
+else
+{
+  debug("Parameter EMAIL_USED is not set, ignoring eMail config file.",7);
+}
 
-// Read IP-CAM connection details from URL
-$plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].$plugin_cfg['imagepath'].$channel_part));
+debug("Set camera name if provided in URL via &cam-name=xxxx",7);
+if (isset($_GET['cam-name']))
+{
+	$cam_name="[".addslashes($_GET['cam-name'])."] ";
+	debug("Parameter 'cam_name' (for eMail) is set, take value into account: ".$cam_name,7);
+}
+else
+{
+	debug("Parameter 'cam_name' (for eMail) is not set, ignoring it.",7);
+	$cam_name="";
+}
+
+debug("Read IP-CAM connection details from URL",7);
+$plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].$plugin_cfg['imagepath']));
 $plugin_cfg['user'] = addslashes($_GET['user']);
 $plugin_cfg['pass'] = addslashes($_GET['pass']);
 
 function get_image()
 {
-	global $plugin_cfg, $curl;
-	// Wait a half second to be sure the image is available.
+	debug("Function get_image called",7);
+	global $plugin_cfg, $curl, $lbpplugindir;
+	debug("Wait a half second to be sure the image is available.",7);
 	sleep(.5);
-	// Exception for Digitus DN-16049
+    $curl = curl_init() or debug("Problem to init curl.",3);
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
+	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+	curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
+	curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
+
+	debug("Check for 'Digitus DN-16049' camera model",7);
 	if ( $plugin_cfg['model'] == "DN-16049" )
 	{
-	  $curl = curl_init();
-	  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-	  curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
-	  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-	  curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
-	  curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
+	  debug("It's a 'Digitus DN-16049' camera - do some exceptional things to get real image path",7);
+	  debug("Read webpage from 'Digitus DN-16049' camera to cut out the image path",7);
 	  foreach(split("\n",curl_exec($curl)) as $k=>$html_zeile)
 	  {
 	    if(preg_match("/\b.jpg\b/i", $html_zeile))
@@ -174,372 +190,528 @@ function get_image()
 	      $anfang             = stripos($html_zeile, '"../../..')  +9;
 	      $ende               = strrpos($html_zeile, '.jpg"')       -5 -9;
 	      $plugin_cfg['url']  = "http://".trim(addslashes($_GET['kamera'].":".$_GET['port'].substr($html_zeile,$anfang,$ende)));
+		  debug("Line with '.jpg' found. Resulting URL is:".$plugin_cfg['url'],7);
 	      break;
+	    }
+	    else
+	    {
+		  debug("No line with '.jpg' found. Keep going until a line is found or no lines are left.",7);
 	    }
 	  }
 	}
-	
-	// Init and config cURL
-	$curl = curl_init();
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
-	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-	curl_setopt($curl, CURLOPT_USERPWD, $plugin_cfg['user'].":".$plugin_cfg['pass']);
-	curl_setopt($curl, CURLOPT_URL, $plugin_cfg['url']);
-	$picture = curl_exec($curl);
-	curl_close($curl);
-	// Read picture from IP-Cam and close connection to Cam
-	if($picture === false)
+	else
 	{
-	  $picture = get_image(); //error_image ($phrases,$error_msg);
-	}	
+	  debug("It's no 'Digitus DN-16049' but a ". $plugin_cfg['model'] ." camera - continue normally",7);
+	  debug("Get the image from the camera: ".$plugin_cfg['url'],7);
+	  $picture = curl_exec($curl) or debug("Problem to esec curl on: ".$plugin_cfg['url'],3) or debug("Cannot execute the curl command on: ".$plugin_cfg['url'],7);
+	  if ($curl) { curl_close($curl); }
+
+		if($picture === false)
+		{
+		  debug("Something went wrong. Try again to get the image from the camera...",4);
+		  $picture = get_image();
+		}
+		else
+		{
+		  debug("Image successfully read from the camera.",7);
+		  if ( $plugin_cfg["LOGLEVEL"] == 7 )
+		  {
+		  	$finfo 	= 	new finfo(FILEINFO_MIME);
+		  	$type 	= 	explode(';',$finfo->buffer($picture),2)[0];
+		  	debug("Type: ".$type." Size: ".strlen($picture)." Bytes",7);
+			if (!isset($_GET['stream']))
+			{
+			  	 debug("<img src='data:".$type.";base64,".base64_encode($picture)."'></>",7);
+			}
+			else
+			{
+			  	debug("Picture:\n[not shown in stream mode]",7);
+			}
+		  }
+		}
+	}
 	return $picture;
 }
-
+debug("Call get_image() fist time",7);
 $picture = get_image();
 
-
-
-
-// If the result has less than 500 byte, it's no picture.
-if(mb_strlen($picture) < 500)
+debug("Check, if the picture has less than 1000 bytes - then it's no picture.",7);
+if(mb_strlen($picture) < 1000)
 {
-  // Image too small, raise error 01
-  header ("Content-type: image/jpeg");
-  header ("Cache-Control: no-cache, no-store, must-revalidate"); 
-  header ("Pragma: no-cache"); 
-  header ("Expires: 0"); 
-  $error_msg = $phrases["ERROR01"];
-  $error_image      = @ImageCreate (1280, 800) or die ($error_msg);
-  $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
-  $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
-  ImageString ($error_image,20, 10, 10, $error_msg, $text_color);
-  $text_color       = ImageColorAllocate ($error_image, 0, 0, 255);
-  $error_msg = "URL: ".$plugin_cfg['url']."  HTTPAUTH: ".$plugin_cfg['httpauth'];
-  ImageString ($error_image, 20, 10, 50, $error_msg, $text_color);
-  $text_color       = ImageColorAllocate ($error_image, 128,128,128);
-  $line = 70;
-  $picture= preg_replace("/\r|/",'',$picture);
+  debug("Image too small. Just ".mb_strlen($picture)." Bytes. We got:",7);
   foreach (explode("\n",$picture ) as $pic_line)
   {
-    $line = $line + 20;
-    ImageString ($error_image, 20, 10, $line, $pic_line, $text_color);
+	  debug("=> $pic_line",7);
   }
-  ImageJPEG ($error_image);
-  ImageDestroy($error_image);
-  exit;
+  error_image($L["ERRORS.ERROR_ACCESS_CAM"]);
 }
 else
 {
-  // Seems to be ok - Display the picture
+  debug("Image seems to be ok, continue",7);
   if ($plugin_cfg["WATERMARK"] == 1)
   {
-    // Create Cam Image Object
-    $watermarked_picture = imagecreatefromstring($picture);
+    debug("WATERMARK = 1 so I have to put the overlay LoxBerry on it",7);
+	$watermarkfile = LBPHTMLDIR."/watermark.png";
+    debug("The overlay file will be: ".$watermarkfile,7);
+    $watermarked_picture = imagecreatefromstring($picture) or debug("Function imagecreatefromstring failed.",3);
     list($ix, $iy, $type, $attr) = getimagesizefromstring($picture);
-    if ($type <> 2) error_image($phrases,"ERROR02");
-
-    // Create Watermark Image
-    $stamp = imagecreatefrompng(dirname(__FILE__)."/watermark.png");
+    if ($type <> 2) error_image($L["ERRORS.ERROR02"]);
+    debug("Reading watermark.png into variable and applying overlay to camera image.",7);
+    $stamp = imagecreatefrompng($watermarkfile) or debug("Function imagecreatefrompng failed.",3);
     $sx    = imagesx($stamp);
     $sy    = imagesy($stamp);
-
-    // Wanted Logo Size
+    debug("Target image width/height: ".$sx."/".$sy,7);
     $logo_width  = 120;
     $logo_height = 86;
-
-    // Borders for Watermark
+    debug("Logo width/height: ".$logo_width."/".$logo_height,7);
     $margin_right  = $ix - $logo_width - 20;
     $margin_bottom = 20;
-
-    // Mix the images together
+    debug("Margin right/bottom: ".$margin_right."/".$margin_bottom,7);
     ImageCopyResized($watermarked_picture, $stamp, $ix - $logo_width - $margin_right, $iy - $logo_height - $margin_bottom, 0, 0, $logo_width, $logo_height, $sx, $sy);
     ImageDestroy($stamp);
     ob_start();
     ImageJPEG($watermarked_picture);
     $picture = ob_get_contents();
+	if ( $plugin_cfg["LOGLEVEL"] == 7 )
+	{
+		if (!isset($_GET['stream']))
+		{
+		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".base64_encode($picture)."'></>",7);
+		}
+		else
+		{
+		  	debug("Converted picture:\n[not shown in stream mode]",7);
+		}
+
+	}
     ob_end_clean();
     ImageDestroy($watermarked_picture);
   }
+  else
+  {
+	debug("WATERMARK = 0 so I don't have to put the overlay LoxBerry on it",7);
+  }
 
-  // Resize image to parameter &image_resize=xxx from URL if provided - must be >= 240 or <= 1920
+  debug("Check if resize image parameter '&image_resize=xxx' from URL was provided otherwise use IMAGE_RESIZE read from config file",7);
   if ( isset($_GET["image_resize"]) && $_GET["image_resize"] <> 0 )
   {
-    // Resize
+    debug("Yes, found URL parameter 'image_resize' with: ".$_GET["image_resize"],7);
     if ( (intval($_GET["image_resize"]) >= 200) &&  ( intval($_GET["image_resize"]) <= 1920 ) )
     {
+	  debug("URL parameter 'image_resize' is in valid range because ".$_GET["image_resize"]." is >= 200 and <= 1920.",7);
       $newwidth = intval($_GET["image_resize"]);
+	  debug("Resizing picture to ".$newwidth,7);
       $resized_picture = resize_cam_image($picture,$newwidth);
     }
     else
     {
-      // Invalid, no resize
+	  debug("URL parameter 'image_resize' is not within a valid range because ".$_GET["image_resize"]." is not >= 200 and <= 1920.",7);
+	  debug("No resizing here, keep picture as it is.",7);
       $resized_picture = $picture;
     }
   }
-  // Resize image to parameter IMAGE_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
   elseif ( ( isset( $plugin_cfg['IMAGE_RESIZE'] ) && $plugin_cfg['IMAGE_RESIZE'] <> 0 ) && !isset($_GET["image_resize"]) )
   {
-    // Resize as configured in cam-connect.cfg
+  	debug("Resize image to parameter IMAGE_RESIZE read from config file: ".$plugin_cfg['IMAGE_RESIZE'],7);
     if ( (intval($plugin_cfg['IMAGE_RESIZE']) >= 200) &&  ( intval($plugin_cfg['IMAGE_RESIZE']) <= 1920 ) )
     {
+	  debug("CFG parameter 'IMAGE_RESIZE' is in valid range because ".intval($plugin_cfg['IMAGE_RESIZE'])." is >= 200 and <= 1920.",7);
       $newwidth = intval($plugin_cfg['IMAGE_RESIZE']);
-      $resized_picture = resize_cam_image($picture,$newwidth);
+      debug("Resizing picture to ".$newwidth,7);
+	  $resized_picture = resize_cam_image($picture,$newwidth);
     }
     else
     {
-      // Invalid, no resize
+	  debug("CFG parameter 'IMAGE_RESIZE' is not within a valid range because ".intval($plugin_cfg['IMAGE_RESIZE'])." is not >= 200 and <= 1920.",7);
+	  debug("No resizing here, keep picture as it is.",7);
       $resized_picture = $picture;
     }
   }
   else
   {
-    // No resize
+    debug("No resizing wanted. Neither in config nor via URL request. Keep picture size.",7);
     $resized_picture = $picture;
   }
 
-	if (isset($_GET['stream'])) 
+    debug("Check if stream parameter '&stream' from URL was provided",7);
+	if (isset($_GET['stream']))
 	{
+        debug("Yes, looping the picture as mjpeg_stream.",7);
 		$boundary = "mjpeg_stream";
 		header("Cache-Control: no-cache");
 		header("Cache-Control: private");
 		header("Pragma: no-cache");
 		header("Content-type: multipart/x-mixed-replace; boundary=$boundary");
 		print "--$boundary\n";
-		# Set this so PHP doesn't timeout during a long stream
+        debug("Set PHP time limit to 0 so it doesn't timeout during a long stream",7);
 		set_time_limit(0);
-		# Disable Apache and PHP's compression of output to the client
-		@apache_setenv('no-gzip', 1);
+        debug("Disable output compression",7);
+		#@apache_setenv('no-gzip', 1);
 		@ini_set('zlib.output_compression', 0);
-		# Set implicit flush, and flush all current buffers
+        debug("Enable implicit_flush",7);
 		@ini_set('implicit_flush', 1);
 		for ($i = 0; $i < ob_get_level(); $i++)
     	ob_end_flush();
 		ob_implicit_flush(1);
-		# The loop, producing one jpeg frame per iteration
-		while (true) 
+		$maxloops=180;
+        debug("Start looping stream now, max $maxloops times",7);
+		while ($maxloops > 0)
 		{
-	    # Per-image header, note the two new-lines
-	    print "Content-type: image/jpeg\n\n";
+			$maxloops = $maxloops - 1;
+	    	print "Content-type: image/jpeg\n\n";
 			$picture = get_image();
 			// Try again if last call failed e.g. device busy
 			if(mb_strlen($picture) < 2000)
 			{
+		        debug("Fail, try again",7);
 				$picture = get_image();
 			}
 			// Try again if last call failed - but last time we try it...
 			if(mb_strlen($picture) < 2000)
 			{
+		        debug("Fail again, try last time",7);
 				$picture = get_image();
 			}
+	        debug("Send frame $maxloops to ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
 			echo $picture;
 			print "--$boundary\n";
 		}
+        debug("Exit normally after stream mode reached max loop count: ".$maxloops,7);
 		exit;
 	}
 	else
 	{
-		// No picture to display?
+      debug("No, streaming mode is not wanted, so continue normally.",7);
 	  if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ) )
 	  {
-	    // No picture
+        debug("No picture wanted, display a text instead:".$L['CC.IMAGE_RESIZE_JUST_TEXT_MSG'],7);
+	    echo $L['CC.IMAGE_RESIZE_JUST_TEXT_MSG'];
 	  }
 	  else
 	  {
+        debug("Picture wanted, display it now.",7);
 	    header ('Content-type: image/jpeg');
-	    header ("Cache-Control: no-cache, no-store, must-revalidate"); 
-	    header ("Pragma: no-cache"); 
-	    header ("Expires: ".gmdate('D, d M Y H:i:s', time()-3600) . " GMT"); 
+	    header ("Cache-Control: no-cache, no-store, must-revalidate");
+	    header ("Pragma: no-cache");
+	    header ("Expires: ".gmdate('D, d M Y H:i:s', time()-3600) . " GMT");
 	    header ('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg');
+        debug("Picture wanted, display it now.",7);
+		if ( $plugin_cfg["LOGLEVEL"] == 7 )
+		{
+			$finfo 	= 	new finfo(FILEINFO_MIME);
+			$type 	= 	explode(';',$finfo->buffer($resized_picture),2)[0];
+			debug("Type: ".$type." Size: ".strlen($resized_picture)." Bytes",7);
+			if (!isset($_GET['stream']))
+			{
+			  	 debug("<img src='data:".$type.";base64,".base64_encode($resized_picture)."'></>",7);
+			}
+			else
+			{
+			  	debug("Picture:\n[not shown in stream mode]",7);
+			}
+		}
 	    echo $resized_picture;
 	  }
 	}
 
-  // eMail Part
-  // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
-  if ( isset($_GET["email_resize"]) )
-  {
-    // Resize
-    if ( (intval($_GET["email_resize"]) >= 200) &&  ( intval($_GET["email_resize"]) <= 1920 ) )
-    {
-      $newwidth = intval($_GET["email_resize"]);
-      $resized_picture = resize_cam_image($picture,$newwidth);
-    }
-    else
-    {
-      // Invalid, no resize
-      $resized_picture = $picture;
-    }
-  }
-  // Resize image to parameter EMAIL_RESIZE read from cam-connect.cfg - must be >= 240 or <= 1920
-  elseif ( isset( $plugin_cfg['EMAIL_RESIZE'] ) )
-  {
-    // Resize as configured in cam-connect.cfg
-    if ( (intval($plugin_cfg['EMAIL_RESIZE']) >= 200) &&  ( intval($plugin_cfg['EMAIL_RESIZE']) <= 1920 ) )
-    {
-      $newwidth = intval($plugin_cfg['EMAIL_RESIZE']);
-      $resized_picture = resize_cam_image($picture,$newwidth);
-    }
-    else
-    {
-      // Invalid, no resize
-      $resized_picture = $picture;
-    }
-  }
-  else
-  {
-    // No resize
-    $resized_picture = $picture;
-  }
+	debug("eMail Part reached",7);
+    debug("Check for parameter &email_resize=xxx in URL or EMAIL_RESIZE in config ",7);
+	if ( isset($_GET["email_resize"]) )
+	{
+		debug("Resize image parameter &email_resize=xxx found in URL: ".$_GET["email_resize"],7);
+		if ( (intval($_GET["email_resize"]) >= 200) &&  ( intval($_GET["email_resize"]) <= 1920 ) )
+		{
+		  $newwidth = intval($_GET["email_resize"]);
+		  debug("URL parameter 'email_resize' is in valid range because ".$newwidth." is >= 200 and <= 1920.",7);
+		  debug("Resizing picture to ".$newwidth,7);
+		  $resized_picture = resize_cam_image($picture,$newwidth);
+		}
+		else
+		{
+		  debug("URL parameter 'email_resize' is not within a valid range because ".$_GET["email_resize"]." is not >= 200 and <= 1920.",7);
+		  debug("No resizing here, keep picture as it is.",7);
+		  $resized_picture = $picture;
+		}
+	}
+	elseif ( isset( $plugin_cfg['EMAIL_RESIZE'] ) )
+	{
+		debug("Resize image parameter EMAIL_RESIZE found in configuration: ".$plugin_cfg['EMAIL_RESIZE'],7);
+		if ( (intval($plugin_cfg['EMAIL_RESIZE']) >= 200) &&  ( intval($plugin_cfg['EMAIL_RESIZE']) <= 1920 ) )
+		{
+		  $newwidth = intval($plugin_cfg['EMAIL_RESIZE']);
+		  debug("CFG parameter 'EMAIL_RESIZE' is in valid range because ".$newwidth." is >= 200 and <= 1920.",7);
+		  debug("Resizing picture to ".$newwidth,7);
+		  $resized_picture = resize_cam_image($picture,$newwidth);
+		}
+		else
+		{
+		  debug("CFG parameter 'EMAIL_RESIZE' is not within a valid range because ".$plugin_cfg['EMAIL_RESIZE']." is not >= 200 and <= 1920.",7);
+		  debug("No resizing here, keep picture as it is.",7);
+		  $resized_picture = $picture;
+		}
+	}
+	else
+	{
+		debug("No resizing of eMail picture requested in URL or configured in plugin settings.",7);
+		$resized_picture = $picture;
+	}
 
-  // If wanted, send eMail
-  if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"])) $sent = send_mail_pic($resized_picture);
+	debug("Check if sending eMail is enabled",7);
+	if (($plugin_cfg['EMAIL_USED'] == 1) && ($mail_cfg['SMTP']['ISCONFIGURED'] == 1) && !isset($_GET["no_email"]))
+	{
+		debug("Sending email because 'EMAIL_USED' is set in config and SMTP server is configured and 'no_email' URL parameter is not set.",7);
+		if (isset($plugin_cfg['EMAIL_USED'])) debug("CFG parameter 'EMAIL_USED' is: ".$plugin_cfg['EMAIL_USED'],7);
+		if (isset($mail_cfg['SMTP']['ISCONFIGURED'])) debug("CFG parameter 'SMTP.ISCONFIGURED' is: ".$mail_cfg['SMTP']['ISCONFIGURED'],7);
+		if (isset($_GET["no_email"])) debug("URL parameter 'no_email' is: ".$_GET["no_email"],7);
+		$sent = send_mail_pic($resized_picture);
+	}
+	else
+	{
+		debug("Do not send email because 'EMAIL_USED' is not set in config or SMTP server is not configured or 'no_email' URL parameter is set.",7);
+		if (isset($plugin_cfg['EMAIL_USED'])) debug("CFG parameter 'EMAIL_USED' is: ".$plugin_cfg['EMAIL_USED'],7);
+		if (isset($mail_cfg['SMTP']['ISCONFIGURED'])) debug("CFG parameter 'SMTP.ISCONFIGURED' is: ".$mail_cfg['SMTP']['ISCONFIGURED'],7);
+		if (isset($_GET["no_email"])) debug("URL parameter 'no_email' is: ".$_GET["no_email"],7);
+	}
 
-  // If just text mode
-  if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ))
-  {
-    echo $sent;
-  }
-	
+#	if ( ($_GET["image_resize"] == 0 && isset($_GET["image_resize"])) || ( !isset($_GET["image_resize"]) && $plugin_cfg['IMAGE_RESIZE'] == 0 ))
+#	{
+#		debug("Just text mode for email.",7);
+#		echo $sent;
+#	}
+#	else
+#	{
+#		debug("Not just text mode. But we're done",7);
+#		echo "Don't know what to do here.";
+#	}
 }
+debug("Exit plugin normally now.",7);
 exit;
 
-function error_image ($phrases,$error_code)
+function error_image ($error_msg)
 {
-  // Read error string
-  $error_msg   = $phrases[$error_code];
-  (strlen($error_msg) > 0)?$error_msg=$error_msg:$error_msg="Plugin-Error: [$error_code]";
-
+  global $L;
+  (strlen($error_msg) > 0)?$error_msg=$error_msg:$error_msg=$L["ERRORS.ERROR_UNKNOWN"];
+  debug($error_msg,3);
   // Display an Error-Picture
   header ("Content-type: image/jpeg");
-  header ("Cache-Control: no-cache, no-store, must-revalidate"); 
-  header ("Pragma: no-cache"); 
-  header ("Expires: 0"); 
+  header ("Cache-Control: no-cache, no-store, must-revalidate");
+  header ("Pragma: no-cache");
+  header ("Expires: 0");
   $error_image      = @ImageCreate (320, 240) or die ($error_msg);
-  $background_color = ImageColorAllocate ($error_image, 255, 240, 240);
-  $text_color       = ImageColorAllocate ($error_image, 255, 64, 64);
+  $background_color = ImageColorAllocate ($error_image, 0, 0, 0);
+  $text_color       = ImageColorAllocate ($error_image, 255, 0, 0);
   ImageString ($error_image, 20, 10, 110, $error_msg, $text_color);
   ImageJPEG ($error_image);
+	if ( $plugin_cfg["LOGLEVEL"] == 7 )
+	{
+		$finfo 	= 	new finfo(FILEINFO_MIME);
+		$type 	= 	explode(';',$finfo->buffer(ImageJPEG ($error_image)),2)[0];
+		debug("Type: ".$type." Size: ".strlen(ImageJPEG ($error_image))." Bytes",7);
+		if (!isset($_GET['stream']))
+		{
+		  	 debug("<img src='data:".$type.";base64,".base64_encode(ImageJPEG ($error_image))."'></>",7);
+		}
+		else
+		{
+		  	debug("Picture:\n[not shown in stream mode]",7);
+		}
+	}
   ImageDestroy($error_image);
+  debug("Exit plugin in function error_image",7);
   exit;
 }
 
 function send_mail_pic($picture)
 {
-  global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $phrases;
-  require dirname($_SERVER["SCRIPT_FILENAME"]).'/PHPMailerAutoload.php';
-  $mail = new PHPMailer;
-  $mail->isSMTP();                                       // Set mailer to use SMTP
-  $mail->isHTML(true);                                   // Set email format to HTML
-
-  if ($mail_cfg['SMTP']['CRYPT'] == "1")
-  {
-    $mail->SMTPSecure = 'tls';                             // Enable encryption
-  }
-  $mail->Host       = $mail_cfg['SMTP']['SMTPSERVER'].":".$mail_cfg['SMTP']['PORT'];         // Specify server
-  $mail->SMTPAuth   = $mail_cfg['SMTP']['AUTH'];         // Enable SMTP authentication
-  $mail->Username   = $mail_cfg['SMTP']['SMTPUSER'];     // SMTP username
-  $mail->Password   = $mail_cfg['SMTP']['SMTPPASS'];     // SMTP password
-  $mail->From       = $mail_cfg['SMTP']['EMAIL'];        // Sender address
+  debug("Function send_mail_pic reached",7);
+  global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $L;
   if ( isset($plugin_cfg["EMAIL_FROM_NAME"]) )
   {
-      $mail->FromName   = utf8_decode($plugin_cfg["EMAIL_FROM_NAME"]);    // Sender name
+      $mailFromName   = '"'.utf8_decode($plugin_cfg["EMAIL_FROM_NAME"]). '" <'.$mail_cfg['SMTP']['EMAIL'].'>';  // Sender name
+      debug("Config value EMAIL_FROM_NAME found - using it: ".$mailFromName,7);
   }
   else
   {
-      $mail->FromName   = "LoxBerry";
+      $mailFromName   = '"LoxBerry" <'.$mail_cfg['SMTP']['EMAIL'].'>';  // Default Sender name
+      debug("Config value EMAIL_FROM_NAME not found - using default: ".$mailFromName,4);
   }
-
-  // Use recipients from URL if valid and configured
   $at_least_one_valid_email=0;
-
   if ( $plugin_cfg['EMAIL_TO'] == 1 )
   {
+    debug("Config value EMAIL_TO found with value: 1 -> start recipients manipulation.",7);
     if ( isset($_GET["email_to"]) )
     {
+      debug("URL parameter 'email_to' found. Using it: ".$_GET["email_to"],7);
+      debug("Removing original eMail recipient",7);
+      $mailTo = ""; 
       foreach (explode(";",rawurldecode($_GET["email_to"]) ) as $recipients_data)
       {
         $recipients_data = str_ireplace("(at)","@",$recipients_data);
+        debug("Recipient(s): ".$recipients_data,7);
         if (filter_var($recipients_data, FILTER_VALIDATE_EMAIL))
         {
-          $mail->addAddress($recipients_data);  // Add recipient
+          $mailTo .= '"'.$recipients_data.'"'." <$recipients_data>";  // Add recipient
+          if ( $at_least_one_valid_email == 1 ) $mailTo .= ";";
           $at_least_one_valid_email=1;
+          debug("Validated recipient(s): ".$recipients_data,7);
         }
+        else
+        {
+          debug("Invalid recipient(s) in: ".$recipients_data,3);
+          debug("Abort recipients manipulation.",7);
+    	}
       }
     }
-  }
-
-  // Read recipients
-  if ( $at_least_one_valid_email == 0 )
-  {
-    foreach (explode(";",$plugin_cfg['EMAIL_RECIPIENTS']) as $recipients_data)
+    else
     {
-      $mail->addAddress($recipients_data);  // Add recipient
+      debug("URL parameter 'email_to' not found. Abort recipients manipulation.",7);
     }
   }
+else
+	{
+	 debug("Config value EMAIL_TO has not value 1. No recipients manipulation.",7);
+	}
+  if ( $at_least_one_valid_email == 0 )
+  {
+  	debug("URL parameter 'email_to' had no valid recipients. Using default from config file.",7);
+   	debug("Adding recipients from config file: ".$plugin_cfg['EMAIL_RECIPIENTS'],7);
 
-	// Date for eMail
-  $datum = $datetime->format($plugin_cfg['EMAIL_DATE_FORMAT']." ".$plugin_cfg['EMAIL_TIME_FORMAT']);
-	
-  // Generate subject
-  $mail->Subject = utf8_decode($cam_name.$plugin_cfg["EMAIL_SUBJECT1"].$datetime->format($plugin_cfg["EMAIL_DATE_FORMAT"]).$plugin_cfg["EMAIL_SUBJECT2"].$datetime->format($plugin_cfg["EMAIL_TIME_FORMAT"]).$plugin_cfg["EMAIL_SUBJECT3"]);
-
-  // Create Body
-  $mail->AltBody = $plugin_cfg["EMAIL_BODY"];
-  $html  = '<html><body>';                                              // Start of eMail
-  $html .= utf8_decode($plugin_cfg["EMAIL_BODY"])."<br/>";
-
-  // Place image inline or as attachment based on config
+      foreach (explode(";",$plugin_cfg['EMAIL_RECIPIENTS']) as $recipients_data)
+      {
+        debug("Recipient(s): ".$recipients_data,7);
+        $recipients_data = str_ireplace("\"","",$recipients_data);
+        if (filter_var($recipients_data, FILTER_VALIDATE_EMAIL))
+        {
+          $mailTo .= '"'.$recipients_data.'"'." <$recipients_data>";  // Add recipient
+          if ( $at_least_one_valid_email == 1 ) $mailTo .= ";";
+          $at_least_one_valid_email=1;
+          debug("Validated recipient(s): ".$recipients_data,7);
+        }
+        else
+        {
+          debug("Invalid recipient(s) in: ".$recipients_data,3);
+          debug("Abort recipients manipulation.",7);
+    	}
+      }
+   }
+	else
+	{
+    	debug("Using recipient taken from URL before.",7);
+	}
+  $emailSubject = utf8_decode($cam_name.$plugin_cfg["EMAIL_SUBJECT1"]." ".$datetime->format($plugin_cfg["EMAIL_DATE_FORMAT"])." ".$plugin_cfg["EMAIL_SUBJECT2"]." ".$datetime->format($plugin_cfg["EMAIL_TIME_FORMAT"])." ".$plugin_cfg["EMAIL_SUBJECT3"]);
+  debug("Building eMail subject: ".$emailSubject,7);
   if ($plugin_cfg["EMAIL_INLINE"] == 1)
   {
+    debug("Place image inline",7);
     $inline  =  'inline';
-    $html   .=  '<img src="cid:'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'" alt="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg'.'" />';
+    $email_image_part =  '<img src="cid:'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'" alt="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg'.'" />';
   }
   else
   {
+    debug("Place image as attachment",7);
     $inline  =  'attachment';
+    $email_image_part ="";
   }
 
-  // Resize image to parameter &email_resize=xxx from URL if provided - must be >= 240 or <= 1920
+  debug("Resize image to parameter &email_resize=xxx from URL if provided",7);
   if ( isset($_GET["email_resize"]) )
   {
+    debug("Found. Try to override EMAIL_RESIZE from config with 'email_resize' from URL: ".$plugin_cfg['EMAIL_RESIZE']."=>".$_GET["email_resize"],7);
     if ( (intval($_GET["email_resize"]) >= 200) && (intval($_GET["email_resize"]) <= 1920) )
     {
       $plugin_cfg['EMAIL_RESIZE'] = intval($_GET["email_resize"]);
+      debug("Override EMAIL_RESIZE ok: ".$plugin_cfg['EMAIL_RESIZE'],7);
     }
-  }
-
-  // Resize image if EMAIL_RESIZE is >= 240 - max is 1920
-  $newwidth = $plugin_cfg['EMAIL_RESIZE'];
-  if ($newwidth >= 240)
-  {
-    if ($newwidth > 1920) $newwidth=1920;
-    $picture = resize_cam_image($picture,$newwidth);
-  }
-
-  // Insert image
-  $mail->AddStringEmbeddedImage($picture, $plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s"), $plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg', 'base64', "image/jpeg", "$inline");
-  $html .= "<br/>".utf8_decode($plugin_cfg["EMAIL_SIGNATURE"]);
-  $html .= '</body></html>';                                            // End of eMail
-  $mail->Body    = $html;
-
-
-
-  ob_start();
-  if(!$mail->send())
-  {
-  ob_end_clean();
-  return "Plugin-Error: [".$mail->ErrorInfo."]";
+    else
+    {
+      debug("Override EMAIL_RESIZE failed, keep value from config: ".$plugin_cfg['EMAIL_RESIZE'],7);
+    }
   }
   else
   {
-  ob_end_clean();
-  return "Mail ok.";
+  	debug("Not found. No resize override by URL",7);
+  }
+
+  $newwidth = $plugin_cfg['EMAIL_RESIZE'];
+  debug("Check if resize value is valid.",7);
+  if ($newwidth >= 240)
+  {
+    debug("Minimum width >= 240 : yes => ".$newwidth,7);
+    if ($newwidth > 1920)
+    {
+        debug("Maximum width > 1920, adapt width from ".$newwidth." to max. 1920",4);
+    	$newwidth=1920;
+    }
+    else
+    {
+    	 debug("Maximum width <= 1920 : yes => ".$newwidth,7);
+    }
+    debug("Resizing to: ".$newwidth,7);
+    $picture = resize_cam_image($picture,$newwidth);
+  }
+  else
+  {
+       debug("Mimimum width < 240, but ok, keep it: ".$newwidth,4);
+  }
+
+$html = "To: ".$mailTo."
+From: ".$mailFromName."
+Subject: ".$emailSubject." 
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary=\"b1_7eb9272345eb191ab133eafc6fca47e1\"
+Content-Transfer-Encoding: 8bit
+
+--b1_7eb9272345eb191ab133eafc6fca47e1
+Content-Type: text/plain; charset=us-ascii
+
+Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.
+
+
+--b1_7eb9272345eb191ab133eafc6fca47e1
+Content-Type: multipart/related;
+	boundary=\"b2_7eb9272345eb191ab133eafc6fca47e1\"
+
+--b2_7eb9272345eb191ab133eafc6fca47e1
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+<html><body>Hallo,<br/>es wurde eben geklingelt. Anbei das Bild.<br/>".$email_image_part."
+".utf8_decode($plugin_cfg["EMAIL_SIGNATURE"])." 
+</body></html>
+
+
+--b2_7eb9272345eb191ab133eafc6fca47e1
+Content-Type: image/jpeg; name=\"".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."\"
+Content-Transfer-Encoding: base64
+Content-ID: <".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").">
+Content-Disposition: ".$inline."; filename=".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."
+
+".base64_encode($picture)."
+
+--b2_7eb9272345eb191ab133eafc6fca47e1--
+
+
+--b1_7eb9272345eb191ab133eafc6fca47e1--\n\n";
+
+  debug("eMail-Body will be:\n".$html,7);
+  $last_line = system("echo '$html' | /usr/sbin/sendmail -t 2>&1 ",$retval);
+  debug("Sendmail Ausgabe: ".$last_line,7);
+  if($retval)
+  {
+    debug("Send eMail failed. Code: ".$retval,3);
+    return "Plugin-Error: [".$last_line."]";
+  }
+  else
+  {
+    debug("Send eMail ok.",7);
+    return "Mail ok.";
   }
 }
 
 function resize_cam_image ($picture,$newwidth=720)
 {
+	debug("Function resize_cam_image",7);
     list($width, $height) = getimagesizefromstring($picture);
     $newheight = $height / ($width/$newwidth);
     $thumb = imagecreatetruecolor($newwidth, $newheight);

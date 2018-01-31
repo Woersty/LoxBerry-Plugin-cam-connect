@@ -5,4 +5,11 @@
 5|Hikvision|DS-2CD2132|/Streaming/channels/1/picture|CURLAUTH_ANY
 6|Hikvision|DS-2CD2532|/Streaming/channels/1/picture|CURLAUTH_ANY
 7|Hikvision|Generic|/Streaming/channels/1/picture|CURLAUTH_ANY
-8|Luna|DVR27108-4MP|/cgi-bin/snapshot.cgi|CURLAUTH_DIGEST
+8|Luna|DVR27108-4MP Channel 1|/cgi-bin/snapshot.cgi?channel=1|CURLAUTH_DIGEST
+9|Luna|DVR27108-4MP Channel 2|/cgi-bin/snapshot.cgi?channel=2|CURLAUTH_DIGEST
+10|Luna|DVR27108-4MP Channel 3|/cgi-bin/snapshot.cgi?channel=3|CURLAUTH_DIGEST
+11|Luna|DVR27108-4MP Channel 4|/cgi-bin/snapshot.cgi?channel=4|CURLAUTH_DIGEST
+12|Luna|DVR27108-4MP Channel 5|/cgi-bin/snapshot.cgi?channel=5|CURLAUTH_DIGEST
+13|Luna|DVR27108-4MP Channel 6|/cgi-bin/snapshot.cgi?channel=6|CURLAUTH_DIGEST
+14|Luna|DVR27108-4MP Channel 7|/cgi-bin/snapshot.cgi?channel=7|CURLAUTH_DIGEST
+15|Luna|DVR27108-4MP Channel 8|/cgi-bin/snapshot.cgi?channel=8|CURLAUTH_DIGEST
