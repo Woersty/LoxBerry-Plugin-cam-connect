@@ -43,7 +43,7 @@
 															<nobr><TMPL_VAR CC.EMAIL_RECIPIENTS_TEXT></nobr>
 														</td>
 														<td width="100%">
-															<input id="EMAIL_RECIPIENTS" name="EMAIL_RECIPIENTS" type="text" data-validation="length letternumeric" data-validation-length="Min5"
+															<input id="EMAIL_RECIPIENTS" autocomplete="nope" name="EMAIL_RECIPIENTS" type="text" data-validation="length letternumeric" data-validation-length="Min5"
 																data-validation-allowing="-_ </>@.;:." class="textfield" value="<TMPL_VAR EMAIL_RECIPIENTS>" data-validation-error-msg="<TMPL_VAR CC.EMAIL_RECIPIENTS_VALIDATION>">
 															<input type="hidden" name="EMAIL_FILENAME" value="<TMPL_VAR EMAIL_FILENAME>">
 														</td>
@@ -179,19 +179,51 @@
 													</td>
 												</tr>
 											</table>
-										</form>
+											<br>
+													<b><TMPL_VAR CC.URL_HELPER_SECTION_TEXT></b>
+											<br>					
+									<script>
+
+										function cam_url(string2check, camid)
+										{
+											var cam_host_or_ip = string2check.split(":");
+											if ( cam_host_or_ip.length > 1 && ( cam_host_or_ip[1] != "80" & cam_host_or_ip[1] != "") )
+											{
+												$( "#cam_host_or_ip_url"+camid ).html(cam_host_or_ip[0]);
+												$( "#cam_host_or_ip_port"+camid ).html('&port=<span style="color:#00C000">'+cam_host_or_ip[1]+"</SPAN>");
+												var cam_url = cam_host_or_ip[0]+"&port="+cam_host_or_ip[1];
+											}
+											else
+											{
+												$( "#cam_host_or_ip_url"+camid ).html(cam_host_or_ip[0]);
+												$( "#cam_host_or_ip_port"+camid ).html('&port=<span style="color:#00C000">'+80+"</SPAN>");
+												var cam_url = cam_host_or_ip[0]+"&port=80";
+											}
+											return cam_url
+										}
+									</script>
+									<button onclick="$.ajax({url: '', type: 'GET', data: { 'create_cam':1}}); " data-role="button" data-inline="true" data-mini="true" data-icon="plus"><TMPL_VAR CC.BUTTON_CREATE_CAM></button>
+									<TMPL_LOOP NAME="CAMDATA">
+									<div id="camdiv<TMPL_VAR CAMNO>">
+									<br>
 										<table width="90%" style="padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(109,172,32,.2);">
 											<tr>
-												<td colspan="3" >
-													<b><TMPL_VAR CC.URL_HELPER_SECTION_TEXT></b>
+												<td align="right">
+													<label id="label_CAM_NAME<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_NAME_TEXT></label>
+												</td>
+												<td>
+													<input style="width:500px" id="CAM_NAME<TMPL_VAR CAMNO>" name="CAM_NAME<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_NAME_SUGGESTION>" value="<TMPL_VAR CAM_NAME>">
+												</td>
+												<td>
+													&nbsp;<button onclick="$.ajax({url: '', type: 'GET', data: { 'delete_cam':<TMPL_VAR CAMNO>}}).done(function() { $( '#camdiv<TMPL_VAR CAMNO>' ).empty(); }); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="delete"><TMPL_VAR CC.BUTTON_DELETE_CAM></button>
 												</td>
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_host_or_ip"><TMPL_VAR CC.CAM_HOST_TEXT></label>
+													<label id="label_CAM_NOTE<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_NOTE_TEXT></label>
 												</td>
 												<td>
-													<input style="width:500px" id="cam_host_or_ip" name="cam_host_or_ip" type="text" class="textfield" value="<TMPL_VAR CC.CAM_HOST_SUGGESTION>">
+													<input style="width:500px" id="CAM_NOTE<TMPL_VAR CAMNO>" name="CAM_NOTE<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_NOTE_SUGGESTION>" value="<TMPL_VAR CAM_NOTE>">
 												</td>
 												<td>
 													&nbsp;
@@ -199,21 +231,33 @@
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_model"><TMPL_VAR CC.CAM_MODEL_TEXT></label>
+													<label id="label_CAM_HOST_OR_IP<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_HOST_TEXT></label>
 												</td>
 												<td>
-													<select style="align:left;" id="cam_model" name="cam_model" data-mini="false">
+													<input style="width:500px" id="CAM_HOST_OR_IP<TMPL_VAR CAMNO>" name="CAM_HOST_OR_IP<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_HOST_SUGGESTION>" value="<TMPL_VAR CAM_HOST_OR_IP>">
+												</td>
+												<td>
+													&nbsp;
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													<label id="label_CAM_MODEL<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_MODEL_TEXT></label>
+												</td>
+												<td>
+													<select style="align:left;" id="CAM_MODEL<TMPL_VAR CAMNO>" name="CAM_MODEL<TMPL_VAR CAMNO>" data-mini="false">
 														<TMPL_VAR cam_model_list>
 													</select>
+													<SCRIPT> $("#CAM_MODEL<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_MODEL>'); </SCRIPT>
 												</td>
 												<td>&nbsp;</td>
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_user"><TMPL_VAR CC.CAM_USER_TEXT></label>
+													<label id="label_CAM_USER<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_USER_TEXT></label>
 												</td>
 												<td>
-													<input id="cam_user" name="cam_user" type="text" class="textfield" value="<TMPL_VAR CC.CAM_USER_SUGGESTION>">
+													<input id="CAM_USER<TMPL_VAR CAMNO>" autocomplete="nope" name="CAM_USER<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_USER_SUGGESTION>" value="<TMPL_VAR CAM_USER>">
 												</td>
 												<td>
 													&nbsp;
@@ -221,10 +265,10 @@
 											</tr>
 											<tr>
 												<td align="right">
-													<label id="label_cam_pass"><TMPL_VAR CC.CAM_PASS_TEXT></label>
+													<label id="label_CAM_PASS<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_PASS_TEXT></label>
 												</td>
 												<td>
-													<input id="cam_pass" type="text" class="textfield" value="<TMPL_VAR CC.CAM_PASS_SUGGESTION>">
+													<input id="CAM_PASS<TMPL_VAR CAMNO>" autocomplete="new-password" name="CAM_PASS<TMPL_VAR CAMNO>" type="password" class="textfield" value="<TMPL_VAR CAM_PASS>">
 												</td>
 												<td>
 													&nbsp;
@@ -245,7 +289,8 @@
 													&nbsp;
 												</td>
 												<td colspan="2">
-													<input onclick="if ( $(this).is(':checked') ) { $( '#image_resize' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#IMAGE_RESIZE').val()+'</SPAN>'); $( '#image_resize' ).prop('url','&image_resize=' + $('#IMAGE_RESIZE').val()) } else { $( '#image_resize' ).html(''); $( '#image_resize' ).prop('url','') }" type="checkbox" id="URL_HELP_IMAGE_RESIZE" name="URL_HELP_IMAGE_RESIZE"><label id="URL_HELP_IMAGE_RESIZE_LABEL" for="URL_HELP_IMAGE_RESIZE"><TMPL_VAR CC.URL_HELP_IMAGE_RESIZE_TEXT></label>
+													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>').val(1); $( '#image_resize<TMPL_VAR CAMNO>' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','&image_resize=' + $('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()) } else { $('#CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>').val(0); $( '#image_resize<TMPL_VAR CAMNO>' ).html(''); $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','') }" type="checkbox" id="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>"><label id="CAM_IMAGE_RESIZE_LABEL<TMPL_VAR CAMNO>" for="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.URL_HELP_IMAGE_RESIZE_TEXT></label>
+												<input id="CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_IMAGE_RESIZE_CB>">
 												</td>
 											</tr>
 											<tr>
@@ -253,7 +298,17 @@
 													&nbsp;
 												</td>
 												<td colspan="2">
-													<input onclick="if ( $(this).is(':checked') ) { $( '#email_resize' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#EMAIL_RESIZE').val()+'</SPAN>'); $( '#email_resize' ).prop('url','&email_resize=' + $('#EMAIL_RESIZE').val()) } else { $( '#email_resize' ).html(''); $( '#email_resize' ).prop('url','') }" type="checkbox" id="URL_HELP_EMAIL_RESIZE" name="URL_HELP_EMAIL_RESIZE"><label id="URL_HELP_EMAIL_RESIZE_LABEL" for="URL_HELP_EMAIL_RESIZE"><TMPL_VAR CC.URL_HELP_EMAIL_RESIZE_TEXT></label>
+														<select id="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" data-mini="false">
+																<option value="0"   ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> <TMPL_VAR CC.IMAGE_RESIZE_ORIGINAL_TEXT></option>
+																<option value="240" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 240px</option>
+																<option value="320" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 320px</option>
+																<option value="640" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 640px</option>
+																<option value="720" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 720px</option>
+																<option value="1024"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1024px</option>
+																<option value="1280"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1280px</option>
+																<option value="1600"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1600px</option>
+																<option value="1920"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1920px</option>
+															</select>
 												</td>
 											</tr>
 											<tr>
@@ -261,16 +316,211 @@
 													&nbsp;
 												</td>
 												<td colspan="2">
-													<input onclick="if ( $(this).is(':checked') ) { $( '#no_email' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>'); $( '#no_email' ).prop('url','&no_email=1') } else { $( '#no_email' ).html(''); $( '#no_email' ).prop('url','') }" type="checkbox" id="URL_HELP_NO_MAIL" name="URL_HELP_NO_MAIL"><label id="URL_HELP_NO_MAIL_LABEL" for="URL_HELP_NO_MAIL"><TMPL_VAR CC.URL_HELP_NO_MAIL_TEXT></label>
+													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>').val(1); $( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()) } else { $('#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>').val(0); $( '#email_resize<TMPL_VAR CAMNO>' ).html(''); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','') }" type="checkbox" id="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>"><label id="CAM_EMAIL_RESIZE_LABEL<TMPL_VAR CAMNO>" for="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.URL_HELP_EMAIL_RESIZE_TEXT></label>
+												<input id="CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_EMAIL_RESIZE_CB>">
+												</td>
+											</tr>
+											<tr>
+												<td>
+													&nbsp;
+												</td>
+												<td colspan="2">
+														<select id="CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>" data-mini="false">
+																<option value="0"   ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> <TMPL_VAR CC.EMAIL_RESIZE_ORIGINAL_TEXT></option>
+																<option value="240" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 240px</option>
+																<option value="320" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 320px</option>
+																<option value="640" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 640px</option>
+																<option value="720" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 720px</option>
+																<option value="1024"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1024px</option>
+																<option value="1280"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1280px</option>
+																<option value="1600"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1600px</option>
+																<option value="1920"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1920px</option>
+															</select>
+												</td>
+											</tr>
+
+											<tr>
+												<td>
+													&nbsp;
+												</td>
+												<td colspan="2">
+													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(1);     $( '#no_email<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(0); $( '#no_email<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>"><label id="CAM_NO_EMAIL_LABEL<TMPL_VAR CAMNO>" for="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.URL_HELP_NO_MAIL_TEXT></label>
+												<input id="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_NO_EMAIL_CB>">
 												</td>
 											</tr>
 											<tr>
 												<td colspan="3" width="100%">
 													<hr><TMPL_VAR CC.LOXONE_CONFIG_TEXT><br/><br/>
-										<font face="courier"><small><b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url">?</span><span style="color:#000000" id="cam_host_or_ip_port"></span>&user=<span style="color:#FF40C0" id="cam_user_url">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url">?</span>&cam-model=<span style="color:#40c040" id="cam_type">?</span><span url="" id="email_to"></span><span url="" id="no_email"></span><span url="" id="image_resize"></span><span url="" id="email_resize"></span></b></font></small>
-										<br/><center><a id="btntest" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><TMPL_VAR CC.TEST_TEXT></a></center></td>
+										<font face="courier"><small><b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url<TMPL_VAR CAMNO>">?</span><span style="color:#000000" id="cam_host_or_ip_port<TMPL_VAR CAMNO>"></span>&user=<span style="color:#FF40C0" id="cam_user_url<TMPL_VAR CAMNO>">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url<TMPL_VAR CAMNO>">?</span>&cam-model=<span style="color:#40c040" id="cam_type<TMPL_VAR CAMNO>">?</span><span url="" id="email_to<TMPL_VAR CAMNO>"></span><span url="" id="no_email<TMPL_VAR CAMNO>"></span><span url="" id="image_resize<TMPL_VAR CAMNO>"></span><span url="" id="email_resize<TMPL_VAR CAMNO>"></span></b></font></small>
+										<br><center><a id="btntest<TMPL_VAR CAMNO>" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><TMPL_VAR CC.TEST_TEXT></a>
+											</center></td>
 											</tr>
 										</table>
+									<script>
+
+									<TMPL_VAR CAM_IMAGE_RESIZE_CB_script>
+									if ( "<TMPL_VAR CAM_IMAGE_RESIZE_CB>" == 1  ) 
+									{ 
+										$("#CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>").prop("checked", 1);
+										$( "label[for='CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+									    $( '#image_resize<TMPL_VAR CAMNO>' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>');
+									    $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','&image_resize=' + $('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()) 
+									} 
+									else 
+									{ 
+										$( '#image_resize<TMPL_VAR CAMNO>' ).html(''); $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','') 
+									};
+									$("#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_IMAGE_RESIZE>');
+									$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').on('change', function(event) 
+									{ 
+										if ( $('#CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>').val() == 1 ) 
+										{ 
+											$( '#image_resize<TMPL_VAR CAMNO>' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); 
+											$( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','&image_resize=' + $('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()) 
+										} 
+										else 
+										{ 
+											$( '#image_resize<TMPL_VAR CAMNO>' ).html(''); 
+											$( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','') 
+										};
+									});
+									$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').trigger('change');
+
+									<TMPL_VAR CAM_EMAIL_RESIZE_CB_script>
+									if ( "<TMPL_VAR CAM_EMAIL_RESIZE_CB>" == 1  ) 
+									{ 
+										$("#CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>").prop("checked", 1);
+										$( "label[for='CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+									    $( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>');
+									    $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()) 
+									} 
+									else 
+									{ 
+										$( '#email_resize<TMPL_VAR CAMNO>' ).html(''); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','') 
+									};
+									$("#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_EMAIL_RESIZE>');
+									$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').on('change', function(event) 
+									{ 
+										if ( $('#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>').val() == 1 ) 
+										{ 
+											$( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); 
+											$( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()) 
+										} 
+										else 
+										{ 
+											$( '#email_resize<TMPL_VAR CAMNO>' ).html(''); 
+											$( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','') 
+										};
+									});
+									$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').trigger('change');
+
+									<TMPL_VAR CAM_NO_EMAIL_CB_script>
+									if ( "<TMPL_VAR CAM_NO_EMAIL_CB>" == 1  ) 
+									{ 
+										$("#CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>").prop("checked", 1);
+										$( "label[for='CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+										$('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(1); 
+										$( '#no_email<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>'); 
+									} 
+									else 
+									{ 
+										$('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(0); 
+										$( '#no_email<TMPL_VAR CAMNO>' ).html('');
+									};
+
+
+
+
+										cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>"); 										
+										$( "#cam_type<TMPL_VAR CAMNO>" ).html( $( "#CAM_MODEL<TMPL_VAR CAMNO>").val() );
+										$( "#cam_user_url<TMPL_VAR CAMNO>" ).html($( "#CAM_USER<TMPL_VAR CAMNO>").val());
+										$( "#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val());
+
+
+										$("#CAM_MODEL<TMPL_VAR CAMNO>").change(function()  
+										{ 	
+											$( "#cam_type<TMPL_VAR CAMNO>" ).html($( "#CAM_MODEL<TMPL_VAR CAMNO>").val() ); 
+										}); 
+										$( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").keyup(function( event ) 
+										{ 
+											cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>"); 
+										}); 
+										$( "#CAM_USER<TMPL_VAR CAMNO>" ).keyup(function( event ) 
+										{ 
+											$( "#cam_user_url<TMPL_VAR CAMNO>" ).html($("#CAM_USER<TMPL_VAR CAMNO>").val()); 
+										}); 
+										$( "#CAM_PASS<TMPL_VAR CAMNO>" ).keyup(function( event ) 
+										{ 
+											$("#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val()); 
+										}); 
+										$( "#btntest<TMPL_VAR CAMNO>" ).click(function () 
+										{ 
+											last_part = '';
+											if ($( "#image_resize<TMPL_VAR CAMNO>").prop('url'))
+											{
+												last_part = last_part + $( "#image_resize<TMPL_VAR CAMNO>").prop('url');
+											}
+
+											if ( $( "#CAM_NO_EMAIL<TMPL_VAR CAMNO>").css('display') == 'none' )
+											{
+												// Ignore in URL if not visible 
+											}
+											else
+											{
+												if ($( "#email_resize<TMPL_VAR CAMNO>").prop('url'))
+												{
+													last_part = last_part + $( "#email_resize<TMPL_VAR CAMNO>").prop('url');
+												}
+												if ( $( "#CAM_NO_EMAIL<TMPL_VAR CAMNO>").prop('url') )
+												{
+													last_part = last_part + $( "#CAM_NO_EMAIL<TMPL_VAR CAMNO>").prop('url');
+												}
+											}
+											url2open = "http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=" + cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>") + "&user=" + 	 $( "#CAM_USER<TMPL_VAR CAMNO>").val() + "&pass=" + $( "#CAM_PASS<TMPL_VAR CAMNO>").val() + "&cam-model=" + $( "#CAM_MODEL<TMPL_VAR CAMNO>").val() + $( "#email_to<TMPL_VAR CAMNO>").attr('url').replace(new RegExp("@", 'g'), "(at)") +"&"+ last_part; window.open(url2open,'Cam-Connect<TMPL_VAR CAMNO>','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
+										}); 
+										
+//										
+										if ( "<TMPL_VAR CAM_EMAIL_RESIZE_CB>" == 1 || "<TMPL_VAR CAM_EMAIL_RESIZE_CB>" == 'checked' || "<TMPL_VAR CAM_EMAIL_RESIZE_CB>" == 'on' ) 
+										{ 
+												$("#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>").prop("checked", 1);
+												$( "label[for='CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+											    $( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>');
+											    $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()) 
+										} 
+										else 
+										{ 
+											$( '#email_resize<TMPL_VAR CAMNO>' ).html(''); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','') 
+										};
+										if ( "<TMPL_VAR CAM_EMAIL_RESIZE_CB>" == 1 || "<TMPL_VAR CAM_EMAIL_RESIZE_CB>" == 'checked' || "<TMPL_VAR CAM_EMAIL_RESIZE_CB>" == 'on' ) 
+										{ 
+												$("#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>").prop("checked", 1);
+												$( "label[for='CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+											    $( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>');
+											    $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()) 
+										} 
+										else 
+										{ 
+											$( '#email_resize<TMPL_VAR CAMNO>' ).html(''); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','') 
+										};
+										if ( "<TMPL_VAR CAM_NO_EMAIL>" == 1 || "<TMPL_VAR CAM_NO_EMAIL>" == 'checked' || "<TMPL_VAR CAM_NO_EMAIL>" == 'on' ) 
+										{ 
+												$("#CAM_NO_EMAIL<TMPL_VAR CAMNO>").prop("checked", 1);
+												$( "label[for='CAM_NO_EMAIL<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+											    $( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>'+$('#CAM_NO_EMAIL<TMPL_VAR CAMNO>').val()+'</SPAN>');
+											    $( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).prop('url','&no_email=' + $('#CAM_NO_EMAIL<TMPL_VAR CAMNO>').val()) 
+										} 
+										else 
+										{ 
+											$( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).html(''); $( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).prop('url','') 
+										};
+																				
+									
+									
+									</script>
+		</div>
+						</TMPL_LOOP>
+
+
 									</center>
 									<script>
 								
@@ -281,40 +531,10 @@
 											errorMessagePosition : $messages
 										});
 
-										$('#IMAGE_RESIZE').on('click change', function(event) 
-										{ 
-											if ( $('#URL_HELP_IMAGE_RESIZE').is(':checked') ) { $( '#image_resize' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#IMAGE_RESIZE').val()+'</SPAN>'); $( '#image_resize' ).prop('url','&image_resize=' + $('#IMAGE_RESIZE').val()) } else { $( '#image_resize' ).html(''); $( '#image_resize' ).prop('url','') };
-										});
-										$('#EMAIL_RESIZE').on('click change', function(event) 
-										{ 
-													if ( $('#URL_HELP_EMAIL_RESIZE').is(':checked') ) { $( '#email_resize' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#EMAIL_RESIZE').val()+'</SPAN>'); $( '#email_resize' ).prop('url','&email_resize=' + $('#EMAIL_RESIZE').val()) } else { $( '#email_resize' ).html(''); $( '#email_resize' ).prop('url','') };
-										});
-
 										
 											
 										// Init
 
-										function cam_url(string2check)
-										{
-											var cam_host_or_ip = string2check.split(":");
-											if ( cam_host_or_ip.length > 1 && ( cam_host_or_ip[1] != "80" & cam_host_or_ip[1] != "") )
-											{
-												$( "#cam_host_or_ip_url" ).html(cam_host_or_ip[0]);
-												$( "#cam_host_or_ip_port" ).html('&port=<span style="color:#00C000">'+cam_host_or_ip[1]+"</SPAN>");
-												var cam_url = cam_host_or_ip[0]+"&port="+cam_host_or_ip[1];
-											}
-											else
-											{
-												$( "#cam_host_or_ip_url" ).html(cam_host_or_ip[0]);
-												$( "#cam_host_or_ip_port" ).html('&port=<span style="color:#00C000">'+80+"</SPAN>");
-												var cam_url = cam_host_or_ip[0]+"&port=80";
-											}
-											return cam_url
-										}
-										cam_url($( "#cam_host_or_ip").val()); 										
-										$( "#cam_type" ).html( $( "#cam_model").val() );
-										$( "#cam_user_url" ).html($( "#cam_user").val());
-										$( "#cam_pass_url" ).html($( "#cam_pass").val());
 
 										$( "#EMAIL_RECIPIENTS" ).keyup(function( event ) 
 										{ 
@@ -351,52 +571,7 @@
 										}); 
 										$('#EMAIL_TO_checkbox').trigger('change');
 
-										$( "#btntest" ).css('visibility', 'hidden'); 
-										$("#cam_model").change(function()  
-										{ 	
-											$( "#cam_type" ).html($( "#cam_model").val() ); 
-										}); 
-										$( "#cam_host_or_ip").keyup(function( event ) 
-										{ 
-											cam_url($( "#cam_host_or_ip").val()); 
-											$( "#btntest" ).css('visibility', 'visible')
-										}); 
-										$( "#cam_user" ).keyup(function( event ) 
-										{ 
-											$( "#cam_user_url" ).html($("#cam_user").val()); 
-											$( "#btntest" ).css('visibility','visible')
-										}); 
-										$( "#cam_pass" ).keyup(function( event ) 
-										{ 
-											$("#cam_pass_url" ).html($( "#cam_pass").val()); 
-											$( "#btntest" ).css('visibility', 'visible')
-										}); 
-										$( "#btntest" ).click(function () 
-										{ 
-											last_part = '';
-											if ($( "#image_resize").prop('url'))
-											{
-												last_part = last_part + $( "#image_resize").prop('url');
-											}
 
-											if ( $( "#no_email").css('display') == 'none' )
-											{
-												// Ignore in URL if not visible 
-											}
-											else
-											{
-												if ($( "#email_resize").prop('url'))
-												{
-													last_part = last_part + $( "#email_resize").prop('url');
-												}
-												if ( $( "#no_email").prop('url') )
-												{
-													last_part = last_part + $( "#no_email").prop('url');
-												}
-											}
-											url2open = "http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=" + cam_url($( "#cam_host_or_ip").val()) + "&user=" + 	 $( "#cam_user").val() + "&pass=" + $( "#cam_pass").val() + "&cam-model=" + $( "#cam_model").val() + $( "#email_to").attr('url').replace(new RegExp("@", 'g'), "(at)") +"&"+ last_part; window.open(url2open,'Cam-Connect','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
-										}); 
-									
 										
 										// Disable some options on click depending on selected value
 										function chk_boxes()
@@ -423,13 +598,13 @@
 												$("#EMAIL_FROM_NAME").prop("data-validation-optional",false);
 												$("#EMAIL_RECIPIENTS").prop("data-validation-optional",false);
 												$('#cam_connect_email_used').css('display','block')
-												$('#URL_HELP_NO_MAIL').css('display','block')
-												$('#URL_HELP_NO_MAIL_LABEL').css('display','block')
-												$('#no_email').css('display','initial')
+												$('#CAM_NO_EMAIL').css('display','block')
+												$('#CAM_NO_EMAIL_LABEL').css('display','block')
+												$('#CAM_NO_EMAIL').css('display','initial')
 												$('#email_to').css('display','initial')
-												$('#email_resize').css('display','initial')
-												$('#URL_HELP_EMAIL_RESIZE_LABEL').css('display','block')
-												$('#URL_HELP_EMAIL_RESIZE').css('display','block')
+												$('#EMAIL_RESIZE').css('display','initial')
+												$('#CAM_EMAIL_RESIZE_CB_LABEL').css('display','block')
+												$('#CAM_EMAIL_RESIZE_CB').css('display','block')
 											}
 											else
 											{
@@ -439,13 +614,13 @@
 												$("#EMAIL_FROM_NAME").prop("data-validation-optional",true);
 												$("#EMAIL_RECIPIENTS").prop("data-validation-optional",true);
 												$('#cam_connect_email_used').css('display','none')
-												$('#URL_HELP_NO_MAIL').css('display','none')
-												$('#URL_HELP_NO_MAIL_LABEL').css('display','none')
-												$('#no_email').css('display','none')
-												$('#email_resize').css('display','none')
+												$('#CAM_NO_EMAIL').css('display','none')
+												$('#CAM_NO_EMAIL_LABEL').css('display','none')
+												$('#CAM_NO_EMAIL').css('display','none')
+												$('#EMAIL_RESIZE').css('display','none')
 												$('#email_to').css('display','none')
-												$('#URL_HELP_EMAIL_RESIZE_LABEL').css('display','none')
-												$('#URL_HELP_EMAIL_RESIZE').css('display','none')
+												$('#CAM_EMAIL_RESIZE_CB_LABEL').css('display','none')
+												$('#CAM_EMAIL_RESIZE_CB').css('display','none')
 											}
 											if ( $('#EMAIL_INLINE_checkbox').is(':checked') )
 											{
@@ -473,6 +648,7 @@
 										$( document ).ready(function()
 										{
 											chk_boxes();
-											$( "#cam_host_or_ip").trigger('keyup');
+											$( "#CAM_HOST_OR_IP").trigger('keyup');
 										});
 									</script>
+										</form>

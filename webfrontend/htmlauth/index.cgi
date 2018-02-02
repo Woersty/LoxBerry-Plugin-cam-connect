@@ -17,6 +17,7 @@ use LoxBerry::System;
 use LoxBerry::Web;
 use LoxBerry::Log;
 use MIME::Base64;
+use List::MoreUtils 'true','minmax';
 use CGI::Carp qw(fatalsToBrowser);
 use CGI qw/:standard/;
 use Config::Simple '-strict';
@@ -37,6 +38,7 @@ my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not r
 my $version 					= "2.0.1";
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
 my @pluginconfig_strings 		= ('LOGLEVEL','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
+my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_NAME","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_IMAGE_RESIZE_CB","CAM_EMAIL_RESIZE_CB","CAM_NO_EMAIL_CB");
 my $cam_model_list				= "";
 my @lines						= [];	
 my $log 						= LoxBerry::Log->new ( name => 'CamConnect', filename => $lbplogdir ."/". $logfile, append => 1 );
@@ -156,14 +158,14 @@ if (!-r $lbpconfigdir . "/" . $pluginconfigfile)
 	LOGDEB "Try to create a default config";
 	$error_message = $ERR{'ERRORS.ERR_CREATE CONFIG_FILE'};
 	open my $configfileHandle, ">", $lbpconfigdir . "/" . $pluginconfigfile or &error;
- 		print $configfileHandle 'WATERMARK="1"'."\n";
-		print $configfileHandle 'EMAIL_USED="0"'."\n";
-		print $configfileHandle 'EMAIL_INLINE="0"'."\n";
-		print $configfileHandle 'EMAIL_TO="0"'."\n";
+ 		print $configfileHandle 'WATERMARK=1'."\n";
+		print $configfileHandle 'EMAIL_USED=0'."\n";
+		print $configfileHandle 'EMAIL_INLINE=0'."\n";
+		print $configfileHandle 'EMAIL_TO=0'."\n";
 		print $configfileHandle 'EMAIL_BODY="Hallo,<br/>es wurde eben geklingelt. Anbei das Bild."'."\n";
 		print $configfileHandle 'EMAIL_SIGNATURE="--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry"'."\n";
-		print $configfileHandle 'EMAIL_RESIZE="0"'."\n";
-		print $configfileHandle 'IMAGE_RESIZE="0"'."\n";
+		print $configfileHandle 'EMAIL_RESIZE=0'."\n";
+		print $configfileHandle 'IMAGE_RESIZE=0'."\n";
 		print $configfileHandle 'EMAIL_SUBJECT1="Es wurde am"'."\n";
 		print $configfileHandle 'EMAIL_SUBJECT2="um"'."\n";
 		print $configfileHandle 'EMAIL_SUBJECT3="Uhr geklingelt!"'."\n";
@@ -172,7 +174,7 @@ if (!-r $lbpconfigdir . "/" . $pluginconfigfile)
 		print $configfileHandle 'EMAIL_FROM_NAME="LoxBerry"'."\n";
 		print $configfileHandle 'EMAIL_RECIPIENTS="noreply@loxberry.de;invalid@loxberry.de"'."\n";
 		print $configfileHandle 'EMAIL_FILENAME="Snapshot"'."\n";
-		print $configfileHandle 'LOGLEVEL="2"'."\n";
+		print $configfileHandle 'LOGLEVEL=2'."\n";
 	close $configfileHandle;
 	LOGWARN "Default config created. Display error anyway to force a page reload";
 	$error_message = $ERR{'ERRORS.ERR_NO_CONFIG_FILE'};
@@ -227,6 +229,27 @@ if ( $R::saveformdata )
 			}
 		}
 	}
+
+	my @matches = grep { /CAM_HOST_OR_IP[0-9]*/ } %R::;
+	s/CAM_HOST_OR_IP// for @matches ;
+ 
+	foreach my $cameras (@matches)
+	{
+	LOGDEB "Write camera $cameras to config file";
+		foreach my $cam_parameter_to_write (@pluginconfig_cameras)
+		{
+
+		    while (my ($cam_config_variable, $cam_value) = each %R::) 
+		    {
+				if ( $cam_config_variable eq $cam_parameter_to_write . $cameras )
+				{
+					$plugin_cfg->param($cam_config_variable , ${$cam_value});		
+					LOGDEB "Setting configuration variable [".$cam_config_variable . "] to value (" . ${$cam_value} .")";
+				}
+			}
+		}
+	}
+	$plugin_cfg->param('VERSION', $version);		
 	LOGDEB "Write config to file";
 	$error_message = $ERR{'ERRORS.ERR_SAVE_CONFIG_FILE'};
 	$plugin_cfg->save() or &error; 
@@ -284,6 +307,102 @@ sub defaultpage
 	LOGDEB "Check for pending notifications for: " . $lbpplugindir . " " . ${'CC.MY_NAME'};
 	LOGDEB "Notifications are: ".$notifications;
     $maintemplate->param( "NOTIFICATIONS" , $notifications);
+	my @camdata = ();
+	my @known_cams = grep { /CAM_HOST_OR_IP[0-9]*/ } %Config;
+	s/default.CAM_HOST_OR_IP// for @known_cams ;
+	LOGDEB "Found following cameras in config: ".join(",",@known_cams);
+	my ($first_cam_id, $last_cam_id) = minmax @known_cams;
+	if ( $R::create_cam )
+	{
+		LOGDEB "Oh, it's a create_cam call. ";
+		LOGDEB "Create new camera: ".$last_cam_id;
+		$error_message = $ERR{'ERRORS.ERR_CREATE_CONFIG_FILE'};
+		open my $configfileHandle, ">>", $lbpconfigdir . "/" . $pluginconfigfile or &error;
+			my $last_cam_id = $last_cam_id + 1;
+			print $configfileHandle 'CAM_IMAGE_RESIZE'.$last_cam_id.'=0'."\n";
+			print $configfileHandle 'CAM_EMAIL_RESIZE'.$last_cam_id.'=0'."\n";
+			print $configfileHandle 'CAM_HOST_OR_IP'.$last_cam_id.'="'.$L{'CAM_HOST_SUGGESTION'}.'"'."\n";
+			print $configfileHandle 'CAM_USER'.$last_cam_id.'="'.$L{'CAM_USER_SUGGESTION'}.'"'."\n";
+			print $configfileHandle 'CAM_PASS'.$last_cam_id.'=""'."\n";
+			print $configfileHandle 'CAM_NAME'.$last_cam_id.'="'.$L{'CAM_NAME_SUGGESTION'}.'"'."\n";
+			print $configfileHandle 'CAM_IMAGE_RESIZE_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_EMAIL_RESIZE_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_NO_EMAIL_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_NOTE'.$last_cam_id.'="'.$L{'CAM_NOTE_SUGGESTION'}.'"'."\n";
+			print $configfileHandle 'CAM_MODEL'.$last_cam_id.'=1'."\n";
+		close $configfileHandle;
+		print "Content-Type: text/plain\n\n";
+		print "OK\n";
+		exit;
+	}
+	else
+	{
+		LOGDEB "No create_cam call. Go ahead";
+	}
+	if ( $R::delete_cam )
+	{
+		LOGDEB "Oh, it's a delete_cam call. ";
+		LOGDEB "Delete camera: ".$R::delete_cam;
+		$error_message = $ERR{'ERRORS.ERR_CREATE_CONFIG_FILE'};
+		use Tie::File;
+		print "Content-Type: text/plain\n\n";
+		my $cam_param_to_delete = "";
+		foreach my $param_to_delete (@pluginconfig_cameras)
+	    {
+			my $cam_param_to_delete = $param_to_delete.$R::delete_cam."=";
+			LOGDEB "Delete cam parameter: ".$cam_param_to_delete;
+			tie my @file_lines, 'Tie::File', $lbpconfigdir . "/" . $pluginconfigfile or die;
+			@file_lines = grep !/^$cam_param_to_delete/, @file_lines;
+			untie @file_lines or die "$!";
+		}
+		print "OK\n";
+		exit;
+	}
+	else
+	{
+		LOGDEB "No delete_cam call. Go ahead";
+	}
+
+    foreach my $camno (@known_cams)
+    {	
+		my %cam;
+		$cam{CAMNO} = $camno;
+		$cam{CAM_HOST_OR_IP} 		= $plugin_cfg->param("CAM_HOST_OR_IP".$camno);
+		$cam{CAM_MODEL} 			= $plugin_cfg->param("CAM_MODEL".$camno);
+		$cam{CAM_USER} 				= uri_unescape($plugin_cfg->param("CAM_USER".$camno));
+		$cam{CAM_PASS} 				= uri_unescape($plugin_cfg->param("CAM_PASS".$camno));
+		$cam{CAM_NOTE} 				= uri_unescape($plugin_cfg->param("CAM_NOTE".$camno));
+		$cam{CAM_NAME} 				= uri_unescape($plugin_cfg->param("CAM_NAME".$camno));
+		$cam{CAM_IMAGE_RESIZE} 		= $plugin_cfg->param("CAM_IMAGE_RESIZE".$camno);
+		$cam{CAM_EMAIL_RESIZE} 		= $plugin_cfg->param("CAM_EMAIL_RESIZE".$camno);
+		foreach my $cam_parameter_to_process ('CAM_IMAGE_RESIZE_CB','CAM_EMAIL_RESIZE_CB','CAM_NO_EMAIL_CB')
+		{
+			if ( int($plugin_cfg->param($cam_parameter_to_process . $camno)) eq 1 ) 
+			{
+				$cam{$cam_parameter_to_process} = 1; 
+			    $cam{$cam_parameter_to_process. "_script"} = '$("#'.$cam_parameter_to_process . '_checkbox'.$camno .'").prop("checked", 1);';
+			}
+			else
+			{
+				$cam{$cam_parameter_to_process} = 0; 
+			    $cam{$cam_parameter_to_process. "_script"} = 
+			    '
+					$("#'.$cam_parameter_to_process . '_checkbox'.$camno.'").prop("checked", 0);
+					if ( $("#'.$cam_parameter_to_process . '_checkbox'.$camno.'").is(":checked") )
+					{
+						$("#'.$cam_parameter_to_process . $camno.'").val(1);
+					}
+					else
+					{
+						$("#'.$cam_parameter_to_process . $camno.'").val(0);
+					}			    
+				';
+			}
+			LOGDEB "Set special parameter " . $cam_parameter_to_process . $camno;
+		}
+		push(@camdata, \%cam);
+	}
+	$maintemplate->param("CAMDATA" => \@camdata);
     print $maintemplate->output();
 	LoxBerry::Web::lbfooter();
 	LOGDEB "Leaving Cam-Connect Plugin normally";
