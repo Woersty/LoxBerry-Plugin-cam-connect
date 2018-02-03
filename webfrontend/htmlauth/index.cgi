@@ -38,7 +38,7 @@ my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not r
 my $version 					= "2.0.1";
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
 my @pluginconfig_strings 		= ('LOGLEVEL','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
-my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_NAME","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_IMAGE_RESIZE_CB","CAM_EMAIL_RESIZE_CB","CAM_NO_EMAIL_CB");
+my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_IMAGE_RESIZE_CB","CAM_EMAIL_RESIZE_CB","CAM_NO_EMAIL_CB");
 my $cam_model_list				= "";
 my @lines						= [];	
 my $log 						= LoxBerry::Log->new ( name => 'CamConnect', filename => $lbplogdir ."/". $logfile, append => 1 );
@@ -164,8 +164,8 @@ if (!-r $lbpconfigdir . "/" . $pluginconfigfile)
 		print $configfileHandle 'EMAIL_TO=0'."\n";
 		print $configfileHandle 'EMAIL_BODY="Hallo,<br/>es wurde eben geklingelt. Anbei das Bild."'."\n";
 		print $configfileHandle 'EMAIL_SIGNATURE="--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry"'."\n";
-		print $configfileHandle 'EMAIL_RESIZE=0'."\n";
-		print $configfileHandle 'IMAGE_RESIZE=0'."\n";
+		print $configfileHandle 'EMAIL_RESIZE=9999'."\n";
+		print $configfileHandle 'IMAGE_RESIZE=9999'."\n";
 		print $configfileHandle 'EMAIL_SUBJECT1="Es wurde am"'."\n";
 		print $configfileHandle 'EMAIL_SUBJECT2="um"'."\n";
 		print $configfileHandle 'EMAIL_SUBJECT3="Uhr geklingelt!"'."\n";
@@ -319,9 +319,10 @@ sub defaultpage
 		$error_message = $ERR{'ERRORS.ERR_CREATE_CONFIG_FILE'};
 		open my $configfileHandle, ">>", $lbpconfigdir . "/" . $pluginconfigfile or &error;
 			my $last_cam_id = $last_cam_id + 1;
-			print $configfileHandle 'CAM_IMAGE_RESIZE'.$last_cam_id.'=0'."\n";
-			print $configfileHandle 'CAM_EMAIL_RESIZE'.$last_cam_id.'=0'."\n";
+			print $configfileHandle 'CAM_IMAGE_RESIZE'.$last_cam_id.'=9999'."\n";
+			print $configfileHandle 'CAM_EMAIL_RESIZE'.$last_cam_id.'=9999'."\n";
 			print $configfileHandle 'CAM_HOST_OR_IP'.$last_cam_id.'="'.$L{'CAM_HOST_SUGGESTION'}.'"'."\n";
+			print $configfileHandle 'CAM_PORT'.$last_cam_id.'="'.$L{'CAM_PORT_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_USER'.$last_cam_id.'="'.$L{'CAM_USER_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_PASS'.$last_cam_id.'=""'."\n";
 			print $configfileHandle 'CAM_NAME'.$last_cam_id.'="'.$L{'CAM_NAME_SUGGESTION'}.'"'."\n";
@@ -329,6 +330,7 @@ sub defaultpage
 			print $configfileHandle 'CAM_EMAIL_RESIZE_CB'.$last_cam_id."=0\n";
 			print $configfileHandle 'CAM_NO_EMAIL_CB'.$last_cam_id."=0\n";
 			print $configfileHandle 'CAM_NOTE'.$last_cam_id.'="'.$L{'CAM_NOTE_SUGGESTION'}.'"'."\n";
+			print $configfileHandle 'CAM_RECIPIENTS'.$last_cam_id.'="'.$L{'CAM_RECIPIENTS_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_MODEL'.$last_cam_id.'=1'."\n";
 		close $configfileHandle;
 		print "Content-Type: text/plain\n\n";
@@ -368,10 +370,12 @@ sub defaultpage
 		my %cam;
 		$cam{CAMNO} = $camno;
 		$cam{CAM_HOST_OR_IP} 		= $plugin_cfg->param("CAM_HOST_OR_IP".$camno);
+		$cam{CAM_PORT} 				= $plugin_cfg->param("CAM_PORT".$camno);
 		$cam{CAM_MODEL} 			= $plugin_cfg->param("CAM_MODEL".$camno);
 		$cam{CAM_USER} 				= uri_unescape($plugin_cfg->param("CAM_USER".$camno));
 		$cam{CAM_PASS} 				= uri_unescape($plugin_cfg->param("CAM_PASS".$camno));
 		$cam{CAM_NOTE} 				= uri_unescape($plugin_cfg->param("CAM_NOTE".$camno));
+		$cam{CAM_RECIPIENTS} 		= uri_unescape($plugin_cfg->param("CAM_RECIPIENTS".$camno));
 		$cam{CAM_NAME} 				= uri_unescape($plugin_cfg->param("CAM_NAME".$camno));
 		$cam{CAM_IMAGE_RESIZE} 		= $plugin_cfg->param("CAM_IMAGE_RESIZE".$camno);
 		$cam{CAM_EMAIL_RESIZE} 		= $plugin_cfg->param("CAM_EMAIL_RESIZE".$camno);

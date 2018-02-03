@@ -23,19 +23,24 @@ function debug($message = "", $loglevel, $raw = 0)
 		switch ($loglevel)
 		{
 		    case 2:
-		        Error_Log( "<CRITICAL> PHP: ".$message );
+		        LOGCRIT( "<CRITICAL> PHP: ".$message );
 		        break;
 		    case 3:
-		        Error_Log( "<ERROR> PHP: ".$message );
+		        LOGERR( "<ERROR> PHP: ".$message );
 		        break;
 		    case 4:
-		        Error_Log( "<WARNING> PHP: ".$message );
+		        LOGWARN( "<WARNING> PHP: ".$message );
 		        break;
 		    case 7:
 		    default:
-		        Error_Log( " PHP: ".$message );
+		        LOGDEB( " PHP: ".$message );
 		        break;
 		}
+		if ( $loglevel < 4 ) 
+		{
+			notify ( LBPPLUGINDIR, $L['CC.MY_NAME'], $message);
+		}
+
 	}
 	return;
 }
