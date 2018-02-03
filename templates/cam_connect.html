@@ -1,5 +1,15 @@
 									<center>
-										<span><img src="<TMPL_VAR CC.LOGO_ICON>"><hr><b><TMPL_VAR CC.LOGO_TEXT></b><hr>
+											<img src="<TMPL_VAR CC.LOGO_ICON>"><br>
+											<table border=0 cellpadding=0 width="90%">
+												<tr>
+													<td colspan="3">
+														<select id="CAM_LIST" onchange="$( $('#CAM_LIST').val()).scrollToMe();" data-mini="false">
+															<script> $('#CAM_LIST').append(new Option('<TMPL_VAR CC.CAM_SELECT_OPTION>', '#CAM_LIST', true, true));</script>
+														</select>
+													</td>
+												</tr>
+											</table><br><hr>
+											<b><TMPL_VAR CC.LOGO_TEXT></b>
 										<!-- NOTIFICATIONS //-->
 										<TMPL_VAR NOTIFICATIONS>
 										<!-- NOTIFICATIONS //-->
@@ -201,15 +211,23 @@
 											}
 											return cam_url
 										}
+
+										jQuery.fn.extend({
+										 scrollToMe: function () {
+										   var x = jQuery(this).offset().top - 50;
+										   jQuery('html,body').animate({scrollTop: x}, 400);
+										}});
 									</script>
 									<button onclick="$.ajax({url: '', type: 'GET', data: { 'create_cam':1}}); " data-role="button" data-inline="true" data-mini="true" data-icon="plus"><TMPL_VAR CC.BUTTON_CREATE_CAM></button>
 									<TMPL_LOOP NAME="CAMDATA">
-									<div id="camdiv<TMPL_VAR CAMNO>">
 									<br>
+									<div id="camdiv<TMPL_VAR CAMNO>">
+										<script> $('#CAM_LIST').append(new Option('<TMPL_VAR CAM_NAME>', '#camdiv<TMPL_VAR CAMNO>', false, false)); </script>
 										<table width="90%" style="padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(109,172,32,.2);">
 											<tr>
 												<td align="left" colspan="3">
 												<big><b><TMPL_VAR CAMNO></b></big>
+												<button onclick="$('#CAM_LIST').scrollToMe(); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="arrow-u"><TMPL_VAR CC.CAM_SELECTION_SCROLL></button>
 												</td>
 											</tr>
 											<tr>
@@ -685,6 +703,7 @@
 										{
 											chk_boxes();
 											$( "#CAM_HOST_OR_IP").trigger('keyup');
+
 										});
 									</script>
 										</form>
