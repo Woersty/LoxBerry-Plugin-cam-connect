@@ -387,7 +387,7 @@
 											<tr>
 												<td colspan="3" width="100%">
 													<hr><TMPL_VAR CC.LOXONE_CONFIG_TEXT><br/><br/>
-										<font face="courier"><small><b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url<TMPL_VAR CAMNO>">?</span><span style="color:#000000" id="cam_host_or_ip_port<TMPL_VAR CAMNO>"></span>&user=<span style="color:#FF40C0" id="cam_user_url<TMPL_VAR CAMNO>">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url<TMPL_VAR CAMNO>">?</span>&cam-model=<span style="color:#40c040" id="cam_type<TMPL_VAR CAMNO>">?</span><span url="" id="email_to<TMPL_VAR CAMNO>"></span><span url="" id="no_email<TMPL_VAR CAMNO>"></span><span url="" id="image_resize<TMPL_VAR CAMNO>"></span><span url="" id="email_resize<TMPL_VAR CAMNO>"></span></b></font></small>
+										<font face="courier"><small><b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url<TMPL_VAR CAMNO>">?</span><span style="color:#000000" id="cam_host_or_ip_port<TMPL_VAR CAMNO>"></span>&user=<span style="color:#FF40C0" id="cam_user_url<TMPL_VAR CAMNO>">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url<TMPL_VAR CAMNO>">?</span>&cam-name=<span style="color:#80c0FF" id="cam_name_url<TMPL_VAR CAMNO>">?</span>&cam-model=<span style="color:#40c040" id="cam_type<TMPL_VAR CAMNO>">?</span><span url="" id="email_to<TMPL_VAR CAMNO>"></span><span url="" id="no_email<TMPL_VAR CAMNO>"></span><span url="" id="image_resize<TMPL_VAR CAMNO>"></span><span url="" id="email_resize<TMPL_VAR CAMNO>"></span></b></font></small>
 										<br><center><a id="btntest<TMPL_VAR CAMNO>" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><TMPL_VAR CC.TEST_TEXT></a>
 											</center></td>
 											</tr>
@@ -485,6 +485,7 @@
 										$( "#cam_type<TMPL_VAR CAMNO>" ).html( $( "#CAM_MODEL<TMPL_VAR CAMNO>").val() );
 										$( "#cam_user_url<TMPL_VAR CAMNO>" ).html($( "#CAM_USER<TMPL_VAR CAMNO>").val());
 										$( "#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val());
+										$( "#cam_name_url<TMPL_VAR CAMNO>" ).html( encodeURIComponent($( "#CAM_NAME<TMPL_VAR CAMNO>").val()));
 
 
 										$("#CAM_MODEL<TMPL_VAR CAMNO>").change(function()  
@@ -506,6 +507,13 @@
 										$( "#CAM_PASS<TMPL_VAR CAMNO>" ).keyup(function( event ) 
 										{ 
 											$("#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val()); 
+										}); 
+										$( "#CAM_NAME<TMPL_VAR CAMNO>" ).keyup(function( event ) 
+										{ 
+											$("#cam_name_url<TMPL_VAR CAMNO>").html( encodeURIComponent($( "#CAM_NAME<TMPL_VAR CAMNO>").val())); 
+											$('#CAM_LIST option[value="#camdiv<TMPL_VAR CAMNO>"]').text( $("#CAM_NAME<TMPL_VAR CAMNO>").val());
+											$('#CAM_LIST-button span').html( $("#CAM_NAME<TMPL_VAR CAMNO>").val());
+											
 										}); 
 										$( "#btntest<TMPL_VAR CAMNO>" ).click(function () 
 										{ 
