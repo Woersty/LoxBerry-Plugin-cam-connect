@@ -309,7 +309,8 @@ sub defaultpage
     $maintemplate->param( "NOTIFICATIONS" , $notifications);
 	my @camdata = ();
 	my @known_cams = grep { /CAM_HOST_OR_IP[0-9]*/ } %Config;
-	s/default.CAM_HOST_OR_IP// for @known_cams ;
+	s/default.CAM_HOST_OR_IP// for @known_cams;
+	@known_cams = sort @known_cams;
 	LOGDEB "Found following cameras in config: ".join(",",@known_cams);
 	my ($first_cam_id, $last_cam_id) = minmax @known_cams;
 	if ( $R::create_cam )

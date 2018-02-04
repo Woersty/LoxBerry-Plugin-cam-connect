@@ -556,7 +556,7 @@ function send_mail_pic($picture)
       debug("Config value EMAIL_FROM found - using it: ".$mailFrom,7);
 	  if ( isset($plugin_cfg["EMAIL_FROM_NAME"]) )
 	  {
-	      $mailFromName   = utf8_decode($plugin_cfg["EMAIL_FROM_NAME"]);  // Sender name
+	      $mailFromName   = $plugin_cfg["EMAIL_FROM_NAME"];  // Sender name
 	      debug("Config value EMAIL_FROM_NAME found - using it: ".$mailFromName,7);
 	  }
 	  else
