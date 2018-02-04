@@ -312,7 +312,7 @@
 												<td>
 												</td>
 												<td>
-													<i><TMPL_VAR CC.URL_HELP_CUSTOMIZE_TEXT></i>
+													<i><TMPL_VAR CC.CUSTOMIZE_TEXT></i>
 												</td>
 												<td>
 													&nbsp;
@@ -323,7 +323,7 @@
 													&nbsp;
 												</td>
 												<td colspan="2">
-													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>').val(1); $( '#image_resize<TMPL_VAR CAMNO>' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','&image_resize=' + $('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()) } else { $('#CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>').val(0); $( '#image_resize<TMPL_VAR CAMNO>' ).html(''); $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','') }" type="checkbox" id="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>"><label id="CAM_IMAGE_RESIZE_LABEL<TMPL_VAR CAMNO>" for="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.URL_HELP_IMAGE_RESIZE_TEXT></label>
+													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>').val(1); $( '#image_resize<TMPL_VAR CAMNO>' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','&image_resize=' + $('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()) } else { $('#CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>').val(0); $( '#image_resize<TMPL_VAR CAMNO>' ).html(''); $( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','') }" type="checkbox" id="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>"><label id="CAM_IMAGE_RESIZE_LABEL<TMPL_VAR CAMNO>" for="CAM_IMAGE_RESIZE_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_IMAGE_RESIZE_TEXT></label>
 												<input id="CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_IMAGE_RESIZE_CB>">
 												</td>
 											</tr>
@@ -333,7 +333,7 @@
 												</td>
 												<td colspan="2">
 														<select id="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" data-mini="false">
-																<option value="9999"   ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> <TMPL_VAR CC.EMAIL_RESIZE_ORIGINAL_TEXT></option>
+																<option value="9999"   ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> <TMPL_VAR CC.IMAGE_RESIZE_ORIGINAL_TEXT></option>
 																<option value="240" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 240px</option>
 																<option value="320" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 320px</option>
 																<option value="640" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 640px</option>
@@ -351,7 +351,7 @@
 													&nbsp;
 												</td>
 												<td colspan="2">
-													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>').val(1); $( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()) } else { $('#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>').val(0); $( '#email_resize<TMPL_VAR CAMNO>' ).html(''); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','') }" type="checkbox" id="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>"><label id="CAM_EMAIL_RESIZE_LABEL<TMPL_VAR CAMNO>" for="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.URL_HELP_EMAIL_RESIZE_TEXT></label>
+													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>').val(1); $( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>'); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()) } else { $('#CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>').val(0); $( '#email_resize<TMPL_VAR CAMNO>' ).html(''); $( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','') }" type="checkbox" id="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>"><label id="CAM_EMAIL_RESIZE_LABEL<TMPL_VAR CAMNO>" for="CAM_EMAIL_RESIZE_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_EMAIL_RESIZE_TEXT></label>
 												<input id="CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_EMAIL_RESIZE_CB>">
 												</td>
 											</tr>
@@ -380,7 +380,7 @@
 													&nbsp;
 												</td>
 												<td colspan="2">
-													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(1);     $( '#no_email<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(0); $( '#no_email<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>"><label id="CAM_NO_EMAIL_LABEL<TMPL_VAR CAMNO>" for="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.URL_HELP_NO_MAIL_TEXT></label>
+													<input onclick="if ( $(this).is(':checked') ) { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(1);     $( '#no_email<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(0); $( '#no_email<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>"><label id="CAM_NO_EMAIL_LABEL<TMPL_VAR CAMNO>" for="CAM_NO_EMAIL_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.NO_MAIL_TEXT></label>
 												<input id="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_NO_EMAIL_CB>">
 												</td>
 											</tr>
