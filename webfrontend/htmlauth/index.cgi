@@ -37,8 +37,9 @@ my $template_title;
 my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not readable. We must abort here. Please try to reinstall the plugin.";
 my $version 					= "2.0.1";
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
-my @pluginconfig_strings 		= ('LOGLEVEL','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
-my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_IMAGE_RESIZE_CB","CAM_EMAIL_RESIZE_CB","CAM_NO_EMAIL_CB");
+#my @pluginconfig_strings 		= ('LOGLEVEL','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
+my @pluginconfig_strings 		= ('LOGLEVEL','EMAIL_FILENAME');
+my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_EMAIL_FROM_NAME","CAM_EMAIL_SUBJECT1","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_SUBJECT2","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_SUBJECT3","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_NO_EMAIL_CB","CAM_WATERMARK_CB","CAM_EMAIL_USED_CB","CAM_EMAIL_MULTIPICS","CAM_EMAIL_INLINE_CB");
 my $cam_model_list				= "";
 my @lines						= [];	
 my $log 						= LoxBerry::Log->new ( name => 'CamConnect', filename => $lbplogdir ."/". $logfile, append => 1 );
@@ -49,12 +50,14 @@ our $error_message				= "";
 # Logging
 if ( $plugin_cfg )
 {
+	LOGSTART "New admin call."      if int($Config{'default.LOGLEVEL'}) eq 7;
 	$log->loglevel(int($Config{'default.LOGLEVEL'}));
 	$LoxBerry::System::DEBUG 	= 1 if int($Config{'default.LOGLEVEL'}) eq 7;
 	$LoxBerry::Web::DEBUG 		= 1 if int($Config{'default.LOGLEVEL'}) eq 7;
 }
 else
 {
+	LOGSTART "New admin call.";
 	$log->loglevel(7);
 	$LoxBerry::System::DEBUG 	= 1;
 	$LoxBerry::Web::DEBUG 		= 1;
@@ -68,14 +71,14 @@ if ( $R::delete_log )
 {
 	LOGDEB "Oh, it's a log delete call. ".$R::delete_log;
 	LOGWARN "Delete Logfile: ".$logfile;
-	print "Content-Type: text/plain\n\n";
 	my $logfile = $log->close;
-	system("/usr/bin/date > $logfile") or print "Failed";
+	system("/usr/bin/date > $logfile");
 	$log->open;
 	LOGSTART "Logfile restarted.";
+	print "Content-Type: text/plain\n\nOK";
 	exit;
 }
-else
+else 
 {
 	LOGDEB "No log delete call. Go ahead";
 }
@@ -158,21 +161,21 @@ if (!-r $lbpconfigdir . "/" . $pluginconfigfile)
 	LOGDEB "Try to create a default config";
 	$error_message = $ERR{'ERRORS.ERR_CREATE CONFIG_FILE'};
 	open my $configfileHandle, ">", $lbpconfigdir . "/" . $pluginconfigfile or &error;
- 		print $configfileHandle 'WATERMARK=1'."\n";
-		print $configfileHandle 'EMAIL_USED=0'."\n";
-		print $configfileHandle 'EMAIL_INLINE=0'."\n";
-		print $configfileHandle 'EMAIL_TO=0'."\n";
-		print $configfileHandle 'EMAIL_BODY="Hallo,<br/>es wurde eben geklingelt. Anbei das Bild."'."\n";
-		print $configfileHandle 'EMAIL_SIGNATURE="--<br/>Beste Gr&uuml;&szlig;e<br/>Dein LoxBerry"'."\n";
-		print $configfileHandle 'EMAIL_RESIZE=9999'."\n";
-		print $configfileHandle 'IMAGE_RESIZE=9999'."\n";
-		print $configfileHandle 'EMAIL_SUBJECT1="Es wurde am"'."\n";
-		print $configfileHandle 'EMAIL_SUBJECT2="um"'."\n";
-		print $configfileHandle 'EMAIL_SUBJECT3="Uhr geklingelt!"'."\n";
-		print $configfileHandle 'EMAIL_DATE_FORMAT="d.m.Y"'."\n";
-		print $configfileHandle 'EMAIL_TIME_FORMAT="H:i:s"'."\n";
-		print $configfileHandle 'EMAIL_FROM_NAME="LoxBerry"'."\n";
-		print $configfileHandle 'EMAIL_RECIPIENTS="noreply@loxberry.de;invalid@loxberry.de"'."\n";
+# 		print $configfileHandle 'WATERMARK=1'."\n";
+#		print $configfileHandle 'EMAIL_USED=0'."\n";
+#		print $configfileHandle 'EMAIL_INLINE=0'."\n";
+#		print $configfileHandle 'EMAIL_TO=0'."\n";
+#		print $configfileHandle 'EMAIL_BODY=""'."\n";
+#		print $configfileHandle 'EMAIL_SIGNATURE=""'."\n";
+#		print $configfileHandle 'EMAIL_RESIZE=9999'."\n";
+#		print $configfileHandle 'IMAGE_RESIZE=9999'."\n";
+#		print $configfileHandle 'EMAIL_SUBJECT1=""'."\n";
+#		print $configfileHandle 'EMAIL_SUBJECT2=""'."\n";
+#		print $configfileHandle 'EMAIL_SUBJECT3=""'."\n";
+#		print $configfileHandle 'EMAIL_DATE_FORMAT=""'."\n";
+#		print $configfileHandle 'EMAIL_TIME_FORMAT=""'."\n";
+#		print $configfileHandle 'EMAIL_FROM_NAME=""'."\n";
+#		print $configfileHandle 'EMAIL_RECIPIENTS=""'."\n";
 		print $configfileHandle 'EMAIL_FILENAME="Snapshot"'."\n";
 		print $configfileHandle 'LOGLEVEL=2'."\n";
 	close $configfileHandle;
@@ -197,21 +200,21 @@ foreach my $config_value (@pluginconfig_strings)
 	}	                                                                
 }    
 
-LOGDEB "Parsing special parameters into the maintemplate";
-foreach my $parameter_to_process ('WATERMARK','EMAIL_INLINE','EMAIL_TO')
-{
-	if ( int(${$parameter_to_process}) eq 1 ) 
-	{
-	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 1);');
-	    ${$parameter_to_process} = 1;
-	}
-	else
-	{
-	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 0);');
-	    ${$parameter_to_process} = 0;
-	}
-	LOGDEB "Set special parameter " . $parameter_to_process . " to " . ${$parameter_to_process};
-}
+#LOGDEB "Parsing special parameters into the maintemplate";
+#foreach my $parameter_to_process ('WATERMARK','EMAIL_INLINE','EMAIL_TO')
+#{
+#	if ( int(${$parameter_to_process}) eq 1 ) 
+#	{
+#	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 1);');
+#	    ${$parameter_to_process} = 1;
+#	}
+#	else
+#	{
+#	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 0);');
+#	    ${$parameter_to_process} = 0;
+#	}
+#	LOGDEB "Set special parameter " . $parameter_to_process . " to " . ${$parameter_to_process};
+#}
 
 $R::saveformdata if 0; # Prevent errors
 LOGDEB "Is it a save call?";
@@ -235,7 +238,7 @@ if ( $R::saveformdata )
  
 	foreach my $cameras (@matches)
 	{
-	LOGDEB "Write camera $cameras to config file";
+	LOGDEB "Prepare camera $cameras config:";
 		foreach my $cam_parameter_to_write (@pluginconfig_cameras)
 		{
 
@@ -303,9 +306,10 @@ sub defaultpage
 	$maintemplate->param( "cam_model_list"	, $cam_model_list);
 	$lbplogdir =~ s/$lbhomedir\/log\///; # Workaround due to missing variable for Logview
 	$maintemplate->param( "LOGFILE" , $lbplogdir . "/" . $logfile );
-	my $notifications = LoxBerry::Log::get_notifications_html($lbpplugindir, $lbpplugindir);
-	LOGDEB "Check for pending notifications for: " . $lbpplugindir . " " . ${'CC.MY_NAME'};
-	LOGDEB "Notifications are: ".$notifications;
+	LOGDEB "Check for pending notifications for: " . $lbpplugindir . " " . $L{'CC.MY_NAME'};
+	my $notifications = LoxBerry::Log::get_notifications_html($lbpplugindir, $L{'CC.MY_NAME'});
+	LOGDEB "Notifications are: ".$notifications if $notifications;
+	LOGDEB "No notifications pending." if !$notifications;
     $maintemplate->param( "NOTIFICATIONS" , $notifications);
 	my @camdata = ();
 	my @known_cams = grep { /CAM_HOST_OR_IP[0-9]*/ } %Config;
@@ -313,6 +317,14 @@ sub defaultpage
 	@known_cams = sort @known_cams;
 	LOGDEB "Found following cameras in config: ".join(",",@known_cams);
 	my ($first_cam_id, $last_cam_id) = minmax @known_cams;
+	if ( "$first_cam_id" eq "" )
+	{
+		$maintemplate->param( "NOCAMS", 1);
+	}
+	else
+	{
+		$maintemplate->param( "SOMECAMS", 1);
+	}
 	if ( $R::create_cam )
 	{
 		LOGDEB "Oh, it's a create_cam call. ";
@@ -327,9 +339,12 @@ sub defaultpage
 			print $configfileHandle 'CAM_USER'.$last_cam_id.'="'.$L{'CAM_USER_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_PASS'.$last_cam_id.'=""'."\n";
 			print $configfileHandle 'CAM_NAME'.$last_cam_id.'="'.$L{'CAM_NAME_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_IMAGE_RESIZE_CB'.$last_cam_id."=0\n";
-			print $configfileHandle 'CAM_EMAIL_RESIZE_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_EMAIL_FROM_NAME'.$last_cam_id.'="'.$L{'CAM_EMAIL_FROM_NAME_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_NO_EMAIL_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_EMAIL_INLINE_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_EMAIL_MULTIPICS'.$last_cam_id.'="10"'."\n";
+			print $configfileHandle 'CAM_WATERMARK_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_EMAIL_USED_CB'.$last_cam_id."=0\n";
 			print $configfileHandle 'CAM_NOTE'.$last_cam_id.'="'.$L{'CAM_NOTE_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_RECIPIENTS'.$last_cam_id.'="'.$L{'CAM_RECIPIENTS_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_MODEL'.$last_cam_id.'=1'."\n";
@@ -378,9 +393,18 @@ sub defaultpage
 		$cam{CAM_NOTE} 				= uri_unescape($plugin_cfg->param("CAM_NOTE".$camno));
 		$cam{CAM_RECIPIENTS} 		= uri_unescape($plugin_cfg->param("CAM_RECIPIENTS".$camno));
 		$cam{CAM_NAME} 				= uri_unescape($plugin_cfg->param("CAM_NAME".$camno));
+		$cam{CAM_EMAIL_FROM_NAME}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_FROM_NAME".$camno));
+		$cam{CAM_EMAIL_SUBJECT1}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SUBJECT1".$camno));
+		$cam{CAM_EMAIL_DATE_FORMAT}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_DATE_FORMAT".$camno));
+		$cam{CAM_EMAIL_SUBJECT2}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SUBJECT2".$camno));
+		$cam{CAM_EMAIL_TIME_FORMAT}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_TIME_FORMAT".$camno));
+		$cam{CAM_EMAIL_SUBJECT3}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SUBJECT3".$camno));
+		$cam{CAM_EMAIL_BODY}		= uri_unescape($plugin_cfg->param("CAM_EMAIL_BODY".$camno));
+		$cam{CAM_EMAIL_SIGNATURE}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SIGNATURE".$camno));
 		$cam{CAM_IMAGE_RESIZE} 		= $plugin_cfg->param("CAM_IMAGE_RESIZE".$camno);
 		$cam{CAM_EMAIL_RESIZE} 		= $plugin_cfg->param("CAM_EMAIL_RESIZE".$camno);
-		foreach my $cam_parameter_to_process ('CAM_IMAGE_RESIZE_CB','CAM_EMAIL_RESIZE_CB','CAM_NO_EMAIL_CB')
+		$cam{CAM_EMAIL_MULTIPICS} 	= $plugin_cfg->param("CAM_EMAIL_MULTIPICS".$camno);
+		foreach my $cam_parameter_to_process ('CAM_NO_EMAIL_CB','CAM_EMAIL_INLINE_CB','CAM_WATERMARK_CB','CAM_EMAIL_USED_CB')
 		{
 			if ( int($plugin_cfg->param($cam_parameter_to_process . $camno)) eq 1 ) 
 			{
@@ -390,19 +414,25 @@ sub defaultpage
 			else
 			{
 				$cam{$cam_parameter_to_process} = 0; 
-			    $cam{$cam_parameter_to_process. "_script"} = 
-			    '
-					$("#'.$cam_parameter_to_process . '_checkbox'.$camno.'").prop("checked", 0);
-					if ( $("#'.$cam_parameter_to_process . '_checkbox'.$camno.'").is(":checked") )
-					{
-						$("#'.$cam_parameter_to_process . $camno.'").val(1);
-					}
-					else
-					{
-						$("#'.$cam_parameter_to_process . $camno.'").val(0);
-					}			    
-				';
+			    $cam{$cam_parameter_to_process. "_script"}  = '	$("#'.$cam_parameter_to_process . '_checkbox'.$camno.'").prop("checked", 0);';
 			}
+			$cam{$cam_parameter_to_process. "_script"}  = $cam{$cam_parameter_to_process. "_script"} . '
+			$("#'.$cam_parameter_to_process . '_checkbox'.$camno.'").on("change", function(event) 
+			{ 
+				if ( $("#'.$cam_parameter_to_process . '_checkbox'.$camno.'").is(":checked") ) 
+				{ 
+					$("#'.$cam_parameter_to_process . $camno.'").val(1); 
+					$("label[for=\''.$cam_parameter_to_process . '_checkbox'.$camno.'\']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+				} 
+				else 
+				{ 
+					$("#'.$cam_parameter_to_process . $camno.'").val(0); 
+					$("label[for=\''.$cam_parameter_to_process . '_checkbox'.$camno.'\']" ).removeClass( "ui-checkbox-on" ).addClass( "ui-checkbox-off" );
+				}
+			});
+			$("#'.$cam_parameter_to_process . '_checkbox' .$camno.'").trigger("change");';
+		
+			
 			LOGDEB "Set special parameter " . $cam_parameter_to_process . $camno;
 		}
 		push(@camdata, \%cam);
