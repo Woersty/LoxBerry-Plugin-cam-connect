@@ -35,7 +35,7 @@ my $languagefile 				= "language.ini";
 my $logfile 					= "cam_connect.log";
 my $template_title;
 my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not readable. We must abort here. Please try to reinstall the plugin.";
-my $version 					= "2.0.1";
+my $version 					= "2018.2.9";
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
 #my @pluginconfig_strings 		= ('LOGLEVEL','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
 my @pluginconfig_strings 		= ('LOGLEVEL','EMAIL_FILENAME');
@@ -258,7 +258,7 @@ if ( $R::saveformdata )
 	$plugin_cfg->save() or &error; 
 
 	LOGDEB "Set page title, load header, parse variables, set footer, end";
-	$template_title = " : " . $SUC{'SAVE.MY_NAME'};
+	$template_title = $SUC{'SAVE.MY_NAME'};
 	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
 	$successtemplate->param('SAVE_ALL_OK'		, $SUC{'SAVE.SAVE_ALL_OK'});
 	$successtemplate->param('SAVE_MESSAGE'		, $SUC{'SAVE.SAVE_MESSAGE'});
@@ -298,7 +298,7 @@ sub defaultpage
 		LOGDEB "Adding cam model: #" . $cams[0] . " " . $cams[1] . " (" . $cams[2] . ")";
 	}
 	LOGDEB "Set page title, load header, parse variables, set footer, end";
-	$template_title = " : " . $L{'CC.MY_NAME'};
+	$template_title = $L{'CC.MY_NAME'};
 	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
 	$maintemplate->param( "CC.LOGO_ICON", get_plugin_icon(64) );
 	$maintemplate->param( "HTTP_HOST"		, $ENV{HTTP_HOST});
@@ -449,7 +449,7 @@ sub error
 	LOGDEB "Sub error";
 	LOGERR $error_message;
 	LOGDEB "Set page title, load header, parse variables, set footer, end with error";
-	$template_title = " : " . $ERR{'ERRORS.MY_NAME'} . " - " . $ERR{'ERRORS.ERR_TITLE'};
+	$template_title = $ERR{'ERRORS.MY_NAME'} . " - " . $ERR{'ERRORS.ERR_TITLE'};
 	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
 	$errortemplate->param('ERR_MESSAGE'		, $error_message);
 	$errortemplate->param('ERR_TITLE'		, $ERR{'ERRORS.ERR_TITLE'});
