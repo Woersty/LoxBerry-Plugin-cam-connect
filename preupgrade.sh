@@ -23,6 +23,6 @@ echo "<INFO> Creating temporary folders for upgrading"
 mkdir -p /var/tmp/$ARGV3
 
 echo "<INFO> Backing up existing config files"
-cp -v -r $ARGV5/config/plugins/$ARGV3/ /var/tmp/$ARGV3
+cp -v -r $ARGV5/config/plugins/$ARGV3/* /var/tmp/$ARGV3
 
 exit 0
