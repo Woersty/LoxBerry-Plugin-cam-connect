@@ -37,7 +37,6 @@ my $template_title;
 my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not readable. We must abort here. Please try to reinstall the plugin.";
 my $version 					= "2018.2.9";
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
-#my @pluginconfig_strings 		= ('LOGLEVEL','WATERMARK','EMAIL_USED','EMAIL_INLINE','EMAIL_TO','EMAIL_BODY','EMAIL_SIGNATURE','EMAIL_RESIZE','IMAGE_RESIZE','EMAIL_SUBJECT1','EMAIL_SUBJECT2','EMAIL_SUBJECT3','EMAIL_DATE_FORMAT','EMAIL_TIME_FORMAT','EMAIL_FROM_NAME','EMAIL_RECIPIENTS','EMAIL_FILENAME');
 my @pluginconfig_strings 		= ('LOGLEVEL','EMAIL_FILENAME');
 my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_EMAIL_FROM_NAME","CAM_EMAIL_SUBJECT1","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_SUBJECT2","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_SUBJECT3","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_NO_EMAIL_CB","CAM_WATERMARK_CB","CAM_EMAIL_USED_CB","CAM_EMAIL_MULTIPICS","CAM_EMAIL_INLINE_CB");
 my $cam_model_list				= "";
@@ -161,21 +160,6 @@ if (!-r $lbpconfigdir . "/" . $pluginconfigfile)
 	LOGDEB "Try to create a default config";
 	$error_message = $ERR{'ERRORS.ERR_CREATE CONFIG_FILE'};
 	open my $configfileHandle, ">", $lbpconfigdir . "/" . $pluginconfigfile or &error;
-# 		print $configfileHandle 'WATERMARK=1'."\n";
-#		print $configfileHandle 'EMAIL_USED=0'."\n";
-#		print $configfileHandle 'EMAIL_INLINE=0'."\n";
-#		print $configfileHandle 'EMAIL_TO=0'."\n";
-#		print $configfileHandle 'EMAIL_BODY=""'."\n";
-#		print $configfileHandle 'EMAIL_SIGNATURE=""'."\n";
-#		print $configfileHandle 'EMAIL_RESIZE=9999'."\n";
-#		print $configfileHandle 'IMAGE_RESIZE=9999'."\n";
-#		print $configfileHandle 'EMAIL_SUBJECT1=""'."\n";
-#		print $configfileHandle 'EMAIL_SUBJECT2=""'."\n";
-#		print $configfileHandle 'EMAIL_SUBJECT3=""'."\n";
-#		print $configfileHandle 'EMAIL_DATE_FORMAT=""'."\n";
-#		print $configfileHandle 'EMAIL_TIME_FORMAT=""'."\n";
-#		print $configfileHandle 'EMAIL_FROM_NAME=""'."\n";
-#		print $configfileHandle 'EMAIL_RECIPIENTS=""'."\n";
 		print $configfileHandle 'EMAIL_FILENAME="Snapshot"'."\n";
 		print $configfileHandle 'LOGLEVEL=2'."\n";
 	close $configfileHandle;
@@ -199,22 +183,6 @@ foreach my $config_value (@pluginconfig_strings)
   		$maintemplate->param($config_value	, "");
 	}	                                                                
 }    
-
-#LOGDEB "Parsing special parameters into the maintemplate";
-#foreach my $parameter_to_process ('WATERMARK','EMAIL_INLINE','EMAIL_TO')
-#{
-#	if ( int(${$parameter_to_process}) eq 1 ) 
-#	{
-#	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 1);');
-#	    ${$parameter_to_process} = 1;
-#	}
-#	else
-#	{
-#	    $maintemplate->param($parameter_to_process . "_script", '$("#'.$parameter_to_process.'_checkbox").prop("checked", 0);');
-#	    ${$parameter_to_process} = 0;
-#	}
-#	LOGDEB "Set special parameter " . $parameter_to_process . " to " . ${$parameter_to_process};
-#}
 
 $R::saveformdata if 0; # Prevent errors
 LOGDEB "Is it a save call?";
@@ -246,8 +214,15 @@ if ( $R::saveformdata )
 		    {
 				if ( $cam_config_variable eq $cam_parameter_to_write . $cameras )
 				{
-					$plugin_cfg->param($cam_config_variable , ${$cam_value});		
-					LOGDEB "Setting configuration variable [".$cam_config_variable . "] to value (" . ${$cam_value} .")";
+					if (defined ${$cam_value} && ${$cam_value} ne '') 
+					{
+						LOGWARN "Setting configuration variable [".$cam_config_variable . "] to value (" . ${$cam_value} .")";
+						$plugin_cfg->param($cam_config_variable , ${$cam_value});		
+					}
+					else
+					{
+						LOGDEB "Config variable: " . $cam_config_variable . " missing or empty. Ignoring it.";     
+					}	 
 				}
 			}
 		}
@@ -384,6 +359,21 @@ sub defaultpage
     foreach my $camno (@known_cams)
     {	
 		my %cam;
+
+		my @fill_suggestions = ("CAM_EMAIL_SUBJECT1","CAM_EMAIL_SUBJECT2","CAM_EMAIL_SUBJECT3","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE");
+    	foreach my $suggestion_field (@fill_suggestions)
+	    {	
+			if (!defined $plugin_cfg->param( $suggestion_field . $camno ) ) 
+			{
+				LOGDEB "Setting suggested CAM configuration variable [" . $suggestion_field . "] to value (" . $L{ "CC." . $suggestion_field . "_SUGGESTION" } . ")";
+				$cam{$suggestion_field}	= uri_unescape($L{ "CC." . $suggestion_field . "_SUGGESTION" });
+			}
+			else
+			{
+				LOGDEB "Setting CAM configuration variable [" . $suggestion_field . $camno . "] to value (" . $L{ "CC." . $suggestion_field . "_SUGGESTION" } . ")";
+				$cam{$suggestion_field}	= uri_unescape($plugin_cfg->param($suggestion_field . $camno));
+			}
+		}
 		$cam{CAMNO} = $camno;
 		$cam{CAM_HOST_OR_IP} 		= $plugin_cfg->param("CAM_HOST_OR_IP".$camno);
 		$cam{CAM_PORT} 				= $plugin_cfg->param("CAM_PORT".$camno);
@@ -394,13 +384,6 @@ sub defaultpage
 		$cam{CAM_RECIPIENTS} 		= uri_unescape($plugin_cfg->param("CAM_RECIPIENTS".$camno));
 		$cam{CAM_NAME} 				= uri_unescape($plugin_cfg->param("CAM_NAME".$camno));
 		$cam{CAM_EMAIL_FROM_NAME}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_FROM_NAME".$camno));
-		$cam{CAM_EMAIL_SUBJECT1}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SUBJECT1".$camno));
-		$cam{CAM_EMAIL_DATE_FORMAT}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_DATE_FORMAT".$camno));
-		$cam{CAM_EMAIL_SUBJECT2}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SUBJECT2".$camno));
-		$cam{CAM_EMAIL_TIME_FORMAT}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_TIME_FORMAT".$camno));
-		$cam{CAM_EMAIL_SUBJECT3}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SUBJECT3".$camno));
-		$cam{CAM_EMAIL_BODY}		= uri_unescape($plugin_cfg->param("CAM_EMAIL_BODY".$camno));
-		$cam{CAM_EMAIL_SIGNATURE}	= uri_unescape($plugin_cfg->param("CAM_EMAIL_SIGNATURE".$camno));
 		$cam{CAM_IMAGE_RESIZE} 		= $plugin_cfg->param("CAM_IMAGE_RESIZE".$camno);
 		$cam{CAM_EMAIL_RESIZE} 		= $plugin_cfg->param("CAM_EMAIL_RESIZE".$camno);
 		$cam{CAM_EMAIL_MULTIPICS} 	= $plugin_cfg->param("CAM_EMAIL_MULTIPICS".$camno);

@@ -297,7 +297,7 @@
 								 <nobr><TMPL_VAR CC.EMAIL_BODY_TEXT></nobr>
 								</td>
 								<td>
-								 <input autocomplete="off" data-validation-rule="^(.*){1,255}$" data-validation-error-msg="<TMPL_VAR CC.EMAIL_BODY_VALIDATION> id="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" name="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_BODY_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_BODY>" ">
+								 <input autocomplete="nope" data-validation-rule="^(.*){1,255}$" data-validation-error-msg="<TMPL_VAR CC.EMAIL_BODY_VALIDATION> id="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" name="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_BODY_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_BODY>">
 								</td>
 							 </tr>
 							 <tr class="cam_email<TMPL_VAR CAMNO>">
@@ -305,7 +305,7 @@
 								 <nobr><TMPL_VAR CC.EMAIL_SIGNATURE_TEXT></nobr>
 								</td>
 								<td colspan="2">
-								 <input autocomplete="off" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SIGNATURE_VALIDATION>" data-validation-rule="^([a-zA-Z0-9\s\-\_\<\/\>\&\;\:\.\,\?\!\+\(\)\#]*){1,1024}$" type="text" class="textfield" id="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" name="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" placeholder="<TMPL_VAR CC.CAM_EMAIL_SIGNATURE_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_SIGNATURE>">
+								 <input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SIGNATURE_VALIDATION>" data-validation-rule="^([a-zA-Z0-9\s\-\_\<\/\>\&\;\:\.\,\?\!\+\(\)\#]*){1,1024}$" type="text" class="textfield" id="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" name="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" placeholder="<TMPL_VAR CC.CAM_EMAIL_SIGNATURE_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_SIGNATURE>">
 								</td>
 							 </tr>
 							 <tr class="cam_email<TMPL_VAR CAMNO>">
@@ -403,68 +403,6 @@
 					validate_chk_object(['#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>','#CAM_NAME<TMPL_VAR CAMNO>','#CAM_NOTE<TMPL_VAR CAMNO>','#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_HOST_OR_IP<TMPL_VAR CAMNO>','#CAM_PORT<TMPL_VAR CAMNO>']);
 					// Set build url from checkbox values
 
-					// IMAGE_RESIZE
-					// Set dropdown trigger
-					$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').on('change', function(event)
-					{
-						$( '#image_resize<TMPL_VAR CAMNO>' ).html('&image_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>');
-						$( '#image_resize<TMPL_VAR CAMNO>' ).prop('url','&image_resize=' + $('#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>').val())
-					});
-					// IMAGE_RESIZE
-
-					// EMAIL_RESIZE
-					// Set dropdown trigger
-					$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').on('change', function(event)
-					{
-						$( '#email_resize<TMPL_VAR CAMNO>' ).html('&email_resize=<span style=\'color:#00C0C0\'>'+$('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val()+'</SPAN>');
-						$( '#email_resize<TMPL_VAR CAMNO>' ).prop('url','&email_resize=' + $('#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>').val())
-					});
-					// EMAIL_RESIZE
-
-					// NO EMAIL
-					// Set checkbox trigger
-					$('#CAM_NO_EMAIL_CB_checkbox<TMPL_VAR CAMNO>').on('change', function(event)
-					{
-					 if ( $(this).is(':checked') )
-					 {
-						$( '#no_email<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>');
-					 }
-					 else
-					 {
-						$( '#no_email<TMPL_VAR CAMNO>' ).html('');
-					 }
-					});
-					// NO EMAIL
-
-					// EMAIL INLINE
-					// Set checkbox trigger
-					$('#CAM_EMAIL_INLINE_CB_checkbox<TMPL_VAR CAMNO>').on('change', function(event)
-					{
-					 if ( $(this).is(':checked') )
-					 {
-						$( '#email_inline<TMPL_VAR CAMNO>' ).html('&email_inline=<span style=\'color:#00C0C0\'>1</SPAN>');
-					 }
-					 else
-					 {
-						$( '#email_inline<TMPL_VAR CAMNO>' ).html('');
-					 }
-					});
-					// EMAIL INLINE
-
-					// WATERMARK
-					// Set checkbox trigger
-					$('#CAM_WATERMARK_CB_checkbox<TMPL_VAR CAMNO>').on('change', function(event)
-					{
-					 if ( $(this).is(':checked') )
-					 {
-						$( '#watermark<TMPL_VAR CAMNO>' ).html('&watermark=<span style=\'color:#00C0C0\'>1</SPAN>');
-					 }
-					 else
-					 {
-						$( '#watermark<TMPL_VAR CAMNO>' ).html('');
-					 }
-					});
-					// WATERMARK
 
 				 	// EMAIL USED
 					// Set checkbox trigger
@@ -474,6 +412,11 @@
 					 {
 						$( '#email_used<TMPL_VAR CAMNO>' ).html('&email_used=<span style=\'color:#00C0C0\'>1</SPAN>');
 						$(".cam_email<TMPL_VAR CAMNO>").fadeIn();
+						$('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>').attr('placeholder'));
+						$('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>').attr('placeholder'));
+						$('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>').attr('placeholder'));
+						$('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>').attr('placeholder'));
+						$('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>').attr('placeholder'));
 						validate_chk_object(['#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>']);  
 					 }
 					 else
