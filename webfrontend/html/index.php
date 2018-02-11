@@ -582,6 +582,36 @@ function send_mail_pic($picture)
   debug("Function send_mail_pic reached",7);
   global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $L, $cam;
   
+	// Prevent sending eMails as long as stream is read from Miniserver
+	// 10 s delay minimum
+	$lockfilename = "/tmp/cam_connect_".$cam;
+	debug("Check if lockfile $lockfilename for cam $cam exists",7);
+	 
+	if (file_exists($lockfilename)) {
+	    debug( "The file $lockfilename exists.",7);
+	    if (filectime($lockfilename)) 
+		{
+			if ( ($datetime->getTimestamp() - filectime($lockfilename)) > 10  )
+			{
+				debug( "Lockfile $filename was changed ". ($datetime->getTimestamp() - filectime($lockfilename)) ." seconds ago. Too old, delete it and send eMail." ,7);
+				unlink ($lockfilename) or debug($L["ERRORS.ERROR_DELETE_LOCKFILE_EMAIL"]." ".$lockfilename,3);
+			}
+			else
+			{
+				debug( "Lockfile $filename was changed ". ($datetime->getTimestamp() - filectime($lockfilename)) ." seconds ago. Not old enough, keeping it, refresh it, and send no eMail." ,7);
+			    $handle = fopen($lockfilename, "w") or debug($L["ERRORS.ERROR_OPEN_LOCKFILE_EMAIL"]." ".$lockfilename,3);
+			    fwrite($handle, $datetime->getTimestamp() ) or debug($L["ERRORS.ERROR_WRITE_LOCKFILE_EMAIL"]." ".$lockfilename,3);
+				exit;
+			}
+		}
+	} 
+	else 
+	{
+	  debug( "The file $lockfilename doesn't exists, create it.",7);
+      $handle = fopen($lockfilename, "w") or debug($L["ERRORS.ERROR_OPEN_LOCKFILE_EMAIL"]." ".$lockfilename,3);
+	  fwrite($handle, $datetime->getTimestamp() ) or debug($L["ERRORS.ERROR_WRITE_LOCKFILE_EMAIL"]." ".$lockfilename,3);
+	  fclose($handle);
+	}
   
   if ( isset($mail_cfg['SMTP']['EMAIL']) )
   {
