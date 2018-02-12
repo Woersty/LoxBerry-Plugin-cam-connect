@@ -471,7 +471,7 @@
 					});
 					$( "#btntest<TMPL_VAR CAMNO>" ).click(function ()
 					{
- 					 $.ajax({url: '/system/get_notifications.php', type: 'GET', data: { 'package':'cam-connect', 'name':'Cam-Connect'} }).success(function(data) {  $( '#notifblock' ).html(data); if ( data.length > 10 ) { $('#notifblock').scrollToMe(); } }) ;
+ 					 $.ajax({url: '/system/get_notifications.php', type: 'GET', data: { 'package':'cam-connect', 'name':'Cam-Connect'} }).success(function(data) {  $( '#notifblock' ).html(data);$(".notifdelete").css('display','none'); if ( data.length > 10 ) { $('#notifblock').scrollToMe(); } }) ;
 					 url2open = "http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?cam=<TMPL_VAR CAMNO>"; window.open(url2open,'Cam-Connect<TMPL_VAR CAMNO>','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
 					});
 
