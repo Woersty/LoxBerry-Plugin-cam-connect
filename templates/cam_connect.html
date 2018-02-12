@@ -58,12 +58,8 @@
 							</div>
 						 </div>
 						 <div style="display:table-cell; text-align:center; white-space: nowrap;">
-							<button id="btncancel" data-role="button" data-inline="true" data-mini="true" data-icon="delete" href="/admin/index.cgi">
-							 <TMPL_VAR CC.CANCEL_TEXT>
-							</button>
-							<button type="submit" form="main_form" id="btnsubmit" data-role="button" data-inline="true" data-mini="true" data-icon="check">
-							 <TMPL_VAR CC.SAVE_TEXT>
-							</button>
+							<a id="btncancel" data-role="button" data-inline="true" data-mini="true" data-icon="delete" href="/admin/system/index.cgi?form=system"><TMPL_VAR CC.CANCEL_TEXT></a>
+							<button type="submit" id="btnsubmit" data-role="button" data-inline="true" data-mini="true" data-icon="check"><TMPL_VAR CC.SAVE_TEXT></button>
 						 </div>
 						 <div style="display:table-cell; text-align:right; min-witdh:30%; width:30%;">
 							<button onclick="$.ajax({url: '', type: 'GET', data: { 'create_cam':1}}); " data-role="button" data-inline="true" data-mini="true" data-icon="plus"><TMPL_VAR CC.BUTTON_CREATE_CAM></button>
