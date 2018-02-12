@@ -468,8 +468,8 @@
 					$( "#CAM_NAME<TMPL_VAR CAMNO>" ).keyup(function( event )
 					{
 					 $("#cam_name_url<TMPL_VAR CAMNO>").html( encodeURIComponent($( "#CAM_NAME<TMPL_VAR CAMNO>").val()));
-					 $('#CAM_LIST option[value="#camdiv<TMPL_VAR CAMNO>"]').text( $("#CAM_NAME<TMPL_VAR CAMNO>").val());
-					 $('#CAM_LIST-button span').html( $("#CAM_NAME<TMPL_VAR CAMNO>").val());
+					 $('#CAM_LIST option[value="#camdiv<TMPL_VAR CAMNO>"]').text($("#CAM_NAME<TMPL_VAR CAMNO>").val());
+					 $('#CAM_LIST-button span').html("#<TMPL_VAR CAMNO> - " + $("#CAM_NAME<TMPL_VAR CAMNO>").val());
 
 					});
 					$( "#btntest<TMPL_VAR CAMNO>" ).click(function ()
