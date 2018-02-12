@@ -183,6 +183,7 @@ foreach my $config_value (@pluginconfig_strings)
   		$maintemplate->param($config_value	, "");
 	}	                                                                
 }    
+$maintemplate->param( "LBPPLUGINDIR" , $lbpplugindir);
 
 $R::saveformdata if 0; # Prevent errors
 LOGDEB "Is it a save call?";
