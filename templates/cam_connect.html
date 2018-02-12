@@ -389,6 +389,7 @@
 				 		 <br>
 				 		 <center>
 				 		 	<a id="btntest<TMPL_VAR CAMNO>" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><TMPL_VAR CC.TEST_TEXT></a>
+				 		 	<span id="btntestsavehint<TMPL_VAR CAMNO>"></span>
 				 		 </center>
 				 	</div>
 				 <script>
@@ -474,7 +475,7 @@
 					});
 					$( "#btntest<TMPL_VAR CAMNO>" ).click(function ()
 					{
- 					$.ajax({url: '/system/get_notifications.php', type: 'GET', data: { 'package':'cam-connect', 'name':'Cam-Connect'} }).success(function(data) {  $( '#notifblock' ).html(data); if ( data.length > 10 ) { $('#notifblock').scrollToMe(); } }) ;
+ 					 $.ajax({url: '/system/get_notifications.php', type: 'GET', data: { 'package':'cam-connect', 'name':'Cam-Connect'} }).success(function(data) {  $( '#notifblock' ).html(data); if ( data.length > 10 ) { $('#notifblock').scrollToMe(); } }) ;
 					 url2open = "http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?cam=<TMPL_VAR CAMNO>"; window.open(url2open,'Cam-Connect<TMPL_VAR CAMNO>','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
 					});
 
@@ -500,6 +501,11 @@
 					{
 					 $( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).html(''); $( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).prop('url','')
 					};
+				 	$("#camdiv<TMPL_VAR CAMNO> :input").on('change', function(event)
+					{
+						$("#btntest<TMPL_VAR CAMNO>").css('display','none');
+						$("#btntestsavehint<TMPL_VAR CAMNO>").html('<TMPL_VAR CC.CAM_SAVE_BEFORE_TEST>');
+					});
 				 });
 				 </script>
 				</div>
