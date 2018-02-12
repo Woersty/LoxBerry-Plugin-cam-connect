@@ -1,5 +1,13 @@
 				 <center>
 					<img src="<TMPL_VAR CC.LOGO_ICON>"><br>
+				 </center>
+				<br>
+				<div id="notifblock">
+				<!-- NOTIFICATIONS //-->
+					<TMPL_VAR NOTIFICATIONS>
+				<!-- NOTIFICATIONS //-->
+				</div>
+				 <center>
 					<b><TMPL_VAR CC.HEADER_TEXT></b>
 					<div style="display:table; width:90%;">
 					 <div style="display:table-row;">
@@ -13,9 +21,6 @@
 					 </div>
 					</div>
 					<br>
-					<!-- NOTIFICATIONS //-->
-					<TMPL_VAR NOTIFICATIONS>
-					<!-- NOTIFICATIONS //-->
 					<form method="post" data-ajax="false" name="main_form" id="main_form" action="<TMPL_VAR SELFURL>">
 					 <input type="hidden" name="saveformdata" value="1">
 					 <div style="display:table; width:90%;">
@@ -469,6 +474,7 @@
 					});
 					$( "#btntest<TMPL_VAR CAMNO>" ).click(function ()
 					{
+ 					$.ajax({url: '/system/get_notifications.php', type: 'GET', data: { 'package':'cam-connect', 'name':'Cam-Connect'} }).success(function(data) {  $( '#notifblock' ).html(data); if ( data.length > 10 ) { $('#notifblock').scrollToMe(); } }) ;
 					 url2open = "http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?cam=<TMPL_VAR CAMNO>"; window.open(url2open,'Cam-Connect<TMPL_VAR CAMNO>','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
 					});
 

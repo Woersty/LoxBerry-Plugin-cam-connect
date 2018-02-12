@@ -14,26 +14,29 @@ $L = LBSystem::readlanguage("language.ini");
 ini_set("log_errors", 1);
 ini_set("error_log", LBPLOGDIR."/cam_connect.log");
 
+$datetime    = new DateTime;
 function debug($message = "", $loglevel, $raw = 0)
 {
 	global $plugin_cfg,$L;
-	if ( intval($plugin_cfg["LOGLEVEL"]) >= intval($loglevel) )
+	if ( intval($plugin_cfg["LOGLEVEL"]) >= intval($loglevel)  || $loglevel == 8 )
 	{
 		($raw == 1)?$message="<br>".$message:$message=htmlentities($message);
 		switch ($loglevel)
 		{
 		    case 2:
-		        error_log( "<CRITICAL> PHP: ".$message );
+		    case 8:
+		        error_log( strftime("%A") ."<CRITICAL> PHP: ".$message );
+		        $loglevel=2;
 		        break;
 		    case 3:
-		        error_log( "<ERROR> PHP: ".$message );
+		        error_log( strftime("%A") ."<ERROR> PHP: ".$message );
 		        break;
 		    case 4:
-		        error_log( "<WARNING> PHP: ".$message );
+		        error_log( strftime("%A") ."<WARNING> PHP: ".$message );
 		        break;
 		    case 7:
 		    default:
-		        error_log( " PHP: ".$message );
+		        error_log( strftime("%A") ." PHP: ".$message );
 		        break;
 		}
 		if ( $loglevel < 4 ) 
@@ -45,32 +48,20 @@ function debug($message = "", $loglevel, $raw = 0)
 	return;
 }
 
-$datetime    = new DateTime;
-debug("Entering plugin for ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
-
-debug("Check Logfile size: ".LBPLOGDIR."/cam_connect.log",7);
-$logsize = filesize(LBPLOGDIR."/cam_connect.log");
-if ( $logsize > 5242880 )
+// Check for GD Library
+if ( !function_exists (@ImageCreate) ) 
 {
-    debug($L["ERROR_LOGFILE_TOO_BIG"]." (".$logsize." Bytes)",4);
-    debug("Set Logfile notification: ".LBPPLUGINDIR." ".$L['CC.MY_NAME']." => ".$L['ERRORS.ERROR_LOGFILE_TOO_BIG'],7);
-    notify ( LBPPLUGINDIR, $L['CC.MY_NAME'], $L['ERRORS.ERROR_LOGFILE_TOO_BIG']);
-    system("echo '' > ".LBPLOGDIR."/cam_connect.log");
-}
-else
-{
-	debug("Logfile size is ok: ".$logsize,7);
+	debug($L["ERRORS.ERROR_IMAGE_FUNCTION_MISSING"],8);
+	die($L["ERRORS.ERROR_IMAGE_FUNCTION_MISSING"]);
 }
 
 $plugin_config_file = LBPCONFIGDIR."/cam-connect.cfg";
-debug("Read plugin config from ".$plugin_config_file,7);
-$plugin_cfg_handle    = fopen($plugin_config_file, "r");
+$plugin_cfg_handle    = fopen($plugin_config_file, "r") or debug($L["ERRORS.ERROR_READING_CFG"],8); ;
 if ($plugin_cfg_handle)
 {
   while (!feof($plugin_cfg_handle))
   {
     $line_of_text = fgets($plugin_cfg_handle);
-    debug("Read plugin config line: ".$line_of_text,7);
     if (strlen($line_of_text) > 3)
     {
       $config_line = explode('=', $line_of_text);
@@ -86,6 +77,20 @@ else
 {
   debug("No plugin config file handle found.",7);
   error_image($L["ERRORS.ERROR_READING_CFG"]);
+}
+debug("Entering plugin for ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
+debug("Check Logfile size: ".LBPLOGDIR."/cam_connect.log",7);
+$logsize = filesize(LBPLOGDIR."/cam_connect.log");
+if ( $logsize > 5242880 )
+{
+    debug($L["ERROR_LOGFILE_TOO_BIG"]." (".$logsize." Bytes)",4);
+    debug("Set Logfile notification: ".LBPPLUGINDIR." ".$L['CC.MY_NAME']." => ".$L['ERRORS.ERROR_LOGFILE_TOO_BIG'],7);
+    notify ( LBPPLUGINDIR, $L['CC.MY_NAME'], $L['ERRORS.ERROR_LOGFILE_TOO_BIG']);
+    system("echo '' > ".LBPLOGDIR."/cam_connect.log");
+}
+else
+{
+	debug("Logfile size is ok: ".$logsize,7);
 }
 
 if (isset($_GET['cam']))
@@ -537,10 +542,6 @@ function error_image ($error_msg)
   }
   debug($error_msg,3);
   // Display an Error-Picture
-  header ("Content-type: image/jpeg");
-  header ("Cache-Control: no-cache, no-store, must-revalidate");
-  header ("Pragma: no-cache");
-  header ("Expires: 0");
   $error_image      = @ImageCreate (640, 480) or die ($error_msg);
   $background_color = ImageColorAllocate ($error_image, 0, 0, 0);
   $text_color       = ImageColorAllocate ($error_image, 255, 0, 0);
@@ -556,6 +557,10 @@ function error_image ($error_msg)
 	  	$line_nb++;
 	}
   }
+  header ("Content-type: image/jpeg");
+  header ("Cache-Control: no-cache, no-store, must-revalidate");
+  header ("Pragma: no-cache");
+  header ("Expires: 0");
   ImageJPEG ($error_image);
 	if ( $plugin_cfg["LOGLEVEL"] == 7 )
 	{
