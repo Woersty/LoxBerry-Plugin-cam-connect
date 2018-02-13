@@ -217,7 +217,7 @@ if ( $R::saveformdata )
 				{
 					if (defined ${$cam_value} && ${$cam_value} ne '') 
 					{
-						LOGWARN "Setting configuration variable [".$cam_config_variable . "] to value (" . ${$cam_value} .")";
+						LOGDEB "Setting configuration variable [".$cam_config_variable . "] to value (" . ${$cam_value} .")";
 						$plugin_cfg->param($cam_config_variable , ${$cam_value});		
 					}
 					else
