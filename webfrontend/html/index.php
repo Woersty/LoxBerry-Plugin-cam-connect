@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 2018.02.03
+# Version: 13.02.2018 19:47:33
 #####################################################################################################
 
 // Error Reporting off
@@ -214,9 +214,10 @@ debug("Using user: ".$plugin_cfg['user'],7);
 $plugin_cfg['pass'] = addslashes($plugin_cfg['CAM_PASS'.$cam]);
 debug("Using pass: ".$plugin_cfg['pass'],7);
 
-function get_image($retry=0)
+function get_image($retry)
 {
 	global $plugin_cfg, $curl, $lbpplugindir, $L, $cam;
+	$retry=intval($retry);
 	debug("Function get_image called ($retry) for camera $cam with hostname/IP: ".$plugin_cfg['CAM_HOST_OR_IP'.$cam],7);
     $curl = curl_init() or error_image($L["ERRORS.ERROR_INIT_CURL"]);
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -256,13 +257,13 @@ function get_image($retry=0)
 		{
 		  debug($L["ERRORS.ERROR_IMAGE_NOT_OK_RETRY"]."\n".$picture,7);
 		  sleep (.25);
-		  $picture = get_image(1);
+		  $picture = get_image($retry + 1);
 		}
 		if( mb_strlen($picture) < 2000 && $retry <= 2) 
 		{
 		  debug($L["ERRORS.ERROR_IMAGE_NOT_OK_LAST_RETRY"]."\n".$picture,4);
 		  sleep (.25);
-		  $picture = get_image(2);
+		  $picture = get_image($retry + 1);
 		}
 		else
 		{
@@ -376,7 +377,6 @@ function main()
 	debug("Function 'main' reached",7);
 	debug("Call get_image() fist time",7);
 	$picture = get_image();
-  debug("Image seems to be ok, continue",7);
   if ($plugin_cfg["CAM_WATERMARK_CB".$cam] == 1)
   {
     debug("Parameter CAM_WATERMARK_CB is set to 1 so I have to put the overlay LoxBerry on it",7);
@@ -551,6 +551,7 @@ function error_image ($error_msg)
   {
   	if ($err_line != "") 
   	{
+		$err_line = str_ireplace(array("\r\n","\r","\n",'\r\n','\r','\n'),'', $err_line);
 	  	$line_pos = $line_pos + $line_height; 
 		ImageString ($error_image, 20, 10, $line_pos, $line_nb.$err_line, $text_color);
 	    if ( !isset($line_nb) ) $text_color = ImageColorAllocate ($error_image, 128,128,128);
