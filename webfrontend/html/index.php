@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 13.02.2018 19:57:44
+# Version: 13.02.2018 20:00:44
 #####################################################################################################
 
 // Error Reporting off
@@ -681,7 +681,8 @@ else
 	debug("Parameter CAM_EMAIL_MULTIPICS missing, use default: Send 1 picture.",7);
 }
 
-$boundary= md5(date());
+$outer_boundary= md5("o".$cam.date());
+$inner_boundary= md5("i".$cam.date());
 $htmlpic="";
 $mailTo = substr($mailTo,0,-1);
 $html = "From: ".$mailFromName." <".$mailFrom.">
@@ -689,22 +690,22 @@ To: ".$mailTo."
 Subject: ".utf8_encode($emailSubject)." 
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
- boundary=\"------------".$boundary."\"
+ boundary=\"------------".$outer_boundary."\"
 
 This is a multi-part message in MIME format.
---------------".$boundary."
+--------------".$outer_boundary."
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 ".$plugin_cfg["CAM_EMAIL_BODY".$cam]."
 \n--\n".$plugin_cfg["CAM_EMAIL_SIGNATURE".$cam]."
 
---------------".$boundary."
+--------------".$outer_boundary."
 Content-Type: multipart/related;
- boundary=\"------------8BA5038419D11A90C957A292\"
+ boundary=\"------------".$inner_boundary."\"
 
 
---------------8BA5038419D11A90C957A292
+--------------".$inner_boundary."
 Content-Type: text/html; charset=utf-8
 Content-Transfer-Encoding: 8bit
 
@@ -738,7 +739,7 @@ for ($i = 1; $i <= $pics; $i++)
     $email_image_part ="\n";
   }
 	
-    debug("Boundary for picture $i of $pics is: ".$boundary,7);
+    debug("Boundary for picture $i of $pics is: ".$outer_boundary,7);
 	 $newwidth = $plugin_cfg['CAM_EMAIL_RESIZE'.$cam];
 	 debug("Check if resize value is valid.",7);
 	 if ($newwidth >= 240)
@@ -761,7 +762,7 @@ for ($i = 1; $i <= $pics; $i++)
 	      debug("Mimimum width < 240, but ok, keep it: ".$newwidth,7);
 	 }
 	$htmlpic 	 .= $email_image_part;
-	$htmlpicdata .= "--------------8BA5038419D11A90C957A292
+	$htmlpicdata .= "--------------".$inner_boundary."
 Content-Type: image/jpeg; name=\"".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."_".$i.".jpg\"
 Content-Transfer-Encoding: base64
 Content-ID: <".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."_".$i.">
@@ -776,8 +777,8 @@ $html .= $htmlpic;
 $html .=" \n--<br>".$plugin_cfg["CAM_EMAIL_SIGNATURE".$cam]." </font></body></html>\n\n";
 
 $html .= $htmlpicdata;
-$html .= "--------------8BA5038419D11A90C957A292--\n\n";
-$html .= "--------------".$boundary."--\n\n";
+$html .= "--------------".$inner_boundary."--\n\n";
+$html .= "--------------".$outer_boundary."--\n\n";
 
   debug("eMail-Body will be:",7);
   debug($html,7,1);
