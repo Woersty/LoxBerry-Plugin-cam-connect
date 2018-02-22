@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 22.02.2018 22:21:01
+# Version: 22.02.2018 22:48:40
 #####################################################################################################
 
 // Error Reporting off
@@ -700,7 +700,7 @@ Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 ".$plugin_cfg["CAM_EMAIL_BODY".$cam]."
-\n--\n".$plugin_cfg["CAM_EMAIL_SIGNATURE".$cam]."
+\n--\n<br>".$plugin_cfg["CAM_EMAIL_SIGNATURE".$cam]."
 
 --------------".$outer_boundary."
 Content-Type: multipart/related;
