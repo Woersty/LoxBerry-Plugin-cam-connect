@@ -14,3 +14,5 @@
 14|Luna|DVR27108-4MP Channel 7|/cgi-bin/snapshot.cgi?channel=7|CURLAUTH_DIGEST
 15|Luna|DVR27108-4MP Channel 8|/cgi-bin/snapshot.cgi?channel=8|CURLAUTH_DIGEST
 16|Ubiquiti|UniFi G3|/snap.jpeg|CURLAUTH_ANY
+17|Mobotix|T24|/record/current.jpg|CURLAUTH_ANY
+18|Grandstream|GDS3710 IP (testing)|/snapshot/view8.jpg|CURLAUTH_DIGEST
