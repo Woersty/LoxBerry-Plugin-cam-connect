@@ -271,7 +271,7 @@ function get_image($retry)
 		if( mb_strlen($picture) < 2000 && $retry <= 2) 
 		{
 		  debug($L["ERRORS.ERROR_IMAGE_NOT_OK_LAST_RETRY"],4);
-		  debug("\n".$picture,7);
+		  debug($L["ERRORS.ERROR_IMAGE_NOT_OK_LAST_RETRY_DEBUG"]."\n".$picture,7);
 		  sleep (.25);
 		  $picture = get_image($retry + 1);
 		}
