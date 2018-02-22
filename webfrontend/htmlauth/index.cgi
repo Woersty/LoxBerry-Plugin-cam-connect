@@ -36,7 +36,7 @@ my $languagefile 				= "language.ini";
 my $logfile 					= "cam_connect.log";
 my $template_title;
 my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not readable. We must abort here. Please try to reinstall the plugin.";
-my $version 					= "2018.2.9";
+my $version 					= "2018.2.24";
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
 my @pluginconfig_strings 		= ('LOGLEVEL','EMAIL_FILENAME');
 my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_EMAIL_FROM_NAME","CAM_EMAIL_SUBJECT1","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_SUBJECT2","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_SUBJECT3","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_NO_EMAIL_CB","CAM_WATERMARK_CB","CAM_EMAIL_USED_CB","CAM_EMAIL_MULTIPICS","CAM_EMAIL_INLINE_CB");
@@ -262,7 +262,7 @@ sub defaultpage
 	LOGDEB "Sub defaultpage";
 	LOGDEB "Prepare Cam list";
 	$cam_model_list="";
-	open(F,"$lbpconfigdir/camera_models.dat") || die "Missing camera list.";
+	open(F,"$lbpdatadir/camera_models.dat") || die "Missing camera list.";
 	 flock(F,2);
 	 @lines = <F>;
 	 flock(F,8);
