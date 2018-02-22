@@ -13,3 +13,4 @@
 13|Luna|DVR27108-4MP Channel 6|/cgi-bin/snapshot.cgi?channel=6|CURLAUTH_DIGEST
 14|Luna|DVR27108-4MP Channel 7|/cgi-bin/snapshot.cgi?channel=7|CURLAUTH_DIGEST
 15|Luna|DVR27108-4MP Channel 8|/cgi-bin/snapshot.cgi?channel=8|CURLAUTH_DIGEST
+16|Ubiquiti|UniFi G3|/snap.jpeg|CURLAUTH_ANY

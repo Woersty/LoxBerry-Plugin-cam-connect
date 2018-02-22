@@ -18,6 +18,7 @@ use LoxBerry::Web;
 use LoxBerry::Log;
 use MIME::Base64;
 use List::MoreUtils 'true','minmax';
+use HTML::Entities;
 use CGI::Carp qw(fatalsToBrowser);
 use CGI qw/:standard/;
 use Config::Simple '-strict';
@@ -284,7 +285,7 @@ sub defaultpage
 	$maintemplate->param( "LOGFILE" , $lbplogdir . "/" . $logfile );
 	LOGDEB "Check for pending notifications for: " . $lbpplugindir . " " . $L{'CC.MY_NAME'};
 	my $notifications = LoxBerry::Log::get_notifications_html($lbpplugindir, $L{'CC.MY_NAME'});
-	LOGDEB "Notifications are: ".$notifications if $notifications;
+	LOGDEB "Notifications are:\n".encode_entities($notifications) if $notifications;
 	LOGDEB "No notifications pending." if !$notifications;
     $maintemplate->param( "NOTIFICATIONS" , $notifications);
 	my @camdata = ();
@@ -438,7 +439,6 @@ sub error
 	$errortemplate->param('ERR_MESSAGE'		, $error_message);
 	$errortemplate->param('ERR_TITLE'		, $ERR{'ERRORS.ERR_TITLE'});
 	$errortemplate->param('ERR_BUTTON_BACK' , $ERR{'ERRORS.ERR_BUTTON_BACK'});
-	$successtemplate->param('ERR_NEXTURL'	, $ENV{REQUEST_URI});
 	print $errortemplate->output();
 	LoxBerry::Web::lbfooter();
 	LOGDEB "Leaving Cam-Connect Plugin with an error";

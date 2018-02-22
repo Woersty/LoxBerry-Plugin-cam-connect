@@ -270,7 +270,8 @@ function get_image($retry)
 		}
 		if( mb_strlen($picture) < 2000 && $retry <= 2) 
 		{
-		  debug($L["ERRORS.ERROR_IMAGE_NOT_OK_LAST_RETRY"]."\n".$picture,4);
+		  debug($L["ERRORS.ERROR_IMAGE_NOT_OK_LAST_RETRY"],4);
+		  debug("\n".$picture,7);
 		  sleep (.25);
 		  $picture = get_image($retry + 1);
 		}
@@ -549,7 +550,8 @@ function error_image ($error_msg)
   {
   	$error_msg=$L["ERRORS.ERROR_UNKNOWN"];
   }
-  debug($error_msg,3);
+  debug(explode("\n",$error_msg)[0],3);
+  debug($error_msg,7);
   // Display an Error-Picture
   $error_image      = @ImageCreate (640, 480) or die ($error_msg);
   $background_color = ImageColorAllocate ($error_image, 0, 0, 0);
