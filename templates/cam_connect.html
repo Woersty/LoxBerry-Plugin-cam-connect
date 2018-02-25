@@ -151,7 +151,8 @@
 							 <label id="label_CAM_MODEL<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_MODEL_TEXT></label>
 							</td>
 							<td>
-							 <select style="align:left;" id="CAM_MODEL<TMPL_VAR CAMNO>" name="CAM_MODEL<TMPL_VAR CAMNO>" data-mini="false">
+							 <select style="align:left;" id="CAM_MODEL<TMPL_VAR CAMNO>" name="CAM_MODEL<TMPL_VAR CAMNO>" data-mini="false" required>
+								<option value=""><TMPL_VAR CC.CAM_MODEL_SELECT_CAM_TEXT></option>
 								<TMPL_VAR cam_model_list>
 							 </select>
 							 <SCRIPT> $("#CAM_MODEL<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_MODEL>'); </SCRIPT>
