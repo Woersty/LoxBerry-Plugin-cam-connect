@@ -409,8 +409,8 @@
 					 <div style="display:table;">
 						<div style="display:table-row;">
 							<div style="display:table-cell; ">
-								<br><TMPL_VAR CC.LOG_AREA>
 								<div style="display:table; padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(19,172,132,.2);">
+								<TMPL_VAR CC.LOG_AREA><br>
 							 		<div style="display:table-row;">
 										<div style="display:table-cell; border-radius: 5px;" id="delete_log_div">
 								 			<button id="delete_log_btn" onclick="$('#delete_log_div').css('background-color','yellow'); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_WAIT>'); $.ajax({url: '', type: 'GET', data: { 'delete_log':1},
