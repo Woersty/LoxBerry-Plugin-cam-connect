@@ -29,7 +29,7 @@ function debug($message = "", $loglevel, $raw = 0)
 			$camprefix="";
 		}
 		$message = $camprefix.$message;
-		($raw == 1)?$message="<br>".$message:$message=htmlentities($message);
+		($raw == 1)?$message="<br>".$message:$message=$message;
 		switch ($loglevel)
 		{
 		    case 2:
