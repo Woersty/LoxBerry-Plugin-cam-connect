@@ -3,510 +3,448 @@
 				</center>
 				<br>
 				<div id="notifblock">
-				<!-- NOTIFICATIONS //-->
+					<!-- NOTIFICATIONS //-->
 					<TMPL_VAR NOTIFICATIONS>
-				<!-- NOTIFICATIONS //-->
+					<!-- NOTIFICATIONS //-->
 				</div>
 				<center>
-					<b><TMPL_VAR CC.HEADER_TEXT></b>
-					<br><br>
-					<div style="display:table; width:90%;">
-					 <div style="display:table-row;">
-						<div style="display:table-cell;">
-						 <select id="CAM_LIST" onchange="$( $('#CAM_LIST').val()).scrollToMe();" data-mini="false">
-						 </select>
-						 <script>
-							$('#CAM_LIST').append(new Option('<TMPL_VAR CC.CAM_SELECT_OPTION>', '#CAM_LIST', true, true));
-						 </script>
-						</div>
-					 </div>
-					</div>
-					<br>
 					<form method="post" data-ajax="false" name="main_form" id="main_form" action="<TMPL_VAR SELFURL>">
-					 <input type="hidden" name="saveformdata" value="1">
-					 <div style="display:table; width:90%;">
-						<div style="display:table-row;">
-						 <div style="display:table-cell; min-witdh:30%; width:30%;">
-							<div style="display:table; width:90%; padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(19,172,132,.2);">
-							 <div style="display:table-row;">
-								<div style="display:table-cell; border-radius: 5px;" id="delete_log_div">
-								 <button id="delete_log_btn" onclick="$('#delete_log_div').css('background-color','yellow'); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_WAIT>'); $.ajax({url: '', type: 'GET', data: { 'delete_log':1},
-						            success: function (data) {
-						                $('#delete_log_div').css('background-color','green');
-						                $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_OK>');
-						                setTimeout( function() { $('#delete_log_div').css('background-color',''); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE>'); }, 2000);
-						            },
-						            error: function (textStatus, errorThrown) {
-						                $('#delete_log_div').css('background-color','red');
-						                $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_FAIL>');
-						                setTimeout( function() { $('#delete_log_div').css('background-color',''); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE>');}, 2000);
-						
-						            }	}); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="delete"><TMPL_VAR CC.LOG_BUTTON_DELETE></button>
-								</div>
+						<input type="hidden" name="saveformdata" value="1">
+						<b><TMPL_VAR CC.HEADER_TEXT></b>
+						<br>
+						<br>
+						<div style="display:table;">
+					 		<div style="display:table-row;">
 								<div style="display:table-cell;">
-								 <button onclick="window.open('/admin/system/tools/logfile.cgi?logfile=<TMPL_VAR LOGFILE>&amp;header=html&amp;format=template', 'log'); return false;" id="logview" data-role="button" data-inline="true" data-mini="true" data-icon="bars"><TMPL_VAR CC.LOG_BUTTON_VIEW></button>
+						 			<select id="CAM_LIST" onchange="$( $('#CAM_LIST').val()).scrollToMe();" data-mini="false"></select>
+									<script>
+										$('#CAM_LIST').append(new Option('<TMPL_VAR CC.CAM_SELECT_OPTION>', '#CAM_LIST', true, true));
+						 			</script>
 								</div>
-								<div style="display:table-cell;">
-								 <select id="LOGLEVEL" name="LOGLEVEL" data-mini="true">
-									<option value="7" ><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL7></option>
-									<option value="4"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL4></option>
-									<option value="3"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL3></option>
-									<option value="2"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL2></option>
-								 </select>
-								 <SCRIPT> $("#LOGLEVEL").val('<TMPL_VAR LOGLEVEL>'); </SCRIPT>
-								</div>
-							 </div>
-							</div>
-						 </div>
-						 <div style="display:table-cell; text-align:center; white-space: nowrap;">
-							<a id="btncancel" data-role="button" data-inline="true" data-mini="true" data-icon="delete" href="/admin/system/index.cgi?form=system"><TMPL_VAR CC.CANCEL_TEXT></a>
-							<button type="submit" id="btnsubmit" data-role="button" data-inline="true" data-mini="true" data-icon="check"><TMPL_VAR CC.SAVE_TEXT></button>
-						 </div>
-						 <div style="display:table-cell; text-align:right; min-witdh:30%; width:30%;">
-							<button onclick="$.ajax({url: '', type: 'GET', data: { 'create_cam':1}}); " data-role="button" data-inline="true" data-mini="true" data-icon="plus"><TMPL_VAR CC.BUTTON_CREATE_CAM></button>
-						 </div>
+					 		</div>
 						</div>
-					 </div>
-					 <br>
+					 	<div style="display:table;">
+							<div style="display:table-row;">
+						 		<div style="display:table-cell; text-align:center; ">
+									<button onclick="$.ajax({url: '', type: 'GET', data: { 'create_cam':1}}); " data-role="button" data-inline="true" data-mini="true" data-icon="plus"><TMPL_VAR CC.BUTTON_CREATE_CAM></button>
+							 	</div>
+							</div>
+						</div>
+						<br>
 <TMPL_IF NOCAMS>
-					<div id="cam_headline"><b><TMPL_VAR CC.NO_CONFIGURED_CAMS_TEXT></b></div>
+						<div id="cam_headline"><b><TMPL_VAR CC.NO_CONFIGURED_CAMS_TEXT></b>
+							<div style="display:table;">
+								<div style="display:table-row;">
+									<div style="display:table-cell; text-align:center; white-space: nowrap;">
+										<a id="btncancel" data-role="button" data-inline="true" data-mini="true" data-icon="delete" href="/admin/system/index.cgi?form=system"><TMPL_VAR CC.CANCEL_TEXT></a>
+										<button type="submit" id="btnsubmit" data-role="button" data-inline="true" data-mini="true" data-icon="check"><TMPL_VAR CC.SAVE_TEXT></button>
+								 	</div>
+								</div>
+							</div>
+						</div>
 </TMPL_IF>
 <TMPL_IF SOMECAMS>
-					<div id="cam_headline"><b><TMPL_VAR CC.CONFIGURED_CAMS_TEXT></b></div>
+						<div id="cam_headline"><b><TMPL_VAR CC.CONFIGURED_CAMS_TEXT></b>
+						</div>
 </TMPL_IF>
-					 <br>
-					 <script>
-						// Build url 
-						function cam_url(host, port, camid)
-						{
-						 $( "#cam_host_or_ip_url"+camid ).html(host);
-						 if ( port.length >= 1 && ( port != "80" & port != "") )
-						 {
-							$( "#cam_host_or_ip_url"+camid ).html(host);
-							$( "#cam_host_or_ip_port"+camid ).html('&port=<span style="color:#00C000">'+$("#CAM_PORT"+camid).val()+"</SPAN>");
-							var cam_url = host+"&port="+port;
-						 }
-						 else
-						 {
-							$( "#cam_host_or_ip_url"+camid ).html(host);
-							$( "#cam_host_or_ip_port"+camid ).html('&port=<span style="color:#00C000">'+80+"</SPAN>");
-							var cam_url = host+"&port=80";
-						 }
-						 return cam_url
-						}
-						// Scroll function for camera dropdown
-						jQuery.fn.extend(
-						{
-						 scrollToMe: function () 
-						 {
-							 var x = jQuery(this).offset().top - 50;
-							 jQuery('html,body').animate({scrollTop: x}, 400);
-						 }
-						});
-						var camera_objects = [];
-					 </script>
+						<script>
+							// Build url 
+							function cam_url(host, port, camid)
+							{
+							 $( "#cam_host_or_ip_url"+camid ).html(host);
+							 if ( port.length >= 1 && ( port != "80" & port != "") )
+							 {
+								$( "#cam_host_or_ip_url"+camid ).html(host);
+								$( "#cam_host_or_ip_port"+camid ).html('&port=<span style="color:#00C000">'+$("#CAM_PORT"+camid).val()+"</SPAN>");
+								var cam_url = host+"&port="+port;
+							 }
+							 else
+							 {
+								$( "#cam_host_or_ip_url"+camid ).html(host);
+								$( "#cam_host_or_ip_port"+camid ).html('&port=<span style="color:#00C000">'+80+"</SPAN>");
+								var cam_url = host+"&port=80";
+							 }
+							 return cam_url
+							}
+							// Scroll function for camera dropdown
+							jQuery.fn.extend(
+							{
+							 scrollToMe: function () 
+							 {
+								 var x = jQuery(this).offset().top - 50;
+								 jQuery('html,body').animate({scrollTop: x}, 400);
+							 }
+							});
+							var camera_objects = [];
+						 </script>
 <TMPL_LOOP NAME="CAMDATA">
-					 <!-- Loop for camera <TMPL_VAR CAMNO> //-->
-					 <div class="camdiv" id="camdiv<TMPL_VAR CAMNO>">
-					 <br>
-					 <!-- Add camera to dropdown //-->
-					 <script> $('#CAM_LIST').append(new Option('#<TMPL_VAR CAMNO> - <TMPL_VAR CAM_NAME>', '#camdiv<TMPL_VAR CAMNO>', false, false)); </script>
-					 <div style="width:90%; padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(109,172,32,.2);">
-						<table style="width:100%;">
-						 <tr>
-							<td align="left">
-							 <big><b>#<TMPL_VAR CAMNO></b></big>
-							 <button onclick="$('#CAM_LIST').scrollToMe(); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="arrow-u"><TMPL_VAR CC.CAM_SELECTION_SCROLL></button>
-							</td>
-							<td>
-							</td>
-							<td align="right">
-							 <button onclick="$.ajax({url: '', type: 'GET', data: { 'delete_cam':<TMPL_VAR CAMNO>}}).done(function() {  $( '#camdiv<TMPL_VAR CAMNO>' ).remove(); if($('.camdiv').length == 0 ) {$('#cam_headline').html('<b><TMPL_VAR CC.NO_CONFIGURED_CAMS_TEXT></b>'); }; validate_clean_objects(['#EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#EMAIL_SUBJECT3<TMPL_VAR CAMNO>','#CAM_NAME<TMPL_VAR CAMNO>','#CAM_NOTE<TMPL_VAR CAMNO>','#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_HOST_OR_IP<TMPL_VAR CAMNO>','#CAM_PORT<TMPL_VAR CAMNO>']); }); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="delete"><TMPL_VAR CC.BUTTON_DELETE_CAM></button>
-							</td>
-						 </tr>
-						 <tr>
-							<td style="text-align:right; width:300px; min-width:300px; max-width:300px; vertical-align:bottom;">
-							 <label id="label_CAM_NAME<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_NAME_TEXT></label>
-							</td>
-							<td style="width:100%;">
-							 <div style="display:table; width:100%;">
-								<div style="display:table-row;">
-								 <div style="display:table-cell;">
-									<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_NAME_HINT>" data-validation-rule="special:alphanumeric-accented-ws" id="CAM_NAME<TMPL_VAR CAMNO>" name="CAM_NAME<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_NAME_SUGGESTION>" value="<TMPL_VAR CAM_NAME>">
-								 </div>
-								 <div style="display:table-cell; text-align:right; vertical-align:bottom;">
-									<label id="label_CAM_NOTE<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_NOTE_TEXT></label>
-								 </div>
-								 <div style="display:table-cell;">
-									<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_NOTE_HINT>" data-validation-rule="^([A-Za-z0-9_-\s\(\)\.\,\:\;\/]){0,32}$" id="CAM_NOTE<TMPL_VAR CAMNO>" name="CAM_NOTE<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_NOTE_SUGGESTION>" value="<TMPL_VAR CAM_NOTE>">
-								 </div>
+						 <!-- Loop for camera <TMPL_VAR CAMNO> //-->
+						 <div class="camdiv" id="camdiv<TMPL_VAR CAMNO>"  style="display: inline-block;">
+							 <div style="padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(109,142,32,.2); display: inline-block;">
+							 <!-- Add camera to dropdown //-->
+							  <script> $('#CAM_LIST').append(new Option('#<TMPL_VAR CAMNO> - <TMPL_VAR CAM_NAME>', '#camdiv<TMPL_VAR CAMNO>', false, false)); </script>
+								<big><b>#<TMPL_VAR CAMNO></b></big>
+								<button onclick="$('#CAM_LIST').scrollToMe(); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="arrow-u"><TMPL_VAR CC.CAM_SELECTION_SCROLL></button>
+								<button onclick="$.ajax({url: '', type: 'GET', data: { 'delete_cam':<TMPL_VAR CAMNO>}}).done(function() {  $( '#camdiv<TMPL_VAR CAMNO>' ).remove(); if($('.camdiv').length == 0 ) {$('#cam_headline').html('<b><TMPL_VAR CC.NO_CONFIGURED_CAMS_TEXT></b>'); }; validate_clean_objects(['#EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#EMAIL_SUBJECT3<TMPL_VAR CAMNO>','#CAM_NAME<TMPL_VAR CAMNO>','#CAM_NOTE<TMPL_VAR CAMNO>','#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_HOST_OR_IP<TMPL_VAR CAMNO>','#CAM_PORT<TMPL_VAR CAMNO>']); }); return false;" data-role="button" data-inline="true" data-mini="true" data-icon="delete"><TMPL_VAR CC.BUTTON_DELETE_CAM></button>
+							 <br>
+								<div style="display:table; display: inline-block; background-color: rgba(109,1,132,.5s);">
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											<label id="label_CAM_NAME<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_NAME_TEXT></label>
+											<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_NAME_HINT>" data-validation-rule="special:alphanumeric-accented-ws" id="CAM_NAME<TMPL_VAR CAMNO>" name="CAM_NAME<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_NAME_SUGGESTION>" value="<TMPL_VAR CAM_NAME>">
+										</div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											<label id="label_CAM_NOTE<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_NOTE_TEXT></label>
+											<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_NOTE_HINT>" data-validation-rule="^([A-Za-z0-9_-\s\(\)\.\,\:\;\/]){0,32}$" id="CAM_NOTE<TMPL_VAR CAMNO>" name="CAM_NOTE<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_NOTE_SUGGESTION>" value="<TMPL_VAR CAM_NOTE>">
+										</div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											 <label id="label_CAM_MODEL<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_MODEL_TEXT></label>
+											 <select style="align:left;" id="CAM_MODEL<TMPL_VAR CAMNO>" name="CAM_MODEL<TMPL_VAR CAMNO>" data-mini="false" required>
+												<option value=""><TMPL_VAR CC.CAM_MODEL_SELECT_CAM_TEXT></option>
+												<TMPL_VAR cam_model_list>
+											 </select>
+									 		<SCRIPT> $("#CAM_MODEL<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_MODEL>'); </SCRIPT>
+										</div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											 <select id="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" data-mini="false">
+												<option value="9999" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> <TMPL_VAR CC.IMAGE_RESIZE_ORIGINAL_TEXT></option>
+												<option value="240" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 240px</option>
+												<option value="320" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 320px</option>
+												<option value="640" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 640px</option>
+												<option value="720" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 720px</option>
+												<option value="1024"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1024px</option>
+												<option value="1280"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1280px</option>
+												<option value="1600"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1600px</option>
+												<option value="1920"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1920px</option>
+												<option value="0" ><TMPL_VAR CC.IMAGE_RESIZE_JUST_TEXT></option>
+											 </select>
+											<script>$("#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_IMAGE_RESIZE>');</script>
+										 </div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											<label id="label_CAM_HOST_OR_IP<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_HOST_TEXT></label>
+											<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_HOST_HINT>" data-validation-rule="special:hostname_or_ipaddr" id="CAM_HOST_OR_IP<TMPL_VAR CAMNO>" name="CAM_HOST_OR_IP<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_HOST_SUGGESTION>" value="<TMPL_VAR CAM_HOST_OR_IP>">
+											<label id="label_CAM_PORT<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_PORT_TEXT></label>
+											<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_PORT_HINT>" data-validation-rule="special:ipport" id="CAM_PORT<TMPL_VAR CAMNO>" name="CAM_PORT<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_PORT_SUGGESTION>" value="<TMPL_VAR CAM_PORT>">
+										 </div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											<label id="label_CAM_USER<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_USER_TEXT></label>
+											<input id="CAM_USER<TMPL_VAR CAMNO>" autocomplete="nope" name="CAM_USER<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_USER_SUGGESTION>" value="<TMPL_VAR CAM_USER>">
+										 </div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											<label id="label_CAM_PASS<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_PASS_TEXT></label>
+											<input id="CAM_PASS<TMPL_VAR CAMNO>" autocomplete="nope" name="CAM_PASS<TMPL_VAR CAMNO>" type="text" class="textfield" value="<TMPL_VAR CAM_PASS>">
+										 </div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											<input onclick="if ( $(this).is(':checked') ) { $('#CAM_WATERMARK_CB<TMPL_VAR CAMNO>').val(1); $( '#watermark<TMPL_VAR CAMNO>' ).html('&watermark=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_WATERMARK_CB<TMPL_VAR CAMNO>').val(0); $( '#watermark<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_WATERMARK_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_WATERMARK_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_WATERMARK_LABEL<TMPL_VAR CAMNO>" for="CAM_WATERMARK_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_WATERMARK_TEXT></label>
+											<input id="CAM_WATERMARK_CB<TMPL_VAR CAMNO>" name="CAM_WATERMARK_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_WATERMARK_CB>">
+										 </div>
+									</div>
+									<div style="display:table-row;">
+										<div style="display:table-cell;">
+											<input type="checkbox" id="CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_EMAIL_USED_LABEL<TMPL_VAR CAMNO>" for="CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_EMAIL_USED_TEXT></label>
+										 	<input id="CAM_EMAIL_USED_CB<TMPL_VAR CAMNO>" name="CAM_EMAIL_USED_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_EMAIL_USED_CB>">
+											<div style="display:table;">		
+												<div style="display:table-row;">
+													<div style="display:table-cell; width:auto;">
+														 <div class="cam_email<TMPL_VAR CAMNO>" style="padding:10px; border: 1px solid black; border-radius:0px 0px 8px 8px; background-color: rgba(255,255,192,.5); margin-top:-1px;width:90%;">
+															<table>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <label id="label_CAM_RECIPIENTS<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_RECIPIENTS_TEXT></label>
+																 <input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_RECIPIENTS_HINT>" 			data-validation-rule="special:emails" 					id="CAM_RECIPIENTS<TMPL_VAR CAMNO>" 	name="CAM_RECIPIENTS<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_RECIPIENTS_SUGGESTION>" value="<TMPL_VAR CAM_RECIPIENTS>">
+																</td>
+															 </tr>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <label><TMPL_VAR CC.EMAIL_FROM_NAME_TEXT></label>
+																 <input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_FROM_NAME_VALIDATION>" 	data-validation-rule="special:alphanumeric-accented-ws" id="CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>" name="CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SENDER_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_FROM_NAME>">
+																</td>
+															 </tr>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <label><TMPL_VAR CC.EMAIL_SUBJECT_TEXT></label>
+																 <table>
+																	<tr style="vertical-align:bottom;">
+																	 <td>
+																		<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SUBJECT1_VALIDATION>" 		data-validation-rule="special:alphanumeric-accented-ws" 		id="CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>"		type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SUBJECT1_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_SUBJECT1>">
+																	 </td>
+																	 <td>
+																		<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_DATE_FORMAT_VALIDATION>" 	data-validation-rule="^([\slNSwFnjymdYMD\.\-\/]){1,16}$" 		id="CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>" 	type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_DATE_FORMAT_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_DATE_FORMAT>">
+																	 </td>
+																	 <td>
+																		<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SUBJECT2_VALIDATION>" 		data-validation-rule="special:alphanumeric-accented-ws" 		id="CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>" 		type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SUBJECT2_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_SUBJECT2>">
+																	 </td>
+																	 <td>
+																		<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_TIME_FORMAT_VALIDATION>" 	data-validation-rule="^([\saABgGhHisT\:\.\-\/]){1,16}$" 		id="CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>" 	type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_TIME_FORMAT_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_TIME_FORMAT>">
+																	 </td>
+																	 <td>
+																		<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SUBJECT3_VALIDATION>" 		data-validation-rule="special:alphanumeric-accented-ws" 		id="CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>" 		type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SUBJECT3_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_SUBJECT3>">
+																	 </td>
+																	</tr>
+																 </table>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <label><TMPL_VAR CC.EMAIL_BODY_TEXT></label>
+																 <input autocomplete="nope" data-validation-rule="^(.*){1,255}$" data-validation-error-msg="<TMPL_VAR CC.EMAIL_BODY_VALIDATION> id="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" name="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_BODY_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_BODY>">
+																</td>
+															 </tr>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <label><TMPL_VAR CC.EMAIL_SIGNATURE_TEXT></label>
+																 <input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SIGNATURE_VALIDATION>" data-validation-rule="^([a-zA-Z0-9\s\-\_\<\/\>\&\;\:\.\,\?\!\+\(\)\#]*){1,1024}$" type="text" class="textfield" id="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" name="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" placeholder="<TMPL_VAR CC.CAM_EMAIL_SIGNATURE_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_SIGNATURE>">
+																</td>
+															 </tr>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <select id="CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>" data-mini="false">
+																	<option value="9999" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> <TMPL_VAR CC.EMAIL_RESIZE_ORIGINAL_TEXT></option>
+																	<option value="240" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 240px</option>
+																	<option value="320" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 320px</option>
+																	<option value="640" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 640px</option>
+																	<option value="720" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 720px</option>
+																	<option value="1024"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1024px</option>
+																	<option value="1280"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1280px</option>
+																	<option value="1600"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1600px</option>
+																	<option value="1920"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1920px</option>
+																	<option value="0" ><TMPL_VAR CC.IMAGE_RESIZE_JUST_TEXT></option>
+																 </select>
+																<script>$("#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_EMAIL_RESIZE>');</script>
+																</td>
+															 </tr>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <input onclick="if ( $(this).is(':checked') ) { $('#CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>').val(1); $( '#email_inline<TMPL_VAR CAMNO>' ).html('&email_inline=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>').val(0); $( '#email_inline<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_EMAIL_INLINE_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_EMAIL_INLINE_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_EMAIL_INLINE_LABEL<TMPL_VAR CAMNO>" for="CAM_EMAIL_INLINE_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.EMAIL_INLINE_TEXT></label>
+																<input id="CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>" name="CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_EMAIL_INLINE_CB>">
+																</td>
+															 </tr>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <input onclick="if ( $(this).is(':checked') ) { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(1); $( '#no_email<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(0); $( '#no_email<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_NO_EMAIL_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_NO_EMAIL_LABEL<TMPL_VAR CAMNO>" for="CAM_NO_EMAIL_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.NO_MAIL_TEXT></label>
+																<input id="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_NO_EMAIL_CB>">
+																</td>
+															 </tr>
+															 <tr class="cam_email<TMPL_VAR CAMNO>">
+																<td>
+																 <select id="CAM_EMAIL_MULTIPICS<TMPL_VAR CAMNO>" name="CAM_EMAIL_MULTIPICS<TMPL_VAR CAMNO>" data-mini="false">
+																	<option value="10" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUF1></option>
+																	<option value="21" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIME1></option>
+																	<option value="22" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="23" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="24" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="31" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIME1></option>
+																	<option value="32" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="33" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="34" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="41" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIME1></option>
+																	<option value="42" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="43" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																	<option value="44" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
+																 </select>
+																<script>$("#CAM_EMAIL_MULTIPICS<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_EMAIL_MULTIPICS>');</script>
+																</td>
+															 </tr>
+															</table>
+														 </div>
+														 <hr>
+														 <TMPL_VAR CC.LOXONE_CONFIG_TEXT>
+														 <br>
+														 <br>
+														 <font face="courier">
+															<small>
+															 <!-- <b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url<TMPL_VAR CAMNO>">?</span><span style="color:#000000" id="cam_host_or_ip_port<TMPL_VAR CAMNO>"></span>&user=<span style="color:#FF40C0" id="cam_user_url<TMPL_VAR CAMNO>">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url<TMPL_VAR CAMNO>">?</span>&cam-name=<span style="color:#80c0FF" id="cam_name_url<TMPL_VAR CAMNO>">?</span>&cam-model=<span style="color:#40c040" id="cam_type<TMPL_VAR CAMNO>">?</span><span url="" id="email_to<TMPL_VAR CAMNO>"></span><span url="" id="no_email<TMPL_VAR CAMNO>"></span><span url="" id="watermark<TMPL_VAR CAMNO>"></span><span url="" id="email_used<TMPL_VAR CAMNO>"></span><span url="" id="image_resize<TMPL_VAR CAMNO>"></span><span url="" id="email_resize<TMPL_VAR CAMNO>"></span></b> //-->
+															 <b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?cam=<span style="color:#4040FF"><TMPL_VAR CAMNO></span></b>
+															 </small>
+														 </font>
+												 		 <br>
+												 		 	<a id="btntest<TMPL_VAR CAMNO>" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><TMPL_VAR CC.TEST_TEXT></a>
+												 		 	<span id="btntestsavehint<TMPL_VAR CAMNO>"></span>
+												 	</div>
+												</div>
+											</div>
+										 </div>
+									</div>
 								</div>
-							 </div>
-							</td>
-							<td>
-							</td>
-						 </tr>
-						 <tr>
-							<td align="right" style="vertical-align:middle;">
-							 <label id="label_CAM_MODEL<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_MODEL_TEXT></label>
-							</td>
-							<td>
-							 <select style="align:left;" id="CAM_MODEL<TMPL_VAR CAMNO>" name="CAM_MODEL<TMPL_VAR CAMNO>" data-mini="false" required>
-								<option value=""><TMPL_VAR CC.CAM_MODEL_SELECT_CAM_TEXT></option>
-								<TMPL_VAR cam_model_list>
-							 </select>
-							 <SCRIPT> $("#CAM_MODEL<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_MODEL>'); </SCRIPT>
-							</td>
-							<td>&nbsp;</td>
-						 </tr>
-						 <tr>
-							<td align="right">
-							 <label id="label_CAM_HOST_OR_IP<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_HOST_TEXT></label>
-							</td>
-							<td>
-							 <div style="display:table; width:100%;">
+								 <script>
+								 $( document ).ready(function()
+								 {
+									validate_enable('#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_NAME<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_NOTE<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_RECIPIENTS<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_HOST_OR_IP<TMPL_VAR CAMNO>');
+									validate_enable('#CAM_PORT<TMPL_VAR CAMNO>');
+									validate_chk_object(['#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>','#CAM_NAME<TMPL_VAR CAMNO>','#CAM_NOTE<TMPL_VAR CAMNO>','#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_HOST_OR_IP<TMPL_VAR CAMNO>','#CAM_PORT<TMPL_VAR CAMNO>']);
+									// Set build url from checkbox values
+				
+				
+								 	// EMAIL USED
+									// Set checkbox trigger
+									$('#CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>').on('change', function(event)
+									{
+									 if ( $(this).is(':checked') )
+									 {
+										$( '#email_used<TMPL_VAR CAMNO>' ).html('&email_used=<span style=\'color:#00C0C0\'>1</SPAN>');
+										$(".cam_email<TMPL_VAR CAMNO>").fadeIn();
+										$('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>').attr('placeholder'));
+										$('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>').attr('placeholder'));
+										$('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>').attr('placeholder'));
+										$('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>').attr('placeholder'));
+										$('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>').attr('placeholder'));
+										validate_chk_object(['#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>']);  
+									 }
+									 else
+									 {
+										$( '#email_used<TMPL_VAR CAMNO>' ).html('');
+										$(".cam_email<TMPL_VAR CAMNO>").fadeOut();
+										validate_clean_objects(['#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>']);  
+									 }
+									});
+								 	// EMAIL USED
+				
+									// Set initial values for Checkboxes
+									<TMPL_VAR CAM_NO_EMAIL_CB_script>
+									<TMPL_VAR CAM_WATERMARK_CB_script>
+									<TMPL_VAR CAM_EMAIL_USED_CB_script>
+									<TMPL_VAR CAM_EMAIL_INLINE_CB_script>
+				
+									cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),$( "#CAM_PORT<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>");
+									$( "#cam_type<TMPL_VAR CAMNO>" ).html( $( "#CAM_MODEL<TMPL_VAR CAMNO>").val() );
+									$( "#cam_user_url<TMPL_VAR CAMNO>" ).html($( "#CAM_USER<TMPL_VAR CAMNO>").val());
+									$( "#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val());
+									$( "#cam_name_url<TMPL_VAR CAMNO>" ).html( encodeURIComponent($( "#CAM_NAME<TMPL_VAR CAMNO>").val()));
+				
+									$("#CAM_MODEL<TMPL_VAR CAMNO>").change(function()
+									{
+									 $( "#cam_type<TMPL_VAR CAMNO>" ).html($( "#CAM_MODEL<TMPL_VAR CAMNO>").val() );
+									});
+									$( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").keyup(function( event )
+									{
+									 cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),$( "#CAM_PORT<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>");
+									});
+									$( "#CAM_PORT<TMPL_VAR CAMNO>").keyup(function( event )
+									{
+									 cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),$( "#CAM_PORT<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>");
+									});
+									$( "#CAM_USER<TMPL_VAR CAMNO>" ).keyup(function( event )
+									{
+									 $( "#cam_user_url<TMPL_VAR CAMNO>" ).html($("#CAM_USER<TMPL_VAR CAMNO>").val());
+									});
+									$( "#CAM_PASS<TMPL_VAR CAMNO>" ).keyup(function( event )
+									{
+									 $("#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val());
+									});
+									$( "#CAM_NAME<TMPL_VAR CAMNO>" ).keyup(function( event )
+									{
+									 $("#cam_name_url<TMPL_VAR CAMNO>").html( encodeURIComponent($( "#CAM_NAME<TMPL_VAR CAMNO>").val()));
+									 $('#CAM_LIST option[value="#camdiv<TMPL_VAR CAMNO>"]').text($("#CAM_NAME<TMPL_VAR CAMNO>").val());
+									 $('#CAM_LIST-button span').html("#<TMPL_VAR CAMNO> - " + $("#CAM_NAME<TMPL_VAR CAMNO>").val());
+				
+									});
+									$( "#btntest<TMPL_VAR CAMNO>" ).click(function ()
+									{
+				 					 $.ajax({url: '/plugins/<TMPL_VAR LBPPLUGINDIR>/get_notifications.php', type: 'GET', data: { 'package':'<TMPL_VAR LBPPLUGINDIR>', 'name':'<TMPL_VAR CC.MY_NAME>'} }).success(function(data) {  $( '#notifblock' ).html(data).trigger('create'); if ( data.length > 10 ) { $('#notifblock').scrollToMe(); } }) ;
+									 url2open = "http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?cam=<TMPL_VAR CAMNO>"; window.open(url2open,'<TMPL_VAR CC.MY_NAME><TMPL_VAR CAMNO>','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
+									});
+				
+									if ( "<TMPL_VAR CAM_NO_EMAIL>" == 1 )
+									{
+										$("#CAM_NO_EMAIL<TMPL_VAR CAMNO>").prop("checked", 1);
+										$( "label[for='CAM_NO_EMAIL<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+										$( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>'+$('#CAM_NO_EMAIL<TMPL_VAR CAMNO>').val()+'</SPAN>');
+										$( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).prop('url','&no_email=' + $('#CAM_NO_EMAIL<TMPL_VAR CAMNO>').val())
+									}
+									else
+									{
+									 $( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).html(''); $( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).prop('url','')
+									};
+									if ( "<TMPL_VAR CAM_WATERMARK>" == 1 )
+									{
+										$("#CAM_WATERMARK<TMPL_VAR CAMNO>").prop("checked", 1);
+										$( "label[for='CAM_WATERMARK<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
+										$( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).html('&watermark=<span style=\'color:#00C0C0\'>'+$('#CAM_WATERMARK<TMPL_VAR CAMNO>').val()+'</SPAN>');
+										$( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).prop('url','&watermark=' + $('#CAM_WATERMARK<TMPL_VAR CAMNO>').val())
+									}
+									else
+									{
+									 $( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).html(''); $( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).prop('url','')
+									};
+								 	$("#camdiv<TMPL_VAR CAMNO> :input").on('change', function(event)
+									{
+										$("#btntest<TMPL_VAR CAMNO>").css('display','none');
+										$("#btntestsavehint<TMPL_VAR CAMNO>").html('<TMPL_VAR CC.CAM_SAVE_BEFORE_TEST>');
+									});
+								 });
+								</script>
+							</div>
+							<div style="display:table;">
 								<div style="display:table-row;">
-								 <div style="display:table-cell; width:80%">
-									<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_HOST_HINT>" data-validation-rule="special:hostname_or_ipaddr" id="CAM_HOST_OR_IP<TMPL_VAR CAMNO>" name="CAM_HOST_OR_IP<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_HOST_SUGGESTION>" value="<TMPL_VAR CAM_HOST_OR_IP>">
-								 </div>
-								 <div style="display:table-cell; text-align:right;">
-									<label id="label_CAM_PORT<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_PORT_TEXT></label>
-								 </div>
-								 <div style="display:table-cell;">
-									<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_PORT_HINT>" data-validation-rule="special:ipport" id="CAM_PORT<TMPL_VAR CAMNO>" name="CAM_PORT<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_PORT_SUGGESTION>" value="<TMPL_VAR CAM_PORT>">
-								 </div>
+									<div style="display:table-cell; text-align:center; white-space: nowrap;">
+										<a id="btncancel" data-role="button" data-inline="true" data-mini="true" data-icon="delete" href="/admin/system/index.cgi?form=system"><TMPL_VAR CC.CANCEL_TEXT></a>
+										<button type="submit" id="btnsubmit" data-role="button" data-inline="true" data-mini="true" data-icon="check"><TMPL_VAR CC.SAVE_TEXT></button>
+								 	</div>
 								</div>
-							 </div>
-							</td>
-							<td>&nbsp;</td>
-						 </tr>
-						 <tr>
-							<td align="right" style="vertical-align:bottom;">
-							 <label id="label_CAM_USER<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_USER_TEXT></label>
-							</td>
-							<td>
-							 <div style="display:table; width:100%;">
-								<div style="display:table-row;">
-								 <div style="display:table-cell;">
-									<input id="CAM_USER<TMPL_VAR CAMNO>" autocomplete="nope" name="CAM_USER<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_USER_SUGGESTION>" value="<TMPL_VAR CAM_USER>">
-								 </div>
-								 <div style="display:table-cell; text-align:right; vertical-align:bottom;">
-									 <label id="label_CAM_PASS<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_PASS_TEXT></label>
-								 </div>
-								 <div style="display:table-cell; ">
-									<input id="CAM_PASS<TMPL_VAR CAMNO>" autocomplete="nope" name="CAM_PASS<TMPL_VAR CAMNO>" type="text" class="textfield" value="<TMPL_VAR CAM_PASS>">
-								 </div>
-								</div>
-							 </div>
-							</td>
-							<td>
-							 &nbsp;
-							</td>
-						 </tr>
-						 <tr>
-							<td>
-							 &nbsp;
-							</td>
-							<td>
-							 <input onclick="if ( $(this).is(':checked') ) { $('#CAM_WATERMARK_CB<TMPL_VAR CAMNO>').val(1); $( '#watermark<TMPL_VAR CAMNO>' ).html('&watermark=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_WATERMARK_CB<TMPL_VAR CAMNO>').val(0); $( '#watermark<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_WATERMARK_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_WATERMARK_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_WATERMARK_LABEL<TMPL_VAR CAMNO>" for="CAM_WATERMARK_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_WATERMARK_TEXT></label>
-							<input id="CAM_WATERMARK_CB<TMPL_VAR CAMNO>" name="CAM_WATERMARK_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_WATERMARK_CB>">
-							</td>
-							<td>
-							 &nbsp;
-							</td>
-						 </tr>
-						 <tr>
-							<td>
-							 &nbsp;
-							</td>
-							<td>
-							 <select id="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" name="CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>" data-mini="false">
-								<option value="9999" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> <TMPL_VAR CC.IMAGE_RESIZE_ORIGINAL_TEXT></option>
-								<option value="240" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 240px</option>
-								<option value="320" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 320px</option>
-								<option value="640" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 640px</option>
-								<option value="720" ><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 720px</option>
-								<option value="1024"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1024px</option>
-								<option value="1280"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1280px</option>
-								<option value="1600"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1600px</option>
-								<option value="1920"><TMPL_VAR CC.IMAGE_RESIZE_TEXT> 1920px</option>
-								<option value="0" ><TMPL_VAR CC.IMAGE_RESIZE_JUST_TEXT></option>
-							 </select>
-							<script>$("#CAM_IMAGE_RESIZE<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_IMAGE_RESIZE>');</script>
-							</td>
-							<td>
-							 &nbsp;
-							</td>
-						 </tr>
-							<tr>
-							<td style="text-align:right;">
-								&nbsp;
-							 </td>
-							 <td>
-								<input type="checkbox" id="CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_EMAIL_USED_LABEL<TMPL_VAR CAMNO>" for="CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_EMAIL_USED_TEXT></label>
-							 <input id="CAM_EMAIL_USED_CB<TMPL_VAR CAMNO>" name="CAM_EMAIL_USED_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_EMAIL_USED_CB>">
-								</td>
-							 <td>
-								&nbsp;
-							 </td>
-							</tr>
-						 </table>
-						 <div class="cam_email<TMPL_VAR CAMNO>" style="width:90%; padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(255,255,192,.5);">
-							<table style="width:100%;">
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td class="cam_email<TMPL_VAR CAMNO>" style="text-align:right; width:100px; min-width:100px;">
-								 <label id="label_CAM_RECIPIENTS<TMPL_VAR CAMNO>"><TMPL_VAR CC.CAM_RECIPIENTS_TEXT></label>
-								</td>
-								<td>
-								 <input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.CAM_RECIPIENTS_HINT>" 			data-validation-rule="special:emails" 					id="CAM_RECIPIENTS<TMPL_VAR CAMNO>" 	name="CAM_RECIPIENTS<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_RECIPIENTS_SUGGESTION>" value="<TMPL_VAR CAM_RECIPIENTS>">
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td align="right">
-								 <nobr><TMPL_VAR CC.EMAIL_FROM_NAME_TEXT></nobr>
-								</td>
-								<td>
-								 <input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_FROM_NAME_VALIDATION>" 	data-validation-rule="special:alphanumeric-accented-ws" id="CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>" name="CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SENDER_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_FROM_NAME>">
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td align="right">
-								 <nobr><TMPL_VAR CC.EMAIL_SUBJECT_TEXT></nobr>
-								</td>
-								<td>
-								 <table width="100%">
-									<tr style="vertical-align:bottom;">
-									 <td>
-										<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SUBJECT1_VALIDATION>" 		data-validation-rule="special:alphanumeric-accented-ws" 		id="CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>"		type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SUBJECT1_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_SUBJECT1>">
-									 </td>
-									 <td>
-										<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_DATE_FORMAT_VALIDATION>" 	data-validation-rule="^([\slNSwFnjymdYMD\.\-\/]){1,16}$" 		id="CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>" 	type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_DATE_FORMAT_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_DATE_FORMAT>">
-									 </td>
-									 <td>
-										<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SUBJECT2_VALIDATION>" 		data-validation-rule="special:alphanumeric-accented-ws" 		id="CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>" 		type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SUBJECT2_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_SUBJECT2>">
-									 </td>
-									 <td>
-										<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_TIME_FORMAT_VALIDATION>" 	data-validation-rule="^([\saABgGhHisT\:\.\-\/]){1,16}$" 		id="CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>" 	type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_TIME_FORMAT_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_TIME_FORMAT>">
-									 </td>
-									 <td>
-										<input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SUBJECT3_VALIDATION>" 		data-validation-rule="special:alphanumeric-accented-ws" 		id="CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>" 	name="CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>" 		type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_SUBJECT3_SUGGESTION>" 	value="<TMPL_VAR CAM_EMAIL_SUBJECT3>">
-									 </td>
-									</tr>
-								 </table>
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td align="right">
-								 <nobr><TMPL_VAR CC.EMAIL_BODY_TEXT></nobr>
-								</td>
-								<td>
-								 <input autocomplete="nope" data-validation-rule="^(.*){1,255}$" data-validation-error-msg="<TMPL_VAR CC.EMAIL_BODY_VALIDATION> id="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" name="CAM_EMAIL_BODY<TMPL_VAR CAMNO>" type="text" class="textfield" placeholder="<TMPL_VAR CC.CAM_EMAIL_BODY_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_BODY>">
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td align="right">
-								 <nobr><TMPL_VAR CC.EMAIL_SIGNATURE_TEXT></nobr>
-								</td>
-								<td colspan="2">
-								 <input autocomplete="nope" data-validation-error-msg="<TMPL_VAR CC.EMAIL_SIGNATURE_VALIDATION>" data-validation-rule="^([a-zA-Z0-9\s\-\_\<\/\>\&\;\:\.\,\?\!\+\(\)\#]*){1,1024}$" type="text" class="textfield" id="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" name="CAM_EMAIL_SIGNATURE<TMPL_VAR CAMNO>" placeholder="<TMPL_VAR CC.CAM_EMAIL_SIGNATURE_SUGGESTION>" value="<TMPL_VAR CAM_EMAIL_SIGNATURE>">
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td>
-								 &nbsp;
-								</td>
-								<td>
-								 <select id="CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>" name="CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>" data-mini="false">
-									<option value="9999" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> <TMPL_VAR CC.EMAIL_RESIZE_ORIGINAL_TEXT></option>
-									<option value="240" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 240px</option>
-									<option value="320" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 320px</option>
-									<option value="640" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 640px</option>
-									<option value="720" ><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 720px</option>
-									<option value="1024"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1024px</option>
-									<option value="1280"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1280px</option>
-									<option value="1600"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1600px</option>
-									<option value="1920"><TMPL_VAR CC.EMAIL_RESIZE_TEXT> 1920px</option>
-									<option value="0" ><TMPL_VAR CC.IMAGE_RESIZE_JUST_TEXT></option>
-								 </select>
-								<script>$("#CAM_EMAIL_RESIZE<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_EMAIL_RESIZE>');</script>
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td>
-								 &nbsp;
-								</td>
-								<td>
-								 <input onclick="if ( $(this).is(':checked') ) { $('#CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>').val(1); $( '#email_inline<TMPL_VAR CAMNO>' ).html('&email_inline=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>').val(0); $( '#email_inline<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_EMAIL_INLINE_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_EMAIL_INLINE_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_EMAIL_INLINE_LABEL<TMPL_VAR CAMNO>" for="CAM_EMAIL_INLINE_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.EMAIL_INLINE_TEXT></label>
-								<input id="CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>" name="CAM_EMAIL_INLINE_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_EMAIL_INLINE_CB>">
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td>
-								 &nbsp;
-								</td>
-								<td>
-								 <input onclick="if ( $(this).is(':checked') ) { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(1); $( '#no_email<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>1</SPAN>'); } else { $('#CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>').val(0); $( '#no_email<TMPL_VAR CAMNO>' ).html(''); }" type="checkbox" id="CAM_NO_EMAIL_CB_checkbox<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_CB_checkbox<TMPL_VAR CAMNO>"><label id="CAM_NO_EMAIL_LABEL<TMPL_VAR CAMNO>" for="CAM_NO_EMAIL_CB_checkbox<TMPL_VAR CAMNO>"><TMPL_VAR CC.NO_MAIL_TEXT></label>
-								<input id="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" name="CAM_NO_EMAIL_CB<TMPL_VAR CAMNO>" type="hidden" value="<TMPL_VAR CAM_NO_EMAIL_CB>">
-								</td>
-							 </tr>
-							 <tr class="cam_email<TMPL_VAR CAMNO>">
-								<td>
-								 &nbsp;
-								</td>
-								<td>
-								 <select id="CAM_EMAIL_MULTIPICS<TMPL_VAR CAMNO>" name="CAM_EMAIL_MULTIPICS<TMPL_VAR CAMNO>" data-mini="false">
-									<option value="10" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUF1></option>
-									<option value="21" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIME1></option>
-									<option value="22" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="23" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="24" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="31" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIME1></option>
-									<option value="32" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="33" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="34" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="41" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 1 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIME1></option>
-									<option value="42" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 2 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="43" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 3 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-									<option value="44" ><TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_PRE> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_PIC_SUFn> 4 <TMPL_VAR CC.CAM_EMAIL_MULTIPICS_TEXT_TIMEn></option>
-								 </select>
-								<script>$("#CAM_EMAIL_MULTIPICS<TMPL_VAR CAMNO>").val('<TMPL_VAR CAM_EMAIL_MULTIPICS>');</script>
-								</td>
-							 </tr>
-							</table>
-						 </div>
-						 <hr>
-						 <TMPL_VAR CC.LOXONE_CONFIG_TEXT>
-						 <br>
-						 <br>
-						 <font face="courier">
-							<small>
-							 <!-- <b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?kamera=<span style="color:#4040FF" id="cam_host_or_ip_url<TMPL_VAR CAMNO>">?</span><span style="color:#000000" id="cam_host_or_ip_port<TMPL_VAR CAMNO>"></span>&user=<span style="color:#FF40C0" id="cam_user_url<TMPL_VAR CAMNO>">?</span>&pass=<span style="color:#c080FF" id="cam_pass_url<TMPL_VAR CAMNO>">?</span>&cam-name=<span style="color:#80c0FF" id="cam_name_url<TMPL_VAR CAMNO>">?</span>&cam-model=<span style="color:#40c040" id="cam_type<TMPL_VAR CAMNO>">?</span><span url="" id="email_to<TMPL_VAR CAMNO>"></span><span url="" id="no_email<TMPL_VAR CAMNO>"></span><span url="" id="watermark<TMPL_VAR CAMNO>"></span><span url="" id="email_used<TMPL_VAR CAMNO>"></span><span url="" id="image_resize<TMPL_VAR CAMNO>"></span><span url="" id="email_resize<TMPL_VAR CAMNO>"></span></b> //-->
-							 <b>http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?cam=<span style="color:#4040FF"><TMPL_VAR CAMNO></span></b>
-							 </small>
-						 </font>
-				 		 <br>
-				 		 <center>
-				 		 	<a id="btntest<TMPL_VAR CAMNO>" data-role="button" data-inline="true" data-mini="true" data-icon="refresh" href="#"><TMPL_VAR CC.TEST_TEXT></a>
-				 		 	<span id="btntestsavehint<TMPL_VAR CAMNO>"></span>
-				 		 </center>
-				 	</div>
-				 <script>
-				 $( document ).ready(function()
-				 {
-					validate_enable('#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_NAME<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_NOTE<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_RECIPIENTS<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_HOST_OR_IP<TMPL_VAR CAMNO>');
-					validate_enable('#CAM_PORT<TMPL_VAR CAMNO>');
-					validate_chk_object(['#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>','#CAM_NAME<TMPL_VAR CAMNO>','#CAM_NOTE<TMPL_VAR CAMNO>','#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_HOST_OR_IP<TMPL_VAR CAMNO>','#CAM_PORT<TMPL_VAR CAMNO>']);
-					// Set build url from checkbox values
-
-
-				 	// EMAIL USED
-					// Set checkbox trigger
-					$('#CAM_EMAIL_USED_CB_checkbox<TMPL_VAR CAMNO>').on('change', function(event)
-					{
-					 if ( $(this).is(':checked') )
-					 {
-						$( '#email_used<TMPL_VAR CAMNO>' ).html('&email_used=<span style=\'color:#00C0C0\'>1</SPAN>');
-						$(".cam_email<TMPL_VAR CAMNO>").fadeIn();
-						$('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>').attr('placeholder'));
-						$('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>').attr('placeholder'));
-						$('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>').attr('placeholder'));
-						$('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>').attr('placeholder'));
-						$('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>').val($('#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>').attr('placeholder'));
-						validate_chk_object(['#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>']);  
-					 }
-					 else
-					 {
-						$( '#email_used<TMPL_VAR CAMNO>' ).html('');
-						$(".cam_email<TMPL_VAR CAMNO>").fadeOut();
-						validate_clean_objects(['#CAM_RECIPIENTS<TMPL_VAR CAMNO>','#CAM_EMAIL_FROM_NAME<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT1<TMPL_VAR CAMNO>','#CAM_EMAIL_DATE_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT2<TMPL_VAR CAMNO>','#CAM_EMAIL_TIME_FORMAT<TMPL_VAR CAMNO>','#CAM_EMAIL_SUBJECT3<TMPL_VAR CAMNO>']);  
-					 }
-					});
-				 	// EMAIL USED
-
-					// Set initial values for Checkboxes
-					<TMPL_VAR CAM_NO_EMAIL_CB_script>
-					<TMPL_VAR CAM_WATERMARK_CB_script>
-					<TMPL_VAR CAM_EMAIL_USED_CB_script>
-					<TMPL_VAR CAM_EMAIL_INLINE_CB_script>
-
-					cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),$( "#CAM_PORT<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>");
-					$( "#cam_type<TMPL_VAR CAMNO>" ).html( $( "#CAM_MODEL<TMPL_VAR CAMNO>").val() );
-					$( "#cam_user_url<TMPL_VAR CAMNO>" ).html($( "#CAM_USER<TMPL_VAR CAMNO>").val());
-					$( "#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val());
-					$( "#cam_name_url<TMPL_VAR CAMNO>" ).html( encodeURIComponent($( "#CAM_NAME<TMPL_VAR CAMNO>").val()));
-
-					$("#CAM_MODEL<TMPL_VAR CAMNO>").change(function()
-					{
-					 $( "#cam_type<TMPL_VAR CAMNO>" ).html($( "#CAM_MODEL<TMPL_VAR CAMNO>").val() );
-					});
-					$( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").keyup(function( event )
-					{
-					 cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),$( "#CAM_PORT<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>");
-					});
-					$( "#CAM_PORT<TMPL_VAR CAMNO>").keyup(function( event )
-					{
-					 cam_url($( "#CAM_HOST_OR_IP<TMPL_VAR CAMNO>").val(),$( "#CAM_PORT<TMPL_VAR CAMNO>").val(),"<TMPL_VAR CAMNO>");
-					});
-					$( "#CAM_USER<TMPL_VAR CAMNO>" ).keyup(function( event )
-					{
-					 $( "#cam_user_url<TMPL_VAR CAMNO>" ).html($("#CAM_USER<TMPL_VAR CAMNO>").val());
-					});
-					$( "#CAM_PASS<TMPL_VAR CAMNO>" ).keyup(function( event )
-					{
-					 $("#cam_pass_url<TMPL_VAR CAMNO>" ).html($( "#CAM_PASS<TMPL_VAR CAMNO>").val());
-					});
-					$( "#CAM_NAME<TMPL_VAR CAMNO>" ).keyup(function( event )
-					{
-					 $("#cam_name_url<TMPL_VAR CAMNO>").html( encodeURIComponent($( "#CAM_NAME<TMPL_VAR CAMNO>").val()));
-					 $('#CAM_LIST option[value="#camdiv<TMPL_VAR CAMNO>"]').text($("#CAM_NAME<TMPL_VAR CAMNO>").val());
-					 $('#CAM_LIST-button span').html("#<TMPL_VAR CAMNO> - " + $("#CAM_NAME<TMPL_VAR CAMNO>").val());
-
-					});
-					$( "#btntest<TMPL_VAR CAMNO>" ).click(function ()
-					{
- 					 $.ajax({url: '/plugins/<TMPL_VAR LBPPLUGINDIR>/get_notifications.php', type: 'GET', data: { 'package':'<TMPL_VAR LBPPLUGINDIR>', 'name':'<TMPL_VAR CC.MY_NAME>'} }).success(function(data) {  $( '#notifblock' ).html(data).trigger('create'); if ( data.length > 10 ) { $('#notifblock').scrollToMe(); } }) ;
-					 url2open = "http://<TMPL_VAR HTTP_HOST><TMPL_VAR HTTP_PATH>/?cam=<TMPL_VAR CAMNO>"; window.open(url2open,'<TMPL_VAR CC.MY_NAME><TMPL_VAR CAMNO>','status=no,scrollbars=no,titlebar=no,toolbar=no,menubar=no,location=no');
-					});
-
-					if ( "<TMPL_VAR CAM_NO_EMAIL>" == 1 )
-					{
-						$("#CAM_NO_EMAIL<TMPL_VAR CAMNO>").prop("checked", 1);
-						$( "label[for='CAM_NO_EMAIL<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
-						$( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).html('&no_email=<span style=\'color:#00C0C0\'>'+$('#CAM_NO_EMAIL<TMPL_VAR CAMNO>').val()+'</SPAN>');
-						$( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).prop('url','&no_email=' + $('#CAM_NO_EMAIL<TMPL_VAR CAMNO>').val())
-					}
-					else
-					{
-					 $( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).html(''); $( '#CAM_NO_EMAIL<TMPL_VAR CAMNO>' ).prop('url','')
-					};
-					if ( "<TMPL_VAR CAM_WATERMARK>" == 1 )
-					{
-						$("#CAM_WATERMARK<TMPL_VAR CAMNO>").prop("checked", 1);
-						$( "label[for='CAM_WATERMARK<TMPL_VAR CAMNO>']" ).removeClass( "ui-checkbox-off" ).addClass( "ui-checkbox-on" );
-						$( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).html('&watermark=<span style=\'color:#00C0C0\'>'+$('#CAM_WATERMARK<TMPL_VAR CAMNO>').val()+'</SPAN>');
-						$( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).prop('url','&watermark=' + $('#CAM_WATERMARK<TMPL_VAR CAMNO>').val())
-					}
-					else
-					{
-					 $( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).html(''); $( '#CAM_WATERMARK<TMPL_VAR CAMNO>' ).prop('url','')
-					};
-				 	$("#camdiv<TMPL_VAR CAMNO> :input").on('change', function(event)
-					{
-						$("#btntest<TMPL_VAR CAMNO>").css('display','none');
-						$("#btntestsavehint<TMPL_VAR CAMNO>").html('<TMPL_VAR CC.CAM_SAVE_BEFORE_TEST>');
-					});
-				 });
-				 </script>
-				</div>
+							</div>
+						</div>
 </TMPL_LOOP>
+
+					 <div style="display:table;">
+						<div style="display:table-row;">
+							<div style="display:table-cell; ">
+								<br><TMPL_VAR CC.LOG_AREA>
+								<div style="display:table; padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(19,172,132,.2);">
+							 		<div style="display:table-row;">
+										<div style="display:table-cell; border-radius: 5px;" id="delete_log_div">
+								 			<button id="delete_log_btn" onclick="$('#delete_log_div').css('background-color','yellow'); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_WAIT>'); $.ajax({url: '', type: 'GET', data: { 'delete_log':1},
+									            success: function (data) {
+									                $('#delete_log_div').css('background-color','green');
+									                $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_OK>');
+									                setTimeout( function() { $('#delete_log_div').css('background-color',''); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE>'); }, 2000);
+									            },
+									            error: function (textStatus, errorThrown) {
+									                $('#delete_log_div').css('background-color','red');
+									                $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_FAIL>');
+									                setTimeout( function() { $('#delete_log_div').css('background-color',''); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE>');}, 2000);
+									
+									            }	}); return false;" data-role="button" data-inline="true" data-mini="true"><TMPL_VAR CC.LOG_BUTTON_DELETE></button>
+										</div>
+										<div style="display:table-cell;">
+								 			<button onclick="window.open('/admin/system/tools/logfile.cgi?logfile=<TMPL_VAR LOGFILE>&amp;header=html&amp;format=template', 'log'); return false;" id="logview" data-role="button" data-inline="true" data-mini="true"><TMPL_VAR CC.LOG_BUTTON_VIEW></button>
+										</div>
+										<div style="display:table-cell;">
+								 			<select id="LOGLEVEL" name="LOGLEVEL" data-mini="true">
+												<option value="7" ><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL7></option>
+												<option value="4"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL4></option>
+												<option value="3"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL3></option>
+												<option value="2"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL2></option>
+								 			</select>
+								 			<SCRIPT> 
+								 				$("#LOGLEVEL").val('<TMPL_VAR LOGLEVEL>'); 
+			 					 	 			$("label").css("text-align","left").css("margin-top","8px").css("margin-bottom","-8px").css("margin-left","0px");
+											</SCRIPT>
+										</div>
+							 		</div>
+								</div>
+						 	</div>
+					 	</div>
+				 	</div>
 				 </center>
-				</form>
+			</form>
