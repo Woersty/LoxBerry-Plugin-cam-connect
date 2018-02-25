@@ -6,7 +6,7 @@
 #####################################################################################################
 
 // Error Reporting off
-error_reporting(~E_ALL & ~E_STRICT);     // Alle Fehler reporten (Außer E_STRICT)
+error_reporting(~E_ALL & ~E_STRICT);     // Alle Fehler reporten (AuÃŸer E_STRICT)
 ini_set("display_errors", false);        // Fehler nicht direkt via PHP ausgeben
 require_once "loxberry_system.php";
 require_once "loxberry_log.php";
@@ -52,7 +52,6 @@ function debug($message = "", $loglevel, $raw = 0)
 		{
 		  if ( isset($message) && $message != "" ) notify ( LBPPLUGINDIR, $L['CC.MY_NAME'], $message);
 		}
-
 	}
 	return;
 }
@@ -92,10 +91,10 @@ debug("Check Logfile size: ".LBPLOGDIR."/cam_connect.log",7);
 $logsize = filesize(LBPLOGDIR."/cam_connect.log");
 if ( $logsize > 5242880 )
 {
-    debug($L["ERROR_LOGFILE_TOO_BIG"]." (".$logsize." Bytes)",4);
+    debug($L["ERRORS.ERROR_LOGFILE_TOO_BIG"]." (".$logsize." Bytes)",4);
     debug("Set Logfile notification: ".LBPPLUGINDIR." ".$L['CC.MY_NAME']." => ".$L['ERRORS.ERROR_LOGFILE_TOO_BIG'],7);
-    notify ( LBPPLUGINDIR, $L['CC.MY_NAME'], $L['ERRORS.ERROR_LOGFILE_TOO_BIG']);
-    system("echo '' > ".LBPLOGDIR."/cam_connect.log");
+    notify ( LBPPLUGINDIR, $L['CC.MY_NAME'], $L["ERRORS.ERROR_LOGFILE_TOO_BIG"]." (".$logsize." Bytes)");
+	system("echo '' > ".LBPLOGDIR."/cam_connect.log");
 }
 else
 {
