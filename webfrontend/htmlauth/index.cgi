@@ -36,9 +36,9 @@ my $languagefile 				= "language.ini";
 my $logfile 					= "cam_connect.log";
 my $template_title;
 my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not readable. We must abort here. Please try to reinstall the plugin.";
-my $version 					= "2018.2.24";
+my $version 					= LoxBerry::System::pluginversion();
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
-my @pluginconfig_strings 		= ('LOGLEVEL','EMAIL_FILENAME');
+my @pluginconfig_strings 		= ('EMAIL_FILENAME');
 my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_EMAIL_FROM_NAME","CAM_EMAIL_SUBJECT1","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_SUBJECT2","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_SUBJECT3","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_NO_EMAIL_CB","CAM_WATERMARK_CB","CAM_EMAIL_USED_CB","CAM_EMAIL_MULTIPICS","CAM_EMAIL_INLINE_CB");
 my $cam_model_list				= "";
 my @lines						= [];	
@@ -48,20 +48,12 @@ my %Config 						= $plugin_cfg->vars() if ( $plugin_cfg );
 our $error_message				= "";
 
 # Logging
-if ( $plugin_cfg )
-{
-	LOGSTART "New admin call."      if int($Config{'default.LOGLEVEL'}) eq 7;
-	$log->loglevel(int($Config{'default.LOGLEVEL'}));
-	$LoxBerry::System::DEBUG 	= 1 if int($Config{'default.LOGLEVEL'}) eq 7;
-	$LoxBerry::Web::DEBUG 		= 1 if int($Config{'default.LOGLEVEL'}) eq 7;
-}
-else
-{
-	LOGSTART "New admin call.";
-	$log->loglevel(7);
-	$LoxBerry::System::DEBUG 	= 1;
-	$LoxBerry::Web::DEBUG 		= 1;
-}
+my $plugin = LoxBerry::System::plugindata();
+
+LOGSTART "New admin call."      if $plugin->{PLUGINDB_LOGLEVEL} eq 7;
+$LoxBerry::System::DEBUG 	= 1 if $plugin->{PLUGINDB_LOGLEVEL} eq 7;
+$LoxBerry::Web::DEBUG 		= 1 if $plugin->{PLUGINDB_LOGLEVEL} eq 7;
+$log->loglevel($plugin->{PLUGINDB_LOGLEVEL});
 
 LOGDEB "Init CGI and import names in namespace R::";
 my $cgi 	= CGI->new;
@@ -162,7 +154,6 @@ if (!-r $lbpconfigdir . "/" . $pluginconfigfile)
 	$error_message = $ERR{'ERRORS.ERR_CREATE CONFIG_FILE'};
 	open my $configfileHandle, ">", $lbpconfigdir . "/" . $pluginconfigfile or &error;
 		print $configfileHandle 'EMAIL_FILENAME="Snapshot"'."\n";
-		print $configfileHandle 'LOGLEVEL=2'."\n";
 	close $configfileHandle;
 	LOGWARN "Default config created. Display error anyway to force a page reload";
 	$error_message = $ERR{'ERRORS.ERR_NO_CONFIG_FILE'};
@@ -281,6 +272,8 @@ sub defaultpage
 	$maintemplate->param( "HTTP_HOST"		, $ENV{HTTP_HOST});
 	$maintemplate->param( "HTTP_PATH"		, "/plugins/" . $lbpplugindir);
 	$maintemplate->param( "cam_model_list"	, $cam_model_list);
+	$maintemplate->param( "VERSION"			, $version);
+	$maintemplate->param( "LOGLEVEL" 		, $L{"CC.LOGLEVEL".$plugin->{PLUGINDB_LOGLEVEL}});
 	$lbplogdir =~ s/$lbhomedir\/log\///; # Workaround due to missing variable for Logview
 	$maintemplate->param( "LOGFILE" , $lbplogdir . "/" . $logfile );
 	LOGDEB "Check for pending notifications for: " . $lbpplugindir . " " . $L{'CC.MY_NAME'};

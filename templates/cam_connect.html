@@ -410,7 +410,7 @@
 						<div style="display:table-row;">
 							<div style="display:table-cell; ">
 								<div style="display:table; padding:10px; border: 1px solid black; border-radius: 5px; background-color: rgba(19,172,132,.2);">
-								<TMPL_VAR CC.LOG_AREA><br>
+								<TMPL_VAR CC.LOG_AREA> (<TMPL_VAR CC.LOGLEVEL><TMPL_VAR LOGLEVEL>)<br>
 							 		<div style="display:table-row;">
 										<div style="display:table-cell; border-radius: 5px;" id="delete_log_div">
 								 			<button id="delete_log_btn" onclick="$('#delete_log_div').css('background-color','yellow'); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE_WAIT>'); $.ajax({url: '', type: 'GET', data: { 'delete_log':1},
@@ -428,16 +428,7 @@
 										</div>
 										<div style="display:table-cell;">
 								 			<button onclick="window.open('/admin/system/tools/logfile.cgi?logfile=<TMPL_VAR LOGFILE>&amp;header=html&amp;format=template', 'log'); return false;" id="logview" data-role="button" data-inline="true" data-mini="true"><TMPL_VAR CC.LOG_BUTTON_VIEW></button>
-										</div>
-										<div style="display:table-cell;">
-								 			<select id="LOGLEVEL" name="LOGLEVEL" data-mini="true">
-												<option value="7" ><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL7></option>
-												<option value="4"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL4></option>
-												<option value="3"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL3></option>
-												<option value="2"><TMPL_VAR CC.LOGLEVEL> <TMPL_VAR CC.LOGLEVEL2></option>
-								 			</select>
 								 			<SCRIPT> 
-								 				$("#LOGLEVEL").val('<TMPL_VAR LOGLEVEL>'); 
 			 					 	 			$("label").css("text-align","left").css("margin-top","8px").css("margin-bottom","-8px").css("margin-left","0px");
 											</SCRIPT>
 										</div>
@@ -448,3 +439,4 @@
 				 	</div>
 				 </center>
 			</form>
+<small><small><TMPL_VAR VERSION></small></small>
