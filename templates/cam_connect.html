@@ -30,9 +30,6 @@
 							 	</div>
 							</div>
 						</div>
-						<br>
-<TMPL_IF NOCAMS>
-						<div id="cam_headline"><b><TMPL_VAR CC.NO_CONFIGURED_CAMS_TEXT></b>
 							<div style="display:table;">
 								<div style="display:table-row;">
 									<div style="display:table-cell; text-align:center; white-space: nowrap;">
@@ -41,6 +38,9 @@
 								 	</div>
 								</div>
 							</div>
+						<br>
+<TMPL_IF NOCAMS>
+						<div id="cam_headline"><b><TMPL_VAR CC.NO_CONFIGURED_CAMS_TEXT></b>
 						</div>
 </TMPL_IF>
 <TMPL_IF SOMECAMS>
