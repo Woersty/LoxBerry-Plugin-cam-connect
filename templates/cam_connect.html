@@ -425,8 +425,6 @@
 									                setTimeout( function() { $('#delete_log_div').css('background-color',''); $('#delete_log_btn').html('<TMPL_VAR CC.LOG_BUTTON_DELETE>');}, 2000);
 									
 									            }	}); return false;" data-role="button" data-inline="true" data-mini="true"><TMPL_VAR CC.LOG_BUTTON_DELETE></button>
-										</div>
-										<div style="display:table-cell;">
 								 			<button onclick="window.open('/admin/system/tools/logfile.cgi?logfile=<TMPL_VAR LOGFILE>&amp;header=html&amp;format=template', 'log'); return false;" id="logview" data-role="button" data-inline="true" data-mini="true"><TMPL_VAR CC.LOG_BUTTON_VIEW></button>
 								 			<SCRIPT> 
 			 					 	 			$("label").css("text-align","left").css("margin-top","8px").css("margin-bottom","-8px").css("margin-left","0px");
