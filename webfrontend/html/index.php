@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 26.02.2018 07:43:41
+# Version: 28.02.2018 22:51:40
 #####################################################################################################
 
 // Error Reporting off
@@ -35,16 +35,27 @@ function debug($message = "", $loglevel, $raw = 0)
 		($raw == 1)?$message="<br>".$message:$message=$message;
 		switch ($loglevel)
 		{
+		    case 0:
+		        // OFF
+		        break;
+		    case 1:
+		        error_log( strftime("%A") ." <ALERT> PHP: ".$message );
+		        break;
 		    case 2:
 		    case 8:
-		        error_log( strftime("%A") ."<CRITICAL> PHP: ".$message );
-		        $loglevel=2;
+		        error_log( strftime("%A") ." <CRITICAL> PHP: ".$message );
 		        break;
 		    case 3:
-		        error_log( strftime("%A") ."<ERROR> PHP: ".$message );
+		        error_log( strftime("%A") ." <ERROR> PHP: ".$message );
 		        break;
 		    case 4:
-		        error_log( strftime("%A") ."<WARNING> PHP: ".$message );
+		        error_log( strftime("%A") ." <WARNING> PHP: ".$message );
+		        break;
+		    case 5:
+		        error_log( strftime("%A") ." <OK> PHP: ".$message );
+		        break;
+		    case 6:
+		        error_log( strftime("%A") ." <INFO> PHP: ".$message );
 		        break;
 		    case 7:
 		    default:
