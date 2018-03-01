@@ -268,7 +268,7 @@ sub defaultpage
 	LOGDEB "Set page title, load header, parse variables, set footer, end";
 	$template_title = $L{'CC.MY_NAME'};
 	LoxBerry::Web::lbheader($template_title, $helpurl, $helptemplatefilename);
-	$maintemplate->param( "CC.LOGO_ICON", get_plugin_icon(64) );
+	$maintemplate->param( "LOGO_ICON"		, get_plugin_icon(64) );
 	$maintemplate->param( "HTTP_HOST"		, $ENV{HTTP_HOST});
 	$maintemplate->param( "HTTP_PATH"		, "/plugins/" . $lbpplugindir);
 	$maintemplate->param( "cam_model_list"	, $cam_model_list);
