@@ -2,26 +2,24 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 28.02.2018 22:51:40
+# Version: 02.03.2018 23:13:22
 #####################################################################################################
 
 // Error Reporting off
-error_reporting(~E_ALL & ~E_STRICT);     // Alle Fehler reporten (Außer E_STRICT)
+error_reporting(~E_ALL & ~E_STRICT);     // Keine Fehler reporten (auch nicht E_STRICT)
 ini_set("display_errors", false);        // Fehler nicht direkt via PHP ausgeben
 require_once "loxberry_system.php";
 require_once "loxberry_log.php";
 $L = LBSystem::readlanguage("language.ini");
-ini_set("log_errors", 1);
-ini_set("error_log", LBPLOGDIR."/cam_connect.log");
-
 $plugindata = LBSystem::plugindata();
-$plugin_cfg["LOGLEVEL"] = $plugindata['PLUGINDB_LOGLEVEL'];
+ini_set("log_errors", 1);
+ini_set("error_log", $lbplogdir."/cam_connect.log");
 
 $datetime    = new DateTime;
-function debug($message = "", $loglevel, $raw = 0)
+function debug($message = "", $loglevel = 7, $raw = 0)
 {
-	global $plugin_cfg,$L;
-	if ( intval($plugin_cfg["LOGLEVEL"]) >= intval($loglevel)  || $loglevel == 8 )
+	global $L,$plugindata;
+	if ( $plugindata['PLUGINDB_LOGLEVEL'] >= intval($loglevel)  || $loglevel == 8 )
 	{
 		if (isset($_GET['cam']))
 		{
@@ -31,8 +29,7 @@ function debug($message = "", $loglevel, $raw = 0)
 		{
 			$camprefix="";
 		}
-		$message = $camprefix.$message;
-		($raw == 1)?$message="<br>".$message:$message=$message;
+		if ( $raw != 1 ) $message = $camprefix.$message;
 		switch ($loglevel)
 		{
 		    case 0:
@@ -89,6 +86,7 @@ if ($plugin_cfg_handle)
       $config_line = explode('=', $line_of_text);
       if ($config_line[0])
       {
+      	if (!isset($config_line[1])) $config_line[1] = "";
         $plugin_cfg[$config_line[0]]=preg_replace('/\r?\n|\r/','', str_ireplace('"','',$config_line[1]));
       }
     }
@@ -100,7 +98,7 @@ else
   debug("No plugin config file handle found.",7);
   error_image($L["ERRORS.ERROR_READING_CFG"]);
 }
-debug("Entering plugin for ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
+debug($L["ERRORS.ERROR_ENTER_PLUGIN"]." ".$_SERVER['REMOTE_ADDR']."\n+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + ",5);
 debug("Check Logfile size: ".LBPLOGDIR."/cam_connect.log",7);
 $logsize = filesize(LBPLOGDIR."/cam_connect.log");
 if ( $logsize > 5242880 )
@@ -145,7 +143,7 @@ $lines_of_text = file ( $camera_models_file );
         $plugin_cfg['httpauth'] = $config_line[4];
         $plugin_cfg['imagepath'] = $config_line[3];
         $plugin_cfg['model']     = $config_line[2];
-		debug("Found the camera we're looking for at line " . $line_num + 1 .": ".$line_of_text,7);
+		debug( $L["ERRORS.ERROR_CAM_FOUND"] . " ". ( $line_num + 1 ) . "\n" . $line_of_text ,5);
 		debug("Stop reading camera file",7);
         break;
       }
@@ -192,7 +190,7 @@ if ($plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1)
   }
   else
   {
-    debug("eMail config found, assuming it's okay. Using Server: ".$mail_cfg['SMTP']['SMTPSERVER']." on port: ".$mail_cfg['SMTP']['PORT'],7);
+    debug($L["ERRORS.ERROR_EMAIL_CONFIG_OK"]." [".$mail_cfg['SMTP']['SMTPSERVER'].":".$mail_cfg['SMTP']['PORT']."]",5);
     if ( $mail_cfg['SMTP']['ISCONFIGURED'] == "0" )
     {
      debug("eMail ist not configured: SMTP.ISCONFIGURED is 0",7);
@@ -202,7 +200,7 @@ if ($plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1)
 }
 else
 {
-  debug("Parameter CAM_EMAIL_USED_CB is not set for camera $cam, ignoring eMail config file.",7);
+debug($L["ERRORS.ERROR_EMAIL_NOT_USED"],5);
 }
 
 if (isset($plugin_cfg['CAM_NAME'.$cam]) && $plugin_cfg['CAM_NAME'.$cam] != "")
@@ -236,9 +234,9 @@ debug("Using user: ".$plugin_cfg['user'],7);
 $plugin_cfg['pass'] = addslashes($plugin_cfg['CAM_PASS'.$cam]);
 debug("Using pass: ".$plugin_cfg['pass'],7);
 
-function get_image($retry)
+function get_image($retry=0)
 {
-	global $plugin_cfg, $curl, $lbpplugindir, $L, $cam;
+	global $plugin_cfg, $curl, $lbpplugindir, $L, $cam, $plugindata;
 	$retry=intval($retry);
 	debug("Function get_image called ($retry) for camera $cam with hostname/IP: ".$plugin_cfg['CAM_HOST_OR_IP'.$cam],7);
     $curl = curl_init() or error_image($L["ERRORS.ERROR_INIT_CURL"]);
@@ -291,7 +289,7 @@ function get_image($retry)
 		else
 		{
 		  debug("Image successfully read from the camera.",7);
-		  if ( $plugin_cfg["LOGLEVEL"] == 7 )
+		  if ( $plugindata['PLUGINDB_LOGLEVEL'] == 7 )
 		  {
 		  	$finfo 	= 	new finfo(FILEINFO_MIME);
 		  	$type 	= 	explode(';',$finfo->buffer($picture),2)[0];
@@ -311,11 +309,12 @@ function get_image($retry)
 	debug("Check, if the picture has less than 2000 bytes - then it's no picture.",7);
 	if(mb_strlen($picture) < 2000)
 	{
+	  debug($L["ERRORS.ERROR_IMAGE_TOO_SMALL"]."\n".htmlentities($picture),5);
 	  error_image($L["ERRORS.ERROR_IMAGE_TOO_SMALL"]."\n".$picture);
 	}
 	else
 	{
-	  debug("Image ok, ".mb_strlen($picture)." Bytes.",7);
+	  debug($L["ERRORS.ERROR_PIC_OK"]." [".mb_strlen($picture)." Bytes]",5);
 	  return $picture;
 	}
 }
@@ -360,7 +359,7 @@ function stream()
 					        debug("Fail again, try last time",7);
 							$picture = get_image();
 						}
-				        debug("Send frame to ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
+				        debug("Send frame to ".$_SERVER['REMOTE_ADDR'],7);
 						echo $picture;
 						print "--$boundary\n";
 					}
@@ -384,7 +383,7 @@ function stream()
 					        debug("Fail again, try last time",7);
 							$picture = get_image();
 						}
-				        debug("Send frame $maxloops to ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REMOTE_HOST'],7);
+				        debug("Send frame $maxloops to ".$_SERVER['REMOTE_ADDR'],7);
 						echo $picture;
 						print "--$boundary\n";
 						$maxloops = $maxloops - 1;
@@ -396,7 +395,7 @@ function stream()
 
 function main()
 {
-	global $plugin_cfg, $curl, $lbpplugindir, $L, $cam;
+	global $plugin_cfg, $curl, $lbpplugindir, $L, $cam, $plugindata;
 	debug("Function 'main' reached",7);
 	debug("Call get_image() fist time",7);
 	$picture = get_image();
@@ -424,7 +423,7 @@ function main()
     ob_start();
     ImageJPEG($watermarked_picture) or error_image($L["ERRORS.ERROR_BUILD_JPEG"]);
     $picture = ob_get_contents();
-	if ( $plugin_cfg["LOGLEVEL"] == 7 )
+	if ( $plugindata['PLUGINDB_LOGLEVEL'] == 7 )
 	{
 		if (!isset($_GET['stream']))
 		{
@@ -483,7 +482,7 @@ list($picture ,$resized_picture ) = main();
   debug("No, streaming mode is not wanted, so continue normally.",7);
   if ( !isset($plugin_cfg['CAM_IMAGE_RESIZE'.$cam]) || $plugin_cfg['CAM_IMAGE_RESIZE'.$cam] == 0 )
   {
-    debug("No picture wanted, display a text instead:".$L['CC.IMAGE_RESIZE_JUST_TEXT_MSG'],7);
+    debug($L["ERRORS.ERROR_NO_PIC_WANTED"]." ".$L['CC.IMAGE_RESIZE_JUST_TEXT_MSG'],5);
 	ob_end_clean();
 	header("Connection: close");
 	ignore_user_abort(true); // just to be safe
@@ -497,14 +496,14 @@ list($picture ,$resized_picture ) = main();
   }
   else
   {
-    debug("Picture wanted, display it now.",7);
+    debug($L["ERRORS.ERROR_PIC_WANTED"],5);
     header ('Content-type: image/jpeg');
     header ("Cache-Control: no-cache, no-store, must-revalidate");
     header ("Pragma: no-cache");
     header ("Expires: ".gmdate('D, d M Y H:i:s', time()-3600) . " GMT");
     header ('Content-Disposition: inline; filename="'.$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s").'.jpg"');
     debug("Picture wanted, display it now.",7);
-	if ( $plugin_cfg["LOGLEVEL"] == 7 )
+	if ( $plugindata['PLUGINDB_LOGLEVEL'] == 7 )
 	{
 		$finfo 	= 	new finfo(FILEINFO_MIME);
 		$type 	= 	explode(';',$finfo->buffer($resized_picture),2)[0];
@@ -520,8 +519,8 @@ list($picture ,$resized_picture ) = main();
 		}
 	}
 	ob_end_clean();
-	header("Connection: close");
 	ignore_user_abort(true); 
+	header("Connection: close");
 	ob_start();
 	echo $resized_picture;
 	$size = ob_get_length();
@@ -537,7 +536,7 @@ list($picture ,$resized_picture ) = main();
 	debug("Check if sending eMail is enabled",7);
 	if ( $plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1 && $mail_cfg['SMTP']['ISCONFIGURED'] == 1 && $plugin_cfg['CAM_NO_EMAIL_CB'.$cam] == 0 )
 	{
-		debug("Sending email because 'CAM_EMAIL_USED_CB' is set in config and SMTP server is configured and 'CAM_NO_EMAIL_CB' parameter is not set.",7);
+		debug($L["ERRORS.ERROR_SEND_EMAIL_INFO"],5);
 		$sent = send_mail_pic($picture);
 	}
 	else
@@ -549,12 +548,12 @@ list($picture ,$resized_picture ) = main();
 	}
 
 
-debug("Exit plugin normally now.",7);
+debug($L["ERRORS.ERROR_EXIT_PLUGIN_INFO"]."\n+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + ",5);
 exit;
 
 function error_image ($error_msg)
 {
-  global $L;
+  global $L, $plugin_cfg, $plugindata;
   if (strlen($error_msg) > 0)
   {
   	$error_msg=$error_msg;
@@ -571,6 +570,7 @@ function error_image ($error_msg)
   $text_color       = ImageColorAllocate ($error_image, 255, 0, 0);
   $line_height		= 20;
   $line_pos         = 50;
+  $line_nb			= "";
   foreach (explode("\n",$error_msg ) as $err_line)
   {
   	if ($err_line != "") 
@@ -578,7 +578,7 @@ function error_image ($error_msg)
 		$err_line = str_ireplace(array("\r\n","\r","\n",'\r\n','\r','\n'),'', $err_line);
 	  	$line_pos = $line_pos + $line_height; 
 		ImageString ($error_image, 20, 10, $line_pos, $line_nb.$err_line, $text_color);
-	    if ( !isset($line_nb) ) $text_color = ImageColorAllocate ($error_image, 128,128,128);
+	    if ( $line_nb == "" ) $text_color = ImageColorAllocate ($error_image, 128,128,128);
 	  	$line_nb++;
 	}
   }
@@ -587,7 +587,7 @@ function error_image ($error_msg)
   header ("Pragma: no-cache");
   header ("Expires: 0");
   ImageJPEG ($error_image);
-	if ( $plugin_cfg["LOGLEVEL"] == 7 )
+	if ( $plugindata['PLUGINDB_LOGLEVEL'] == 7 )
 	{
 		$finfo 	= 	new finfo(FILEINFO_MIME);
 		$type 	= 	explode(';',$finfo->buffer(ImageJPEG ($error_image)),2)[0];
@@ -610,7 +610,7 @@ function error_image ($error_msg)
 function send_mail_pic($picture)
 {
   debug("Function send_mail_pic reached",7);
-  global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $L, $cam;
+  global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $L, $cam, $plugindata;
   
 	// Prevent sending eMails as long as stream is read from Miniserver
 	// 10 s delay minimum
@@ -623,12 +623,12 @@ function send_mail_pic($picture)
 		{
 			if ( ($datetime->getTimestamp() - filectime($lockfilename)) > 10  )
 			{
-				debug( "Lockfile $filename was changed ". ($datetime->getTimestamp() - filectime($lockfilename)) ." seconds ago. Too old, delete it and send eMail." ,7);
+				debug( "Lockfile $lockfilename was changed ". ($datetime->getTimestamp() - filectime($lockfilename)) ." seconds ago. Too old, delete it and send eMail." ,7);
 				unlink ($lockfilename) or debug($L["ERRORS.ERROR_DELETE_LOCKFILE_EMAIL"]." ".$lockfilename,3);
 			}
 			else
 			{
-				debug( "Lockfile $filename was changed ". ($datetime->getTimestamp() - filectime($lockfilename)) ." seconds ago. Not old enough, keeping it, refresh it, and send no eMail." ,7);
+				debug( "Lockfile $lockfilename was changed ". ($datetime->getTimestamp() - filectime($lockfilename)) ." seconds ago. Not old enough, keeping it, refresh it, and send no eMail." ,7);
 			    $handle = fopen($lockfilename, "w") or debug($L["ERRORS.ERROR_OPEN_LOCKFILE_EMAIL"]." ".$lockfilename,3);
 			    fwrite($handle, $datetime->getTimestamp() ) or debug($L["ERRORS.ERROR_WRITE_LOCKFILE_EMAIL"]." ".$lockfilename,3);
 				exit;
@@ -664,7 +664,7 @@ function send_mail_pic($picture)
       return "Plugin-Error: [No Sender eMail address found]";
   }
    	debug("Adding recipients from config file: ".$plugin_cfg['CAM_RECIPIENTS'.$cam],7);
-
+	  $mailTo="";
       foreach (explode(";",$plugin_cfg['CAM_RECIPIENTS'.$cam]) as $recipients_data)
       {
         debug("Recipient(s): ".$recipients_data,7);
@@ -696,10 +696,13 @@ else
 	debug("Parameter CAM_EMAIL_MULTIPICS missing, use default: Send 1 picture.",7);
 }
 
-$outer_boundary= md5("o".$cam.date());
-$inner_boundary= md5("i".$cam.date());
+$outer_boundary= md5("o".$cam.time());
+$inner_boundary= md5("i".$cam.time());
 $htmlpic="";
 $mailTo = substr($mailTo,0,-1);
+
+debug($L["ERROR_SEND_MAIL_INFO"]." From: ".$mailFromName.htmlentities(" <".$mailFrom."> ")." To: ".$mailTo,5);
+
 $html = "From: ".$mailFromName." <".$mailFrom.">
 To: ".$mailTo."
 Subject: ".utf8_encode($emailSubject)." 
@@ -731,7 +734,7 @@ Content-Transfer-Encoding: 8bit
   <body text=\"#000000\" bgcolor=\"#FFFFFF\">
   
     <font face=\"Verdana\">".$plugin_cfg["CAM_EMAIL_BODY".$cam]."<br>";
-
+$htmlpicdata="";
 for ($i = 1; $i <= $pics; $i++) 
 {
 	debug("Add picture $i of $pics.",7);
@@ -754,7 +757,7 @@ for ($i = 1; $i <= $pics; $i++)
     $email_image_part ="\n";
   }
 	
-    debug("Boundary for picture $i of $pics is: ".$outer_boundary,7);
+     debug("Boundary for picture $i of $pics is: ".$outer_boundary,7);
 	 $newwidth = $plugin_cfg['CAM_EMAIL_RESIZE'.$cam];
 	 debug("Check if resize value is valid.",7);
 	 if ($newwidth >= 240)
