@@ -1,5 +1,4 @@
 
 echo "Restart Apache because of new GD libs"
-systemctl restart apache2
-
+echo `sleep 30;systemctl restart apache2`&
 exit 0
