@@ -365,7 +365,7 @@ sub defaultpage
 			}
 			else
 			{
-				LOGDEB "Setting CAM configuration variable [" . $suggestion_field . $camno . "] to value (" . $L{ "CC." . $suggestion_field . "_SUGGESTION" } . ")";
+				LOGDEB "Setting CAM configuration variable [" . $suggestion_field . $camno . "] to value (" . uri_unescape($plugin_cfg->param($suggestion_field . $camno)) . ")";
 				$cam{$suggestion_field}	= uri_unescape($plugin_cfg->param($suggestion_field . $camno));
 			}
 		}
