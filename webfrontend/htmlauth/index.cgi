@@ -64,7 +64,7 @@ if ( $R::delete_log )
 	LOGDEB "Oh, it's a log delete call. ".$R::delete_log;
 	LOGWARN "Delete Logfile: ".$logfile;
 	my $logfile = $log->close;
-	system("/usr/bin/date > $logfile");
+	system("/bin/date > $logfile");
 	$log->open;
 	LOGSTART "Logfile restarted.";
 	print "Content-Type: text/plain\n\nOK";
