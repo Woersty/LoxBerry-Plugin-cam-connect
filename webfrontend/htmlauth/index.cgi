@@ -295,6 +295,7 @@ sub defaultpage
 	{
 		$maintemplate->param( "SOMECAMS", 1);
 	}
+	$R::create_cam if (0);
 	if ( $R::create_cam )
 	{
 		LOGDEB "Oh, it's a create_cam call. ";
