@@ -75,7 +75,7 @@ if ( !function_exists (@ImageCreate) )
 }
 
 $plugin_config_file = LBPCONFIGDIR."/cam-connect.cfg";
-$plugin_cfg_handle    = fopen($plugin_config_file, "r") or debug($L["ERRORS.ERROR_READING_CFG"],8); ;
+$plugin_cfg_handle    = fopen($plugin_config_file, "r") or debug($L["ERRORS.ERROR_READING_CFG"],4); ;
 if ($plugin_cfg_handle)
 {
   while (!feof($plugin_cfg_handle))
