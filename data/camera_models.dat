@@ -16,11 +16,11 @@
 16|Ubiquiti|UniFi G3|/snap.jpeg|CURLAUTH_ANY
 17|Mobotix|T24|/record/current.jpg|CURLAUTH_ANY
 18|Grandstream|GDS3710 IP (testing)|/snapshot/view8.jpg|CURLAUTH_DIGEST
-19|Videra|NVD Channel 1|/cgi-bin/snapshot.cgi?channel=channel1
-20|Videra|NVD Channel 2|/cgi-bin/snapshot.cgi?channel=channel2
-21|Videra|NVD Channel 3|/cgi-bin/snapshot.cgi?channel=channel3
-22|Videra|NVD Channel 4|/cgi-bin/snapshot.cgi?channel=channel4
-23|Videra|NVD Channel 5|/cgi-bin/snapshot.cgi?channel=channel5
-24|Videra|NVD Channel 6|/cgi-bin/snapshot.cgi?channel=channel6
-25|Videra|NVD Channel 7|/cgi-bin/snapshot.cgi?channel=channel7
-26|Videra|NVD Channel 8|/cgi-bin/snapshot.cgi?channel=channel8
+19|Videra|NVD Channel 1|/cgi-bin/snapshot.cgi?channel=channel1|CURLAUTH_DIGEST
+20|Videra|NVD Channel 2|/cgi-bin/snapshot.cgi?channel=channel2|CURLAUTH_DIGEST
+21|Videra|NVD Channel 3|/cgi-bin/snapshot.cgi?channel=channel3|CURLAUTH_DIGEST
+22|Videra|NVD Channel 4|/cgi-bin/snapshot.cgi?channel=channel4|CURLAUTH_DIGEST
+23|Videra|NVD Channel 5|/cgi-bin/snapshot.cgi?channel=channel5|CURLAUTH_DIGEST
+24|Videra|NVD Channel 6|/cgi-bin/snapshot.cgi?channel=channel6|CURLAUTH_DIGEST
+25|Videra|NVD Channel 7|/cgi-bin/snapshot.cgi?channel=channel7|CURLAUTH_DIGEST
+26|Videra|NVD Channel 8|/cgi-bin/snapshot.cgi?channel=channel8|CURLAUTH_DIGEST
