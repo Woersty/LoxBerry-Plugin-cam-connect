@@ -24,3 +24,4 @@
 24|Videra|NVD Channel 6|/cgi-bin/snapshot.cgi?channel=channel6|CURLAUTH_DIGEST
 25|Videra|NVD Channel 7|/cgi-bin/snapshot.cgi?channel=channel7|CURLAUTH_DIGEST
 26|Videra|NVD Channel 8|/cgi-bin/snapshot.cgi?channel=channel8|CURLAUTH_DIGEST
+27|Techage|IPC-DM13E-20SC|/webcapture.jpg?command=snap&channel=1|CURLAUTH_DIGEST
