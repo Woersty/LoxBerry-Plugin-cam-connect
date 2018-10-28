@@ -15,7 +15,6 @@
 15|Luna|DVR27108-4MP Channel 8|/cgi-bin/snapshot.cgi?channel=8|CURLAUTH_DIGEST
 16|Ubiquiti|UniFi G3|/snap.jpeg|CURLAUTH_ANY
 17|Mobotix|T24|/record/current.jpg|CURLAUTH_ANY
-18|Grandstream|GDS3710 IP (testing)|/snapshot/view8.jpg|CURLAUTH_DIGEST
 19|Videra|NVD Channel 1|/cgi-bin/snapshot.cgi?channel=channel1|CURLAUTH_DIGEST
 20|Videra|NVD Channel 2|/cgi-bin/snapshot.cgi?channel=channel2|CURLAUTH_DIGEST
 21|Videra|NVD Channel 3|/cgi-bin/snapshot.cgi?channel=channel3|CURLAUTH_DIGEST
@@ -25,3 +24,15 @@
 25|Videra|NVD Channel 7|/cgi-bin/snapshot.cgi?channel=channel7|CURLAUTH_DIGEST
 26|Videra|NVD Channel 8|/cgi-bin/snapshot.cgi?channel=channel8|CURLAUTH_DIGEST
 27|Techage|IPC-DM13E-20SC|/webcapture.jpg?command=snap&channel=1|CURLAUTH_DIGEST
+28|Axis|M3114|/jpg/image.jpg|CURLAUTH_DIGEST
+29|Axis|M3017 View 1|/axis-cgi/jpg/image.cgi?camera=1|CURLAUTH_DIGEST
+30|Axis|M3017 View 2|/axis-cgi/jpg/image.cgi?camera=2|CURLAUTH_DIGEST
+31|Axis|M3017 View 3|/axis-cgi/jpg/image.cgi?camera=3|CURLAUTH_DIGEST
+32|Axis|M3017 View 4|/axis-cgi/jpg/image.cgi?camera=4|CURLAUTH_DIGEST
+33|Axis|M3017 View 5|/axis-cgi/jpg/image.cgi?camera=5|CURLAUTH_DIGEST
+34|Axis|M3017 View 6|/axis-cgi/jpg/image.cgi?camera=6|CURLAUTH_DIGEST
+35|Axis|M3017 View 7|/axis-cgi/jpg/image.cgi?camera=7|CURLAUTH_DIGEST
+36|Axis|M3017 View 8|/axis-cgi/jpg/image.cgi?camera=8|CURLAUTH_DIGEST
+37|Axis|M3017 View 9|/axis-cgi/jpg/image.cgi?camera=9|CURLAUTH_DIGEST
+38|Axis|M3017 View 10|/axis-cgi/jpg/image.cgi?camera=10|CURLAUTH_DIGEST
+39|Axis|M3017 View 11|/axis-cgi/jpg/image.cgi?camera=11|CURLAUTH_DIGEST
