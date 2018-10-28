@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 02.03.2018 23:13:22
+# Version: 28.10.2018 19:06:58
 #####################################################################################################
 
 // Error Reporting off
@@ -296,8 +296,8 @@ function get_image($retry=0)
 		  	debug("Type: ".$type." Size: ".strlen($picture)." Bytes",7);
 			if (!isset($_GET['stream']))
 			{
-			  	 debug("<img src='data:".$type.";base64,".base64_encode($picture)."'></>",7);
-			  	 debug("<img src='data:".$type.";base64,".base64_encode($picture)."'></>",7,1);
+			  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($picture))."'></>",7);
+			  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($picture))."'></>",7,1);
 			}
 			else
 			{
@@ -427,8 +427,8 @@ function main()
 	{
 		if (!isset($_GET['stream']))
 		{
-		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".base64_encode($picture)."'></>",7);
-		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".base64_encode($picture)."'></>",7,1);
+		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".chunk_split(base64_encode($picture))."'></>",7);
+		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".chunk_split(base64_encode($picture))."'></>",7,1);
 		}
 		else
 		{
@@ -510,8 +510,8 @@ list($picture ,$resized_picture ) = main();
 		debug("Type: ".$type." Size: ".strlen($resized_picture)." Bytes",7);
 		if (!isset($_GET['stream']))
 		{
-		  	 debug("<img src='data:".$type.";base64,".base64_encode($resized_picture)."'></>",7);
-		  	 debug("<img src='data:".$type.";base64,".base64_encode($resized_picture)."'></>",7,1);
+		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($resized_picture))."'></>",7);
+		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($resized_picture))."'></>",7,1);
 		}
 		else
 		{
@@ -594,8 +594,8 @@ function error_image ($error_msg)
 		debug("Type: ".$type." Size: ".strlen(ImageJPEG ($error_image))." Bytes",7);
 		if (!isset($_GET['stream']))
 		{
-		  	 debug("<img src='data:".$type.";base64,".base64_encode(ImageJPEG ($error_image))."'></>",7);
-		  	 debug("<img src='data:".$type.";base64,".base64_encode(ImageJPEG ($error_image))."'></>",7,1);
+		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode(ImageJPEG ($error_image)))."'></>",7);
+		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode(ImageJPEG ($error_image)))."'></>",7,1);
 		}
 		else
 		{
@@ -786,7 +786,7 @@ Content-Transfer-Encoding: base64
 Content-ID: <".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."_".$i.">
 Content-Disposition: ".$inline."; filename=\"".$plugin_cfg['EMAIL_FILENAME']."_".$datetime->format("Y-m-d_i\hh\mH\s")."_".$i.".jpg\"
 
-".base64_encode($picture)."\n";
+".chunk_split(base64_encode($picture))."\n";
 
 }
 
