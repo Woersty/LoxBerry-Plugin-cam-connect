@@ -2,7 +2,7 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 28.10.2018 19:06:58
+# Version: 27.12.2018 16:56:06
 #####################################################################################################
 
 // Error Reporting off
@@ -180,9 +180,28 @@ if (isset($_GET['stream']))			{ debug($L["ERRORS.ERROR_GET_PARAM_STREAM"],4);			
 debug("Read LoxBerry global eMail config",7);
 if ($plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1) 
 {
-  $mail_config_file   = LBSCONFIGDIR."/mail.cfg";
-  debug("Parameter CAM_EMAIL_USED_CB is set for camera $cam, read eMail config from ".$mail_config_file,7);
-  $mail_cfg    = parse_ini_file($mail_config_file,true);
+	$mail_config_file   = LBSCONFIGDIR."/mail.json";
+	if (is_readable($mail_config_file)) 
+	{
+		debug("Parameter CAM_EMAIL_USED_CB is set for camera $cam, read eMail config from ".$mail_config_file,5);
+		$mail_cfg  = json_decode(file_get_contents($mail_config_file), true);
+	}
+	else
+	{
+		debug("Cannot read eMail config from ".$mail_config_file,7);
+		$mail_config_file   = LBSCONFIGDIR."/mail.cfg";
+		debug("Try to find deprecated config prior LoxBerry v1.4.x in ".$mail_config_file,7);
+		if (is_readable($mail_config_file)) 
+		{
+			debug("Parameter CAM_EMAIL_USED_CB is set for camera $cam, read eMail config from ".$mail_config_file,5);
+			$mail_cfg    = parse_ini_file($mail_config_file,true);
+		}
+		else
+		{
+			debug("Cannot read eMail config from ".$mail_config_file,7);
+		}
+	}
+
   if ( !isset($mail_cfg) )
   {
      debug("Can't read eMail config",7);
@@ -296,8 +315,7 @@ function get_image($retry=0)
 		  	debug("Type: ".$type." Size: ".strlen($picture)." Bytes",7);
 			if (!isset($_GET['stream']))
 			{
-			  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($picture))."'></>",7);
-			  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($picture))."'></>",7,1);
+			  	 debug("\n<img src='data:".$type.";base64,".base64_encode($picture)."'></>",7);
 			}
 			else
 			{
@@ -427,8 +445,7 @@ function main()
 	{
 		if (!isset($_GET['stream']))
 		{
-		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".chunk_split(base64_encode($picture))."'></>",7);
-		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".chunk_split(base64_encode($picture))."'></>",7,1);
+		  	debug("Converted picture:\n<img src='data:image/jpeg;base64,".base64_encode($picture)."'></>",7);
 		}
 		else
 		{
@@ -510,8 +527,7 @@ list($picture ,$resized_picture ) = main();
 		debug("Type: ".$type." Size: ".strlen($resized_picture)." Bytes",7);
 		if (!isset($_GET['stream']))
 		{
-		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($resized_picture))."'></>",7);
-		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode($resized_picture))."'></>",7,1);
+		  	 debug("\n<img src='data:".$type.";base64,".base64_encode($resized_picture)."'></>",7);
 		}
 		else
 		{
@@ -594,8 +610,7 @@ function error_image ($error_msg)
 		debug("Type: ".$type." Size: ".strlen(ImageJPEG ($error_image))." Bytes",7);
 		if (!isset($_GET['stream']))
 		{
-		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode(ImageJPEG ($error_image)))."'></>",7);
-		  	 debug("<img src='data:".$type.";base64,".chunk_split(base64_encode(ImageJPEG ($error_image)))."'></>",7,1);
+		  	 debug("\n<img src='data:".$type.";base64,".base64_encode(ImageJPEG ($error_image))."'></>",7);
 		}
 		else
 		{
