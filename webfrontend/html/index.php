@@ -210,11 +210,11 @@ if ($plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1)
   else
   {
     debug($L["ERRORS.ERROR_EMAIL_CONFIG_OK"]." [".$mail_cfg['SMTP']['SMTPSERVER'].":".$mail_cfg['SMTP']['PORT']."]",5);
-    if ( $mail_cfg['SMTP']['ISCONFIGURED'] == "0" )
-    {
-     debug("eMail ist not configured: SMTP.ISCONFIGURED is 0",7);
-     error_image($L["ERRORS.ERROR_INVALID_EMAIL_CFG"]);
-    }
+#    if ( $mail_cfg['SMTP']['ISCONFIGURED'] == "0" )
+#    {
+#     debug("eMail ist not configured: SMTP.ISCONFIGURED is 0",7);
+#     error_image($L["ERRORS.ERROR_INVALID_EMAIL_CFG"]);
+#    }
   }
 }
 else
