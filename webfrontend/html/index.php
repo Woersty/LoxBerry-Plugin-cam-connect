@@ -210,9 +210,9 @@ if ($plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1)
   else
   {
     debug($L["ERRORS.ERROR_EMAIL_CONFIG_OK"]." [".$mail_cfg['SMTP']['SMTPSERVER'].":".$mail_cfg['SMTP']['PORT']."]",5);
-    if ( $mail_cfg['SMTP']['ACTIVATE_EMAIL'] == "0" )
+    if ( $mail_cfg['SMTP']['ACTIVATE_MAIL'] == "0" )
     {
-     debug("eMail ist not activated: SMTP.ACTIVATE_EMAIL is 0",7);
+     debug("eMail ist not activated: SMTP.ACTIVATE_MAIL is 0",7);
      error_image($L["ERRORS.ERROR_INVALID_EMAIL_CFG"]);
     }
   }
@@ -552,7 +552,7 @@ list($picture ,$resized_picture ) = main();
 	debug("############# eMail Part reached ####################",7);
 
 	debug("Check if sending eMail is enabled",7);
-	if ( $plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1 && $mail_cfg['SMTP']['ACTIVATE_EMAIL'] == 1 && $plugin_cfg['CAM_NO_EMAIL_CB'.$cam] == 0 )
+	if ( $plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1 && $mail_cfg['SMTP']['ACTIVATE_MAIL'] == 1 && $plugin_cfg['CAM_NO_EMAIL_CB'.$cam] == 0 )
 	{
 		debug($L["ERRORS.ERROR_SEND_EMAIL_INFO"],5);
 		$sent = send_mail_pic($picture);
@@ -561,7 +561,7 @@ list($picture ,$resized_picture ) = main();
 	{
 		debug("Do not send email because 'CAM_EMAIL_USED_CB' is not set in config or SMTP server is not configured or 'CAM_NO_EMAIL_CB' parameter is set.",7);
 		if (isset($plugin_cfg['CAM_EMAIL_USED_CB'.$cam])) debug("CFG parameter 'CAM_EMAIL_USED_CB' is: ".$plugin_cfg['CAM_EMAIL_USED_CB'.$cam],7);
-		if (isset($mail_cfg['SMTP']['ACTIVATE_EMAIL'])) debug("CFG parameter 'SMTP.ACTIVATE_EMAIL' is: ".$mail_cfg['SMTP']['ACTIVATE_EMAIL'],7);
+		if (isset($mail_cfg['SMTP']['ACTIVATE_MAIL'])) debug("CFG parameter 'SMTP.ACTIVATE_MAIL' is: ".$mail_cfg['SMTP']['ACTIVATE_MAIL'],7);
 		if (isset($plugin_cfg['CAM_NO_EMAIL_CB'.$cam])) debug("CFG parameter 'CAM_NO_EMAIL_CB' is: ".$plugin_cfg['CAM_NO_EMAIL_CB'.$cam],7);
 	}
 
