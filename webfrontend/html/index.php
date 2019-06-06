@@ -289,6 +289,8 @@ function get_image($retry=0)
 	{
 	  debug("It's no 'Digitus DN-16049' but a ". $plugin_cfg['model'] ." camera - continue normally",7);
 	  debug("Get the image from the camera: ".$plugin_cfg['url'],7);
+	  debug("User is ".$plugin_cfg['user'],7);
+	  debug("Password is ".$plugin_cfg['pass'],7);
 	  $picture = curl_exec($curl) or debug($L["ERRORS.ERROR_CURL"]." ".$plugin_cfg['url'],3);
 	    if ($curl) { curl_close($curl); }
 
