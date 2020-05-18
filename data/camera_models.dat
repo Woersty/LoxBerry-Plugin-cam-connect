@@ -37,3 +37,4 @@
 38|Axis|M3017 View 10|/axis-cgi/jpg/image.cgi?camera=10|CURLAUTH_DIGEST
 39|Axis|M3017 View 11|/axis-cgi/jpg/image.cgi?camera=11|CURLAUTH_DIGEST
 40|Dahua|SD1A203T-GN|/cgi-bin/snapshot.cgi|CURLAUTH_DIGEST
+41|Edimax|IC-5150W|/jpg/image.jpg|CURLAUTH_DIGEST
