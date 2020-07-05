@@ -39,3 +39,4 @@
 40|Dahua|SD1A203T-GN|/cgi-bin/snapshot.cgi|CURLAUTH_DIGEST
 41|Edimax|IC-5150W|/jpg/image.jpg|CURLAUTH_DIGEST
 42|Lupus|LE201|/cgi-bin/mjpg/video.cgi?subtype=1|CURLAUTH_DIGEST
+43|Trendnet|TV-IP315PI|/ISAPI/Streaming/channels/102/picture|CURLAUTH_DIGEST
