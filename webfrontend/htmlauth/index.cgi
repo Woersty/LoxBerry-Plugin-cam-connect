@@ -16,6 +16,7 @@
 use LoxBerry::System;
 use LoxBerry::Web;
 use LoxBerry::Log;
+use LoxBerry::Storage;
 use MIME::Base64;
 use List::MoreUtils 'true','minmax';
 use HTML::Entities;
@@ -39,13 +40,21 @@ my $no_error_template_message	= "<b>Cam-Connect:</b> The error template is not r
 my $version 					= LoxBerry::System::pluginversion();
 my $helpurl 					= "http://www.loxwiki.eu/display/LOXBERRY/Cam-Connect";
 my @pluginconfig_strings 		= ('EMAIL_FILENAME');
-my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_EMAIL_FROM_NAME","CAM_EMAIL_SUBJECT1","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_SUBJECT2","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_SUBJECT3","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_NO_EMAIL_CB","CAM_WATERMARK_CB","CAM_EMAIL_USED_CB","CAM_EMAIL_MULTIPICS","CAM_EMAIL_INLINE_CB");
+my @pluginconfig_cameras 		= ("CAM_HOST_OR_IP","CAM_PORT","CAM_MODEL","CAM_USER","CAM_PASS","CAM_NOTE","CAM_RECIPIENTS","CAM_NAME","CAM_EMAIL_FROM_NAME","CAM_EMAIL_SUBJECT1","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_SUBJECT2","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_SUBJECT3","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE","CAM_IMAGE_RESIZE","CAM_EMAIL_RESIZE","CAM_NO_EMAIL_CB","CAM_WATERMARK_CB","CAM_EMAIL_USED_CB","CAM_EMAIL_MULTIPICS","CAM_EMAIL_INLINE_CB","CAM_SAVE_IMG_USED_CB","FINALSTORAGE","SUBDIR");
 my $cam_model_list				= "";
 my @lines						= [];	
 my $log 						= LoxBerry::Log->new ( name => 'CamConnect', filename => $lbplogdir ."/". $logfile, append => 1 );
 my $plugin_cfg 					= new Config::Simple($lbpconfigdir . "/" . $pluginconfigfile);
 my %Config 						= $plugin_cfg->vars() if ( $plugin_cfg );
 our $error_message				= "";
+my @netshares 					= LoxBerry::Storage::get_netshares();
+my @usbdevices 					= LoxBerry::Storage::get_usbstorage();
+my $localstorage                = $lbpdatadir."/";
+
+my $index = 0;
+$index++ while $netshares[$index]->{NETSHARE_STATE} eq 'Writable' ;
+splice(@netshares, $index, 1);
+
 
 # Logging
 my $plugin = LoxBerry::System::plugindata();
@@ -316,6 +325,9 @@ sub defaultpage
 			print $configfileHandle 'CAM_EMAIL_MULTIPICS'.$last_cam_id.'="10"'."\n";
 			print $configfileHandle 'CAM_WATERMARK_CB'.$last_cam_id."=0\n";
 			print $configfileHandle 'CAM_EMAIL_USED_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'CAM_SAVE_IMG_USED_CB'.$last_cam_id."=0\n";
+			print $configfileHandle 'FINALSTORAGE'.$last_cam_id."=".$localstorage."\n";
+			print $configfileHandle 'SUBDIR'.$last_cam_id."=''\n";
 			print $configfileHandle 'CAM_NOTE'.$last_cam_id.'="'.$L{'CAM_NOTE_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_RECIPIENTS'.$last_cam_id.'="'.$L{'CAM_RECIPIENTS_SUGGESTION'}.'"'."\n";
 			print $configfileHandle 'CAM_MODEL'.$last_cam_id.'=1'."\n";
@@ -352,9 +364,66 @@ sub defaultpage
 		LOGDEB "No delete_cam call. Go ahead";
 	}
 
+	
+
     foreach my $camno (@known_cams)
     {	
 		my %cam;
+		my $nsc=0;
+		my @netshares_converted;
+		my @netshares_plus_subfolder;
+		my @netshares_subdir_subfolder;
+		my @netshares_workdir;
+		my @netshares_for_workdir;
+		foreach my $netshare (@netshares) 
+		{
+			$netshares_plus_subfolder[$nsc]{NETSHARE_SHARENAME} = $netshare->{NETSHARE_SHARENAME};
+			$netshares_plus_subfolder[$nsc]{NETSHARE_SUBFOLDER} = "/".$L{'CC.STORAGE_PREFIX'}.$camno;
+			$netshares_plus_subfolder[$nsc]{NETSHARE_SERVER} 	= $netshare->{NETSHARE_SERVER};
+			$netshares_plus_subfolder[$nsc]{NETSHARE_SHAREPATH} = $netshare->{NETSHARE_SHAREPATH}."+";
+
+			$netshares_subdir_subfolder[$nsc]{NETSHARE_SHARENAME} = $netshare->{NETSHARE_SHARENAME};
+			$netshares_subdir_subfolder[$nsc]{NETSHARE_SUBFOLDER} = "/".$L{"CC.CAM_SAVE_SUGGEST_SUBDIR_TEXT"}."/".$L{'CC.STORAGE_PREFIX'}.$camno;
+			$netshares_subdir_subfolder[$nsc]{NETSHARE_SERVER} 	= $netshare->{NETSHARE_SERVER};
+			$netshares_subdir_subfolder[$nsc]{NETSHARE_SHAREPATH} = $netshare->{NETSHARE_SHAREPATH}."~";
+
+			$netshares_for_workdir[$nsc]{NETSHARE_SHARENAME} = $netshare->{NETSHARE_SHARENAME};
+			$netshares_for_workdir[$nsc]{NETSHARE_SERVER} 	= $netshare->{NETSHARE_SERVER};
+			$netshares_for_workdir[$nsc]{NETSHARE_SHAREPATH} = $netshare->{NETSHARE_SHAREPATH};
+			$nsc++;
+		}
+		push(@netshares_converted, @netshares);
+		push(@netshares_converted, @netshares_plus_subfolder);
+		push(@netshares_converted, @netshares_subdir_subfolder);
+		push(@netshares_workdir, @netshares_for_workdir);
+
+		my $udc=0;
+		my @usbdevices_converted;
+		my @usbdevices_plus_subfolder;
+		my @usbdevices_subdir_subfolder;
+		my @usbdevices_workdir;
+		my @usbdevices_for_workdir;
+		foreach my $usbdevice (@usbdevices) 
+		{
+			$usbdevices_plus_subfolder[$udc]{USBSTORAGE_DEVICE} 	= $usbdevice->{USBSTORAGE_DEVICE};
+			$usbdevices_plus_subfolder[$udc]{USBSTORAGE_SUBFOLDER} 	= $L{'CC.STORAGE_PREFIX'}.$camno;
+			$usbdevices_plus_subfolder[$udc]{USBSTORAGE_NO} 	 	= $usbdevice->{USBSTORAGE_NO};
+			$usbdevices_plus_subfolder[$udc]{USBSTORAGE_DEVICEPATH} = $usbdevice->{USBSTORAGE_DEVICEPATH}."+";
+
+			$usbdevices_subdir_subfolder[$udc]{USBSTORAGE_DEVICE} 	= $usbdevice->{USBSTORAGE_DEVICE};
+			$usbdevices_subdir_subfolder[$udc]{USBSTORAGE_SUBFOLDER}= $L{"CC.CAM_SAVE_SUGGEST_SUBDIR_TEXT"}."/".$L{'CC.STORAGE_PREFIX'}.$camno;
+			$usbdevices_subdir_subfolder[$udc]{USBSTORAGE_NO} 	 	= $usbdevice->{USBSTORAGE_NO};
+			$usbdevices_subdir_subfolder[$udc]{USBSTORAGE_DEVICEPATH} = $usbdevice->{USBSTORAGE_DEVICEPATH}."~";
+
+			$usbdevices_for_workdir[$udc]{USBSTORAGE_DEVICE} 	= $usbdevice->{USBSTORAGE_DEVICE};
+			$usbdevices_for_workdir[$udc]{USBSTORAGE_NO} 	 	= $usbdevice->{USBSTORAGE_NO};
+			$usbdevices_for_workdir[$udc]{USBSTORAGE_DEVICEPATH} = $usbdevice->{USBSTORAGE_DEVICEPATH};
+			$udc++;
+		}
+		push(@usbdevices_converted, @usbdevices);
+		push(@usbdevices_converted, @usbdevices_plus_subfolder);
+		push(@usbdevices_converted, @usbdevices_subdir_subfolder);
+		push(@usbdevices_workdir, @usbdevices_for_workdir);
 
 		my @fill_suggestions = ("CAM_EMAIL_SUBJECT1","CAM_EMAIL_SUBJECT2","CAM_EMAIL_SUBJECT3","CAM_EMAIL_DATE_FORMAT","CAM_EMAIL_TIME_FORMAT","CAM_EMAIL_BODY","CAM_EMAIL_SIGNATURE");
     	foreach my $suggestion_field (@fill_suggestions)
@@ -383,7 +452,15 @@ sub defaultpage
 		$cam{CAM_IMAGE_RESIZE} 		= $plugin_cfg->param("CAM_IMAGE_RESIZE".$camno);
 		$cam{CAM_EMAIL_RESIZE} 		= $plugin_cfg->param("CAM_EMAIL_RESIZE".$camno);
 		$cam{CAM_EMAIL_MULTIPICS} 	= $plugin_cfg->param("CAM_EMAIL_MULTIPICS".$camno);
-		foreach my $cam_parameter_to_process ('CAM_NO_EMAIL_CB','CAM_EMAIL_INLINE_CB','CAM_WATERMARK_CB','CAM_EMAIL_USED_CB')
+
+		$cam{'NETSHARES'} 				= \@netshares_converted;
+		$cam{'USBDEVICES'} 				= \@usbdevices_converted;
+		$cam{'LOCALSTORAGE'} 			= $localstorage;
+		$cam{'LOCALSTORAGENAME'} 		= $localstorage.$L{'CC.STORAGE_PREFIX'}.$camno;
+		$cam{'SUBDIR'}					= $plugin_cfg->param("SUBDIR".$camno);
+		$cam{'FINALSTORAGE'}			= $plugin_cfg->param("FINALSTORAGE".$camno);
+		
+		foreach my $cam_parameter_to_process ('CAM_NO_EMAIL_CB','CAM_EMAIL_INLINE_CB','CAM_WATERMARK_CB','CAM_EMAIL_USED_CB','CAM_SAVE_IMG_USED_CB')
 		{
 			if ( int($plugin_cfg->param($cam_parameter_to_process . $camno)) eq 1 ) 
 			{

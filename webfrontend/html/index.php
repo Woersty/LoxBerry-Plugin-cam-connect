@@ -2,7 +2,6 @@
 #####################################################################################################
 # Loxberry Plugin to change the HTTP-Authentication of a Trendnet TV-IP310PI Surveillance IP-Cam
 # from Digest to none to be used in the Loxone Door-Control-Object.
-# Version: 27.12.2018 16:56:06
 #####################################################################################################
 
 // Error Reporting off
@@ -565,6 +564,106 @@ list($picture ,$resized_picture ) = main();
 		if (isset($plugin_cfg['CAM_NO_EMAIL_CB'.$cam])) debug("CFG parameter 'CAM_NO_EMAIL_CB' is: ".$plugin_cfg['CAM_NO_EMAIL_CB'.$cam],7);
 	}
 
+
+	debug("############# Archive Part reached ####################",7);
+
+	debug("Check if archiving is enabled",7);
+	if ( $plugin_cfg['CAM_SAVE_IMG_USED_CB'.$cam] == 1 )
+	{
+		debug($L["ERRORS.ERROR_ARCHIVING_INFO"],5);
+		if (isset($plugin_cfg['FINALSTORAGE'.$cam])) 
+		{
+			$default_finalstorage	= $lbpdatadir."/";        # Default localstorage
+			$finalstorage           = $plugin_cfg["FINALSTORAGE".$cam];
+			$temp_finalstorage 		= $finalstorage;
+
+			#Check if final target is on an external storage like SMB or USB
+			if (strpos($finalstorage, '/system/storage/') !== false) 
+			{                                       
+				#Yes, is on an external storage 
+				#Check if subdir must be appended
+				if (substr($finalstorage, -1) == "+")
+				{
+					$temp_finalstorage = substr($finalstorage,0, -1);
+					exec("mountpoint '".$temp_finalstorage."' ", $retArr, $retVal);
+					if ( $retVal == 0 )
+					{
+						debug($L["ERRORS.INF_VALID_MOUNTPOINT"]." (".$temp_finalstorage.")",6);
+						$finalstorage = $temp_finalstorage."/".$L["CC.STORAGE_PREFIX"].$cam;
+					}
+					else
+					{
+						debug($L["ERRORS.ERROR_INVALID_MOUNTPOINT"]." ".$temp_finalstorage,3);
+					}
+				}
+				else if (substr($finalstorage, -1) == "~")
+				{
+					$temp_finalstorage = substr($finalstorage,0, -1);
+					exec("mountpoint '".$temp_finalstorage."' ", $retArr, $retVal);
+					if ( $retVal == 0 )
+					{
+						debug($L["ERRORS.INF_VALID_MOUNTPOINT"]." (".$temp_finalstorage.")",6);
+						$finalstorage = $temp_finalstorage."/".$plugin_cfg["SUBDIR".$cam]."/".$L["CC.STORAGE_PREFIX"].$cam;
+					}
+					else
+					{
+						debug($L["ERRORS.ERROR_INVALID_MOUNTPOINT"]." ".$temp_finalstorage,3);
+					}
+				}
+				else
+				{
+					exec("mountpoint '".$finalstorage."' ", $retArr, $retVal);
+					if ( $retVal == 0 )
+					{
+						debug($L["ERRORS.INF_VALID_MOUNTPOINT"]." (".$finalstorage.")",6);
+					}
+					else
+					{
+						debug($L["ERRORS.ERROR_INVALID_MOUNTPOINT"]." ".$finalstorage,3);
+					}
+				} 
+			}
+			if (!is_dir($finalstorage)) 
+			{
+				debug($L["ERRORS.ERROR_DIR_NOT_FOUND_TRY_CREATE"],4);
+				$resultarray = array();
+				@exec("mkdir -v -p '".$finalstorage."' 2>&1",$resultarray,$retval);
+				debug(implode("\n",$resultarray));
+			}
+			if (!is_writable($finalstorage))
+			{
+				debug($L["ERRORS.ERROR_DIR_NOT_WRITABLE"],3);
+			}
+			else
+			{
+				$targetfile = str_ireplace("<datetime>",date($L["CONFIG.DATETIME_FORMAT_PHP"]),str_ireplace("<cam>",$cam,$L["CONFIG.FILENAME_FORMAT_PHP"])).".jpg";
+				debug($L["ERRORS.ERROR_DIR_OK"].$targetfile,6);	
+				if ( !file_put_contents($finalstorage."/".$targetfile, $picture) )
+				{
+					debug($L["ERRORS.ERROR_DIR_NOT_WRITABLE"],3);
+				}
+				else
+				{
+					debug($L["ERRORS.ERROR_ARCHIVING_OK"]." (".$targetfile.")",5);
+				}
+			}
+			
+
+
+		}
+		else
+		{
+			debug($L["ERRORS.ERROR_ARCHIVING_TARGET_DIR_CONFIG"],3);	
+		}
+
+
+		
+	}
+	else
+	{
+		debug("Do not archiving the image because 'CAM_SAVE_IMG_USED_CB' is not set in config.",7);
+		if (isset($plugin_cfg['CAM_SAVE_IMG_USED_CB'.$cam])) debug("CFG parameter 'CAM_SAVE_IMG_USED_CB' is: ".$plugin_cfg['CAM_SAVE_IMG_USED_CB'.$cam],7);
+	}
 
 debug($L["ERRORS.ERROR_EXIT_PLUGIN_INFO"]."\n+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + ",5);
 exit;
