@@ -15,14 +15,23 @@ ini_set("log_errors", 1);
 ini_set("error_log", $lbplogdir."/cam_connect.log");
 
 $datetime    = new DateTime;
+if (isset($_GET['cam']))
+{
+	$cam=intval($_GET['cam']);
+}
+else
+{
+	unset($cam);
+}
+	
 function debug($message = "", $loglevel = 7, $raw = 0)
 {
-	global $L,$plugindata;
+	global $L,$plugindata,$cam;
 	if ( $plugindata['PLUGINDB_LOGLEVEL'] >= intval($loglevel)  || $loglevel == 8 )
 	{
-		if (isset($_GET['cam']))
+		if (isset($cam))
 		{
-			$camprefix="Cam #".intval($_GET['cam']).": ";
+			$camprefix="Cam #".$cam.": ";
 		}
 		else
 		{
@@ -96,6 +105,7 @@ else
 {
   debug("No plugin config file handle found.",7);
   error_image($L["ERRORS.ERROR_READING_CFG"]);
+  exit;
 }
 debug($L["ERRORS.ERROR_ENTER_PLUGIN"]." ".$_SERVER['REMOTE_ADDR']."\n+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + ",5);
 debug("Check Logfile size: ".LBPLOGDIR."/cam_connect.log",7);
@@ -112,14 +122,29 @@ else
 	debug("Logfile size is ok: ".$logsize,7);
 }
 
-if (isset($_GET['cam']))
+if (isset($_GET['alarm'])) 
 {
-	$cam=intval($_GET['cam']);
+	$alarms=explode(",",$_GET['alarm']);
+}
+else
+{
+	$alarms=array();
+}
+alarm_loop:
+if ( count($alarms) >= 1 )
+{
+	$cam = array_shift($alarms);
+	debug("Got Alarm for Cam ".$cam,7);
+}
+
+if (isset($cam))
+{
     debug("Camera $cam requested.",7);
 }
 else
 {
 	error_image($L["ERRORS.ERROR_NO_CAM_PARAMETER"]);
+	exit;
 }
 
 $camera_models_file = LBPDATADIR."/camera_models.dat";
@@ -127,7 +152,16 @@ debug("Read cameras from ".$camera_models_file,7);
 $lines_of_text = file ( $camera_models_file );
 
   
-  (isset($plugin_cfg['CAM_MODEL'.$cam]))?$cam_model=intval($plugin_cfg['CAM_MODEL'.$cam]):error_image($L["ERRORS.ERROR_READING_CAM_MODEL"]);
+  if (isset($plugin_cfg['CAM_MODEL'.$cam]))
+  {
+	  $cam_model=intval($plugin_cfg['CAM_MODEL'.$cam]);
+	  
+  }
+  else
+  {
+	  error_image($L["ERRORS.ERROR_READING_CAM_MODEL"]);
+	  goto alarm_loop;
+  }
   debug("Camera model for camera $cam is ".$cam_model,7);
 
   foreach ($lines_of_text as $line_num => $line_of_text) 
@@ -159,6 +193,7 @@ $lines_of_text = file ( $camera_models_file );
   if ( $plugin_cfg['model'] == "" || $plugin_cfg['httpauth'] == "" || $plugin_cfg['imagepath'] == "" )
   {      
   	error_image($L["ERRORS.ERROR_READING_CAMS"]);
+	goto alarm_loop;
   }
 
 # Check for deprecated values
@@ -205,6 +240,7 @@ if ($plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1)
   {
      debug("Can't read eMail config",7);
      error_image($L["ERRORS.ERROR_READING_EMAIL_CFG"]);
+	 exit;
   }
   else
   {
@@ -213,6 +249,7 @@ if ($plugin_cfg['CAM_EMAIL_USED_CB'.$cam] == 1)
     {
      debug("eMail ist not activated: SMTP.ACTIVATE_MAIL is 0",7);
      error_image($L["ERRORS.ERROR_INVALID_EMAIL_CFG"]);
+	 exit;
     }
   }
 }
@@ -235,6 +272,7 @@ else
 if (!isset($plugin_cfg['CAM_HOST_OR_IP'.$cam]))
 {
      error_image($L["ERRORS.ERROR_INVALID_HOST_OR_IP_CFG"]);
+	 goto alarm_loop;
 }
 else
 {
@@ -242,6 +280,7 @@ else
 	if ( $return_var != 0 )
 	{
 		error_image($L["ERRORS.ERROR_PING_ERR_HOST_OR_IP"]." ".$plugin_cfg['CAM_HOST_OR_IP'.$cam]);
+		goto alarm_loop;
 	}
 }
 
@@ -258,6 +297,7 @@ function get_image($retry=0)
 	$retry=intval($retry);
 	debug("Function get_image called ($retry) for camera $cam with hostname/IP: ".$plugin_cfg['CAM_HOST_OR_IP'.$cam],7);
     $curl = curl_init() or error_image($L["ERRORS.ERROR_INIT_CURL"]);
+	if ($curl === FALSE ) return;
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($curl, CURLOPT_HTTPAUTH, constant($plugin_cfg['httpauth']));
 	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
@@ -330,6 +370,7 @@ function get_image($retry=0)
 	{
 	  debug($L["ERRORS.ERROR_IMAGE_TOO_SMALL"]."\n".htmlentities($picture),5);
 	  error_image($L["ERRORS.ERROR_IMAGE_TOO_SMALL"]."\n".$picture);
+	  return false;
 	}
 	else
 	{
@@ -340,7 +381,7 @@ function get_image($retry=0)
 
 function stream()
 {
-	#global $plugin_cfg, $curl, $lbpplugindir, $L, $cam;
+	global $plugin_cfg, $curl, $lbpplugindir, $L, $cam;
    		debug("Check if stream parameter '&stream' from URL was provided",7);
 		    debug("Yes, looping the picture as mjpeg_stream.",7);
 			$boundary = "mjpeg_stream";
@@ -423,7 +464,12 @@ function main()
     debug("Parameter CAM_WATERMARK_CB is set to 1 so I have to put the overlay LoxBerry on it",7);
 	$watermarkfile = LBPHTMLDIR."/watermark.png";
     debug("The overlay file will be: ".$watermarkfile,7);
-    $watermarked_picture = imagecreatefromstring($picture) or error_image($L["ERRORS.ERROR_CREATE_WATERMARK_UNDERLAY"]);
+    $watermarked_picture = imagecreatefromstring($picture);
+	if ( $watermarked_picture === false ) 
+	{
+		error_image($L["ERRORS.ERROR_CREATE_WATERMARK_UNDERLAY"]);
+		return false;
+	}
     list($ix, $iy, $type, $attr) = getimagesizefromstring($picture);
     if ($type <> 2) error_image($L["ERRORS.ERROR_BAD_WATERMARK_IMAGETYPE"]);
     debug("Reading watermark.png into variable and applying overlay to camera image.",7);
@@ -665,12 +711,20 @@ list($picture ,$resized_picture ) = main();
 		if (isset($plugin_cfg['CAM_SAVE_IMG_USED_CB'.$cam])) debug("CFG parameter 'CAM_SAVE_IMG_USED_CB' is: ".$plugin_cfg['CAM_SAVE_IMG_USED_CB'.$cam],7);
 	}
 
+
+if ( count($alarms) >= 1 ) 
+{
+		debug("Remaining Alarms: ".count($alarms),7);
+		unset($cam);
+		goto alarm_loop;
+}
+
 debug($L["ERRORS.ERROR_EXIT_PLUGIN_INFO"]."\n+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + ",5);
 exit;
 
 function error_image ($error_msg)
 {
-  global $L, $plugin_cfg, $plugindata;
+  global $L, $plugin_cfg, $plugindata, $cam;
   if (strlen($error_msg) > 0)
   {
   	$error_msg=$error_msg;
@@ -720,13 +774,14 @@ function error_image ($error_msg)
 	}
   ImageDestroy($error_image);
   debug("Exit plugin in function error_image",7);
-  exit;
+  unset($cam);
+  return;
 }
 
 function send_mail_pic($picture)
 {
   debug("Function send_mail_pic reached",7);
-  global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $L, $cam, $plugindata;
+  global $datetime, $plugin_cfg, $cam_name, $mail_cfg, $L, $cam, $plugindata, $alarms;
   
 	// Prevent sending eMails as long as stream is read from Miniserver
 	// 10 s delay minimum
@@ -747,7 +802,8 @@ function send_mail_pic($picture)
 				debug( "Lockfile $lockfilename was changed ". ($datetime->getTimestamp() - filectime($lockfilename)) ." seconds ago. Not old enough, keeping it, refresh it, and send no eMail." ,7);
 			    $handle = fopen($lockfilename, "w") or debug($L["ERRORS.ERROR_OPEN_LOCKFILE_EMAIL"]." ".$lockfilename,3);
 			    fwrite($handle, $datetime->getTimestamp() ) or debug($L["ERRORS.ERROR_WRITE_LOCKFILE_EMAIL"]." ".$lockfilename,3);
-				exit;
+				unset($cam);
+				return false;
 			}
 		}
 	} 
@@ -797,7 +853,15 @@ function send_mail_pic($picture)
           debug("Abort recipients manipulation.",7);
     	}
       }
-  $emailSubject = utf8_decode($cam_name.$plugin_cfg["CAM_EMAIL_SUBJECT1".$cam]." ".$datetime->format($plugin_cfg["CAM_EMAIL_DATE_FORMAT".$cam])." ".$plugin_cfg["CAM_EMAIL_SUBJECT2".$cam]." ".$datetime->format($plugin_cfg["CAM_EMAIL_TIME_FORMAT".$cam])." ".$plugin_cfg["CAM_EMAIL_SUBJECT3".$cam]);
+  
+	if ( isset($alarms) )
+	{
+		$emailSubject = utf8_decode($cam_name.$datetime->format($plugin_cfg["CAM_EMAIL_DATE_FORMAT".$cam])." ".$datetime->format($plugin_cfg["CAM_EMAIL_TIME_FORMAT".$cam]));
+	}
+	else
+	{
+		$emailSubject = utf8_decode($cam_name.$plugin_cfg["CAM_EMAIL_SUBJECT1".$cam]." ".$datetime->format($plugin_cfg["CAM_EMAIL_DATE_FORMAT".$cam])." ".$plugin_cfg["CAM_EMAIL_SUBJECT2".$cam]." ".$datetime->format($plugin_cfg["CAM_EMAIL_TIME_FORMAT".$cam])." ".$plugin_cfg["CAM_EMAIL_SUBJECT3".$cam]);
+	}
   debug("Building eMail subject: ".$emailSubject,7);
 
 debug("Check for parameter CAM_EMAIL_MULTIPICS in config: ".$plugin_cfg['CAM_EMAIL_MULTIPICS'.$cam],7);
@@ -818,10 +882,10 @@ $htmlpic="";
 $mailTo = substr($mailTo,0,-1);
 
 debug($L["ERROR_SEND_MAIL_INFO"]." From: ".$mailFromName.htmlentities(" <".$mailFrom."> ")." To: ".$mailTo,5);
-
+( isset($alarms) )?$alarm="=E2=9D=97".$L["CC.ALARM"]."=E2=9D=97":$alarm="";
 $html = "From: ".$mailFromName." <".$mailFrom.">
 To: ".$mailTo."
-Subject: ".utf8_encode($emailSubject)." 
+Subject: =?utf-8?Q? ".$alarm." ".utf8_encode($emailSubject)." ?= 
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
  boundary=\"------------".$outer_boundary."\"

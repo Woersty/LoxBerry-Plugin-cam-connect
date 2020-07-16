@@ -308,30 +308,30 @@ sub defaultpage
 	if ( $R::create_cam )
 	{
 		LOGDEB "Oh, it's a create_cam call. ";
+		sleep (4);
+		my $last_cam_id = $last_cam_id + 1;
 		LOGDEB "Create new camera: ".$last_cam_id;
 		$error_message = $ERR{'ERRORS.ERR_CREATE_CONFIG_FILE'};
 		open my $configfileHandle, ">>", $lbpconfigdir . "/" . $pluginconfigfile or &error;
-			my $last_cam_id = $last_cam_id + 1;
-			print $configfileHandle 'CAM_IMAGE_RESIZE'.$last_cam_id.'=9999'."\n";
-			print $configfileHandle 'CAM_EMAIL_RESIZE'.$last_cam_id.'=9999'."\n";
-			print $configfileHandle 'CAM_HOST_OR_IP'.$last_cam_id.'="'.$L{'CAM_HOST_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_PORT'.$last_cam_id.'="'.$L{'CAM_PORT_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_USER'.$last_cam_id.'="'.$L{'CAM_USER_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_PASS'.$last_cam_id.'=""'."\n";
-			print $configfileHandle 'CAM_NAME'.$last_cam_id.'="'.$L{'CAM_NAME_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_EMAIL_FROM_NAME'.$last_cam_id.'="'.$L{'CAM_EMAIL_FROM_NAME_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_NO_EMAIL_CB'.$last_cam_id."=0\n";
-			print $configfileHandle 'CAM_EMAIL_INLINE_CB'.$last_cam_id."=0\n";
-			print $configfileHandle 'CAM_EMAIL_MULTIPICS'.$last_cam_id.'="10"'."\n";
-			print $configfileHandle 'CAM_WATERMARK_CB'.$last_cam_id."=0\n";
-			print $configfileHandle 'CAM_EMAIL_USED_CB'.$last_cam_id."=0\n";
-			print $configfileHandle 'CAM_SAVE_IMG_USED_CB'.$last_cam_id."=0\n";
-			print $configfileHandle 'FINALSTORAGE'.$last_cam_id."=".$localstorage."\n";
-			print $configfileHandle 'SUBDIR'.$last_cam_id."=''\n";
-			print $configfileHandle 'CAM_NOTE'.$last_cam_id.'="'.$L{'CAM_NOTE_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_RECIPIENTS'.$last_cam_id.'="'.$L{'CAM_RECIPIENTS_SUGGESTION'}.'"'."\n";
-			print $configfileHandle 'CAM_MODEL'.$last_cam_id.'=1'."\n";
+			print $configfileHandle 'CAM_IMAGE_RESIZE'.$last_cam_id.'=9999'."\n".'CAM_EMAIL_RESIZE'.$last_cam_id.'=9999'."\n".'CAM_HOST_OR_IP'.$last_cam_id.'="'.$L{'CAM_HOST_SUGGESTION'}.'"'."\n"
+			.'CAM_PORT'.$last_cam_id.'="'.$L{'CAM_PORT_SUGGESTION'}.'"'."\n"
+			.'CAM_USER'.$last_cam_id.'="'.$L{'CAM_USER_SUGGESTION'}.'"'."\n"
+			.'CAM_PASS'.$last_cam_id.'=""'."\n"
+			.'CAM_NAME'.$last_cam_id.'="'.$L{'CAM_NAME_SUGGESTION'}.'"'."\n"
+			.'CAM_EMAIL_FROM_NAME'.$last_cam_id.'="'.$L{'CAM_EMAIL_FROM_NAME_SUGGESTION'}.'"'."\n"
+			.'CAM_NO_EMAIL_CB'.$last_cam_id."=0\n"
+			.'CAM_EMAIL_INLINE_CB'.$last_cam_id."=0\n"
+			.'CAM_EMAIL_MULTIPICS'.$last_cam_id.'="10"'."\n"
+			.'CAM_WATERMARK_CB'.$last_cam_id."=0\n"
+			.'CAM_EMAIL_USED_CB'.$last_cam_id."=0\n"
+			.'CAM_SAVE_IMG_USED_CB'.$last_cam_id."=0\n"
+			.'FINALSTORAGE'.$last_cam_id."=".$localstorage."\n"
+			.'SUBDIR'.$last_cam_id."=''\n"
+			.'CAM_NOTE'.$last_cam_id.'="'.$L{'CAM_NOTE_SUGGESTION'}.'"'."\n"
+			.'CAM_RECIPIENTS'.$last_cam_id.'="'.$L{'CAM_RECIPIENTS_SUGGESTION'}.'"'."\n"
+			.'CAM_MODEL'.$last_cam_id.'=1'."\n";
 		close $configfileHandle;
+		sleep (4);
 		print "Content-Type: text/plain\n\n";
 		print "OK\n";
 		exit;
