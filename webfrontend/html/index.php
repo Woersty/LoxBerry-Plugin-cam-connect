@@ -854,7 +854,7 @@ function send_mail_pic($picture)
     	}
       }
   
-	if ( isset($alarms) )
+	if ( isset($alarms) && isset($_GET['alarm']) )
 	{
 		$emailSubject = utf8_decode($cam_name.$datetime->format($plugin_cfg["CAM_EMAIL_DATE_FORMAT".$cam])." ".$datetime->format($plugin_cfg["CAM_EMAIL_TIME_FORMAT".$cam]));
 	}
@@ -882,7 +882,7 @@ $htmlpic="";
 $mailTo = substr($mailTo,0,-1);
 
 debug($L["ERROR_SEND_MAIL_INFO"]." From: ".$mailFromName.htmlentities(" <".$mailFrom."> ")." To: ".$mailTo,5);
-( isset($alarms) )?$alarm="=E2=9D=97".$L["CC.ALARM"]."=E2=9D=97":$alarm="";
+( isset($alarms) && isset($_GET['alarm']) )?$alarm="=E2=9D=97".$L["CC.ALARM"]."=E2=9D=97":$alarm="";
 $html = "From: ".$mailFromName." <".$mailFrom.">
 To: ".$mailTo."
 Subject: =?utf-8?Q? ".$alarm." ".utf8_encode($emailSubject)." ?= 
