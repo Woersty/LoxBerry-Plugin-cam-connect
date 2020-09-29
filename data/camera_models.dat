@@ -41,3 +41,4 @@
 42|Lupus|LE201|/cgi-bin/mjpg/video.cgi?subtype=1|CURLAUTH_DIGEST
 43|Trendnet|TV-IP315PI|/ISAPI/Streaming/channels/102/picture|CURLAUTH_DIGEST
 44|Instar|IN-8003|/tmpfs/snap.jpg|CURLAUTH_DIGEST
+45|SONY|SNC-CH180|/oneshotimage.jpg|CURLAUTH_DIGEST
